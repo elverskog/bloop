@@ -1,0 +1,27 @@
+//import css from "css";
+//import autoprefixer from "autoprefixer";
+
+import {getAllFiles} from "./src/utils/dir-utils.mjs";
+import {fileURLToPath} from 'url';
+import path from 'path';
+import fs from "fs";
+
+import postcss from "postcss";
+
+export function parseCSS() {
+  const __filename = fileURLToPath(import.meta.url);
+  global.__basedir = path.dirname(__filename);
+  
+  const cssFileNamesArray = getAllFiles(`${__basedir}/src/components`, "css")
+  let cssFilesString = "/* /dist/css/styles.css */";
+  
+  cssFileNamesArray.forEach( fileName => {
+    const file = fs.readFileSync(fileName);
+    cssFilesString = `${cssFilesString} \n\n ${file}`;
+  })
+
+  const processedCSS = postcss.parse(cssFilesString);
+
+  fs.writeFileSync(`${__basedir}/dist/css/styles.css`, cssFilesString);
+  
+}

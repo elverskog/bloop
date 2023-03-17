@@ -1,0 +1,19 @@
+{
+  "name": "raw-pouch-test",
+  "description": "Bare bones JS to test isomorphic use of pouchdb",
+  "version": "0.1.0",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "http": "^0.0.1-security"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "nodemon --watch ./src -e css,mjs --experimental-network-imports -r dotenv/config server.mjs",
+    "start_bak": "node ./server.mjs"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.7",
+    "postcss": "^8.4.14",
+    "postcss-nesting": "^10.2.0"
+  }
+}

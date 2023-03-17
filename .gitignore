@@ -1,0 +1,47 @@
+#editor/IDE specific
+/.idea
+/.vscode
+#/.editorconfig
+
+## testing
+/coverage/
+
+## temp folders
+/.tmp/
+
+# build
+/_site/
+/dist/
+/out-tsc/
+/build/
+
+# notes
+/notes
+notes
+notes.txt
+
+## system files
+.DS_Store
+Thumbs.db
+
+##swaps and logs
+*.swp
+*.swo
+*.log
+
+#node modules
+/node_modules
+node_modules
+
+#DB or session files
+/sessions
+sessions
+
+#environment files
+/.env
+.env
+*.env
+
+#database files
+/rawtest
+rawtest
