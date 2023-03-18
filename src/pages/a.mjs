@@ -16,12 +16,19 @@ export default async function home() {
       <div id="a" class="a">
         This is A
       </div>    
-    `
+    `,
+    script: {
+      init: function() {
+        if(typeof window === "object") {
+          console.log("INIT A");
+        }
+      } 
+    } 
   }
 
   //add result to hopper
   if(p_p?.isServer) {
-    await p_p.manageHopper.addToHopper(result, "home");
+    await p_p.manageHopper.addToHopper(result, "a");
   }
 
   return result;

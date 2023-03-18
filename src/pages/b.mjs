@@ -16,7 +16,14 @@ export default async function home() {
       <div id="b" class="b">
         This is B
       </div>    
-    `
+    `,
+    script: {
+      init: function() {
+        if(typeof window === "object") {
+          console.log("INIT B");
+        }
+      } 
+    } 
   }
 
   //add result to hopper

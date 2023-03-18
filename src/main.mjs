@@ -117,35 +117,30 @@ export const moduleOrPageCompiler = async function(options) {
   //and have the pages just act as routers loading, usually, just one module
   //OR of course it will probably use wrapper.mjs
 
-  //if this is a module-only call it and add it to hopper
-  //if it's a full-page call, add the "frame" (head, nav, footer etc)
 
   const isFetch = req?.headers["is-fetch"]
-  const type = isFetch ? "pages" : "components";
-
-  const modulePath = isFetch && req.url === "/" ? "a" : req.url;
+  const modulePath = req.url === "/" ? "/a" : req.url;
   const moduleName = modulePath.split("/").pop();
 
   let bodyMod;
 
-  //if we can't find the module/page that matches the path, return 404 page/module
+  //if we can't find the module/page that matches the path, use a 404 page/module
   try {
-    // bodyMod = (await import(`${__basedir}/src/pages${p_p.req.url}/${fileName}`)).default;
+    console.log("test: ", `${__basedir}/src/pages${modulePath}.mjs`);
     bodyMod = (await import(`${__basedir}/src/pages${modulePath}.mjs`)).default;
   } catch(err) {
     bodyMod = (await import(`${__basedir}/src/pages/fourOhFour.mjs`)).default; 
   }
 
+  //get the body module and add it to hopper
   const bodyRes = await bodyMod();
+  await p_p.manageHopper.addToHopper(await bodyRes, moduleName);
 
-  if(req?.headers["is-fetch"]) {
-    await p_p.manageHopper.addToHopper(await bodyRes, moduleName);
-  } else {
+  //if we got a full page request, we need to pass body into wrapper and add wrapper to hopper
+  if(!isFetch) {
     const wrapperMod = (await import(`${__basedir}/src/components/wrapper.mjs`)).default;
-    await p_p.manageHopper.addToHopper(await wrapperMod(bodyRes.markup), moduleName);
+    await p_p.manageHopper.addToHopper(await wrapperMod(bodyRes.markup), "wrapper");
   }
-
-  //await p_p.manageHopper.addToHopper(await module(), moduleName);
   
   //write page CSS from hopper, for each module
   for(const [key, val] of Object.entries(p_p.hopper.css)) {
