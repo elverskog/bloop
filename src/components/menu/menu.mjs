@@ -12,8 +12,8 @@ export default async function menu() {
     }`,
     markup: `
       <menu class="menu">
-        ${ (await menuItemFunc("Main", "/")).markup }
-        ${ (await menuItemFunc("Log In", "/login")).markup }
+        ${ (await menuItemFunc("A", "/a")).markup }
+        ${ (await menuItemFunc("B", "/b")).markup }
       </menu>
     `
   };

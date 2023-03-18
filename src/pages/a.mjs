@@ -2,7 +2,7 @@ export default async function home() {
 
   const result = {
     css: `
-    .home {
+    .a {
       width: 450px;
       border: 1px solid #ff6666;
       padding: 15px;
@@ -13,8 +13,8 @@ export default async function home() {
   
     }`,
     markup: `
-      <div id="home" class="home">
-        This is home, in pages
+      <div id="a" class="a">
+        This is A
       </div>    
     `
   }

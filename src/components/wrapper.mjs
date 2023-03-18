@@ -1,23 +1,8 @@
-export default async function wrapper() {
+export default async function wrapper(bodyMarkup) {
   
   //get menu module
   const menuMod = (await import(`${__basedir}/src/components/menu/menu.mjs`)).default;
   const menu = await menuMod();
-  
-  //get body module, based on using the URL as a file path
-  const lastDir = p_p.req.url.split("/").pop(); //TODO - I assume the filename repeats the last pathname
-  const fileName = lastDir === "" ? "home/home.mjs" : `${lastDir}.mjs`; //hack to handle homepage
-
-  let bodyMod;
-
-  //if we can't find the module/page that matches the path, return 404 page
-  try {
-    bodyMod = (await import(`${__basedir}/src/pages${p_p.req.url}/${fileName}`)).default; 
-  } catch(err) {
-    bodyMod = (await import(`${__basedir}/src/pages/fourOhFour/fourOhFour.mjs`)).default; 
-  }
-
-  const body = await bodyMod();
 
   //create a script tag for each module used in the page, server-side
   //we have to add this module (wrapper) in manually, as module is added to hopper after the block below
@@ -53,14 +38,11 @@ export default async function wrapper() {
         </head>
         <body id="__body">
           <div>
-            <div id="header">
-              <a href="#">Hamburger</a>
-            </div>
             <div id="menu">
               ${menu.markup}
             </div>
             <div id="body">
-              ${body.markup}
+              ${bodyMarkup}
             </div>
           </div>
         </body>

@@ -3,7 +3,6 @@ import { moduleOrPageCompiler } from "./src/main.mjs";
 import fs from "fs";
 import path from "path";
 import {fileURLToPath} from "url";
-import {getAllDirs} from "./src/utils/dir-utils.mjs";
 
 //for node set a base directory as full path
 //for browser we set it in ./src/components/main.js 
@@ -13,15 +12,6 @@ const __filename = fileURLToPath(import.meta.url);
 global.__basedir = path.dirname(__filename);
 
 const PORT = 3000;
-
-//write a JSON file with the valid /pages directories
-const validDirs = getAllDirs(`${__basedir}/src/pages`, null, __basedir);
-
-try {
-  fs.writeFileSync(`${__basedir}/dist/json/valid-dirs.json`, JSON.stringify(validDirs));
-} catch(err) {
-  console.error(err);
-}
 
 const server = http.createServer(async (req, res) => {
 
@@ -68,10 +58,10 @@ const server = http.createServer(async (req, res) => {
       "Pragma": "no-cache"
     });
 
-    const frameOptions = { req, res, __basedir, validDirs };
-    const frame = await moduleOrPageCompiler(frameOptions);
+    const compilerOptions = { req, res, __basedir };
+    const output = await moduleOrPageCompiler(compilerOptions);
 
-    res.write(frame);
+    res.write(output);
     res.end();
 
   }
