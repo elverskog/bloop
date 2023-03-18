@@ -6,17 +6,18 @@ export default async function menu() {
     css: `
     menu.menu {
       display: flex;
+      justify-content: center;
       font-weight: 400;
       color: #ccccff;
       padding: 0 0 5px;
-      margin: 0;
+      margin: 0 auto;
     }`,
     markup: `
       <menu class="menu">
         ${ (await menuItemFunc("A", "/a")).markup }
         ${ (await menuItemFunc("B", "/b")).markup }
         ${ (await menuItemFunc("C", "/c")).markup }
-        ${ (await menuItemFunc("D", "/d")).markup }
+        ${ (await menuItemFunc("?", "/d")).markup }
       </menu>
     `
   };

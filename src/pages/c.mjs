@@ -3,19 +3,19 @@ export default async function c() {
   const result = {
     title: "C",
     css: `
-    .c {
-      width: 450px;
-      border: 1px solid #ff6666;
-      padding: 15px;
-  
-      & div {
-        padding-bottom: 15px;
+      .c {
+        font-size: 35em;
+        text-align: center;
       }
-  
-    }`,
+      @media (max-width: 30em) {
+        .c {
+          font-size: 20em;
+        }
+      }
+    `,
     markup: `
       <div id="c" class="c">
-        This is C
+        C
       </div>    
     `,
     script: {

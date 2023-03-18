@@ -32,6 +32,16 @@ export default async function wrapper(bodyMarkup, title) {
     css: `
       body {
         font-family: sans;
+        margin: 0;
+      }
+      #wrapper {
+        margin: 0 auto;
+        position: relative;
+        max-width: 640px;
+      }
+      #content {
+        padding: 15px;
+        color: #333;
       }
     `,
     markup: /*html*/`
@@ -44,9 +54,9 @@ export default async function wrapper(bodyMarkup, title) {
           ${cssTags}
         </head>
         <body id="__body">
-          <div>
+          <div id="wrapper">
             ${menu.markup}
-            <div id="body">
+            <div id="content">
               ${bodyMarkup}
             </div>
           </div>
@@ -93,7 +103,7 @@ export default async function wrapper(bodyMarkup, title) {
             if (success) {
               console.log("insert styles succeeded");
               //replace body HTML
-              const targetEl = document.getElementById("body");
+              const targetEl = document.getElementById("content");
               targetEl.innerHTML = resParsed.markup;
               //set page title
               document.title = typeof resParsed.title === "string" ? resParsed.title : "Bloop";

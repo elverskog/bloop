@@ -2,19 +2,19 @@ export default async function a() {
   const result = {
     title: "A",
     css: `
-    .a {
-      width: 450px;
-      border: 1px solid #ff6666;
-      padding: 15px;
-  
-      & div {
-        padding-bottom: 15px;
+      .a {
+        font-size: 35em;
+        text-align: center;
       }
-  
-    }`,
+      @media (max-width: 30em) {
+        .a {
+          font-size: 20em;
+        }
+      }
+    `,
     markup: `
       <div id="a" class="a">
-        This is A
+        A
       </div>    
     `,
     script: {

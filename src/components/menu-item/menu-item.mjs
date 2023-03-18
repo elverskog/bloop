@@ -4,8 +4,19 @@ export default async function menuItem (label, pathname) {
 
   const result = {
     css: `
-    .menu menuitem {
-      margin-right: 10px;
+    .menu menuitem a {
+      margin: 10px;
+      padding: 5px 10px;
+      background-color: #333;
+      color: #fff;
+      display: block;
+      font-weight: 600;
+
+      & a.active {
+        background-color: #666;
+      }
+
+
     }`,
     markup: `
       <menuitem>

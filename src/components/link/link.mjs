@@ -6,6 +6,7 @@ export default async function link (label, pathname) {
   let html = `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`;
 
   if(typeof window === "object") {
+    
     // const frag = document.createRange().createContextualFragment(html);
     // frag.addEventListener("click", event => {
     //   event.preventDefault();
@@ -41,14 +42,6 @@ export default async function link (label, pathname) {
     css: `
       a.link {
         text-decoration: none;
-        padding: 5px 10px;
-        background-color: #999;
-        color: #fff;
-        display: block;
-
-        & a.active {
-          background-color: #666;
-        }
       }`,
     markup: html,
     script: {
