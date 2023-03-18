@@ -1,27 +1,33 @@
-export default async function wrapper(bodyMarkup) {
+export default async function wrapper(bodyMarkup, title) {
   
   //get menu module
   const menuMod = (await import(`${__basedir}/src/components/menu/menu.mjs`)).default;
   const menu = await menuMod();
+  const myTitle = typeof title === "string" ? title : "Bloop";
 
-  //create a script tag for each module used in the page, server-side
-  //we have to add this module (wrapper) in manually, as module is added to hopper after the block below
-  let cssTags = `<link id="wrapperStyles" rel="stylesheet" type="text/css" href="/dist/css/wrapper.css" />\n`;
+  //we have to add CSS for wrapper and menu as they are not part of body module stack
+  let cssTags = `
+    <link id="wrapperStyles" rel="stylesheet" type="text/css" href="/dist/css/wrapper.css" />\n
+    <link id="menuStyles" rel="stylesheet" type="text/css" href="/dist/css/menu.css" />\n
+  `;
+
+  //we have to add scripts for wrapper as it are not part of body module stack
   let scriptTags = `<script src="/dist/js/wrapper.js" type="text/javascript"></script>\n`;
 
+  //create a css/link tag for each module used in the page, server-side
   if(Object.keys(p_p.hopper.css).length) {
     Object.keys(p_p.hopper.css).forEach( key => {
       cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`
     })
   }
 
+  //create a script tag for each module used in the page, server-side
   if(Object.keys(p_p.hopper.script).length) {
     Object.keys(p_p.hopper.script).forEach( key => {
       scriptTags += `<script id="${key}Script" src="/dist/js/${key}.js" type="text/javascript"></script>\n`
     })
   }
 
-  // <title>${title}</title>
   const result = {
     css: `
       body {
@@ -32,15 +38,14 @@ export default async function wrapper(bodyMarkup) {
       <!DOCTYPE html>
       <html lang="en">
         <head>
+          <title>${myTitle}</title>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           ${cssTags}
         </head>
         <body id="__body">
           <div>
-            <div id="menu">
-              ${menu.markup}
-            </div>
+            ${menu.markup}
             <div id="body">
               ${bodyMarkup}
             </div>
@@ -90,7 +95,8 @@ export default async function wrapper(bodyMarkup) {
               //replace body HTML
               const targetEl = document.getElementById("body");
               targetEl.innerHTML = resParsed.markup;
-
+              //set page title
+              document.title = typeof resParsed.title === "string" ? resParsed.title : "Bloop";
               //add scripts to head
               insertScripts(resParsed.script, success => {
                 if(success) {

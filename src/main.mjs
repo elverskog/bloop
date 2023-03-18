@@ -26,6 +26,11 @@ export const manageHopper = function() {
       //exit if the moduleResult or moduleName aren't right
       if (typeof moduleResult !== "object" || typeof moduleName !== "string") return;
 
+      //add the title
+      if(typeof moduleResult.title === "string") {
+        p_p.hopper.title = moduleResult.title;
+      }     
+
       //process and add CSS///////////////////////////////////////////////////////
       if(typeof moduleResult.css === "string") {
         const processCSS = (await import(`${__basedir}/src/utils/css-utils.mjs`)).processCSS;
@@ -117,7 +122,6 @@ export const moduleOrPageCompiler = async function(options) {
   //and have the pages just act as routers loading, usually, just one module
   //OR of course it will probably use wrapper.mjs
 
-
   const isFetch = req?.headers["is-fetch"]
   const modulePath = req.url === "/" ? "/a" : req.url;
   const moduleName = modulePath.split("/").pop();
@@ -139,7 +143,7 @@ export const moduleOrPageCompiler = async function(options) {
   //if we got a full page request, we need to pass body into wrapper and add wrapper to hopper
   if(!isFetch) {
     const wrapperMod = (await import(`${__basedir}/src/components/wrapper.mjs`)).default;
-    await p_p.manageHopper.addToHopper(await wrapperMod(bodyRes.markup), "wrapper");
+    await p_p.manageHopper.addToHopper(await wrapperMod(bodyRes.markup, bodyRes.title), "wrapper");
   }
   
   //write page CSS from hopper, for each module

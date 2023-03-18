@@ -1,6 +1,6 @@
-export default async function home() {
-
+export default async function a() {
   const result = {
+    title: "A",
     css: `
     .a {
       width: 450px;
@@ -32,6 +32,5 @@ export default async function home() {
   }
 
   return result;
-
   
 }

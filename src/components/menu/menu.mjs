@@ -8,12 +8,15 @@ export default async function menu() {
       display: flex;
       font-weight: 400;
       color: #ccccff;
-      padding: 0;
+      padding: 0 0 5px;
+      margin: 0;
     }`,
     markup: `
       <menu class="menu">
         ${ (await menuItemFunc("A", "/a")).markup }
         ${ (await menuItemFunc("B", "/b")).markup }
+        ${ (await menuItemFunc("C", "/c")).markup }
+        ${ (await menuItemFunc("D", "/d")).markup }
       </menu>
     `
   };
@@ -26,14 +29,3 @@ export default async function menu() {
   return result;
 
 }
-
-  //   html: `
-    // <menu>
-    //   ${ await formatComponent(menuItem, [ "Main", "/" ]) }
-    //   ${ await formatComponent(menuItem, [ "New Project", "/new" ]) }
-    //   ${ await formatComponent(menuItem, [ "Open Project", "/open" ]) }
-    //   ${ await formatComponent(menuItem, [ "Save Project", "/save" ]) }          
-    //   ${ await formatComponent(menuItem, [ "Save Project As", "/save-as" ]) }
-    //   ${ await formatComponent(menuItem, [ "Log In", "/login" ]) }
-    // </menu>
-  // `

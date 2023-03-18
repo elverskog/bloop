@@ -6,17 +6,6 @@ export default async function menuItem (label, pathname) {
     css: `
     .menu menuitem {
       margin-right: 10px;
-
-      & a {
-        text-decoration: none;
-        padding: 5px 10px;
-        background-color: #999;
-        color: #fff;
-      }
-
-      & a.active {
-        background-color: #666;
-      }
     }`,
     markup: `
       <menuitem>
