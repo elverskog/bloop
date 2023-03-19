@@ -15,7 +15,9 @@ export default async function home() {
     `,
     markup: `
       <div class="fourOhFour">
-        This page cannot be found: 404
+        This page cannot be found
+        <br> 
+        <strong>404</strong>
       </div>    
     `
   }

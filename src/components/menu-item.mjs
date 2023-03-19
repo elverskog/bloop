@@ -1,23 +1,36 @@
 export default async function menuItem (label, pathname) {
 
-  const link = await (await import(`${p_p.baseDir}/src/components/link/link.mjs`)).default(label, pathname);
+  const link = await (await import(`${p_p.baseDir}/src/components/link.mjs`)).default(label, pathname);
 
   const result = {
     css: `
-    .menu menuitem a {
-      margin: 10px;
-      padding: 5px 10px;
-      background-color: #333;
-      color: #fff;
-      display: block;
-      font-weight: 600;
+      .menu menuitem a {
+        margin: 10px;
+        background-color: #333;
+        color: #fff;
+        display: block;
+        font-size: 1em;
+        font-weight: 600;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
 
-      & a.active {
-        background-color: #666;
+        & a.active {
+          background-color: #666;
+        }
+
       }
-
-
-    }`,
+      @media(max-width: 30em) {
+        .menu menuitem a {
+          font-size: 0.75em;
+          width: 35px;
+          height: 35px;
+          line-height: 35px;
+        }
+      }
+    `,
     markup: `
       <menuitem>
         ${ link.markup }

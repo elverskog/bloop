@@ -1,6 +1,6 @@
 export default async function menu() {
 
-  const menuItemFunc = (await import(`${p_p.baseDir}/src/components/menu-item/menu-item.mjs`)).default;
+  const menuItemFunc = (await import(`${p_p.baseDir}/src/components/menu-item.mjs`)).default;
 
   const result = {
     css: `

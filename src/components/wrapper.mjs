@@ -1,7 +1,7 @@
 export default async function wrapper(bodyMarkup, title) {
   
   //get menu module
-  const menuMod = (await import(`${__basedir}/src/components/menu/menu.mjs`)).default;
+  const menuMod = (await import(`${__basedir}/src/components/menu.mjs`)).default;
   const menu = await menuMod();
   const myTitle = typeof title === "string" ? title : "Bloop";
 
