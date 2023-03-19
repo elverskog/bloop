@@ -1,6 +1,7 @@
 import http from "http";
 import { moduleOrPageCompiler } from "./src/main.mjs";
 import fs from "fs";
+import fsExtra from "fs-extra";
 import path from "path";
 import {fileURLToPath} from "url";
 
@@ -12,6 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 global.__basedir = path.dirname(__filename);
 
 const PORT = 3000;
+
+//clear the JS and CSS directories in /src
+//so if in prod mode we don't need to keep writing the files on each page serve
+fsExtra.emptyDirSync(`${__basedir}/dist/css`);
+fsExtra.emptyDirSync(`${__basedir}/dist/js`);
 
 const server = http.createServer(async (req, res) => {
 

@@ -1,6 +1,7 @@
 export default async function home() {
 
-  return {
+  const result = {
+    title: "404",
     css: `
       .fourOhFour {
         font-size: 4em;
@@ -21,5 +22,13 @@ export default async function home() {
       </div>    
     `
   }
+
+
+  //add result to hopper
+  if(p_p?.isServer) {
+    await p_p.manageHopper.addToHopper(result, "fourOhFour");
+  }
+
+  return result;
 
 }
