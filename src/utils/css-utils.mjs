@@ -2,12 +2,20 @@ import postcss from "postcss";
 import autoprefixer from "autoprefixer";
 //import prefixcomponent from "./prefixcomponent.mjs";
 //import PrefixWrap from "postcss-prefixwrap";
+import cssnano from "cssnano";
 import postcssNesting from 'postcss-nesting';
 
 
-export function processCSS(css) {
+export async function processCSS(css) {
   if (!css || typeof css !== "string") return;
-  return postcss([postcssNesting]).process(css).css;
+  //if on prod minify the CSS
+  let result;
+  if(process.env.NODE_ENV === "production") {
+    result = await postcss([cssnano, autoprefixer, postcssNesting]).process(css);
+  } else {
+    result = await postcss([autoprefixer, postcssNesting]).process(css);
+  }
+  return result.css;
 }
 
 

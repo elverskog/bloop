@@ -35,7 +35,7 @@ export const manageHopper = function() {
       //process and add CSS///////////////////////////////////////////////////////
       if(typeof moduleResult.css === "string") {
         const processCSS = (await import(`${__basedir}/src/utils/css-utils.mjs`)).processCSS;
-        p_p.hopper.css[moduleName] = processCSS(moduleResult.css);
+        p_p.hopper.css[moduleName] = await processCSS(moduleResult.css);
       }
 
       //process and add markup////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ export const manageHopper = function() {
         //don't add script if it's module (by key/name) doesn't exist in hopper already
         if(typeof p_p.hopper.script[moduleName] === "undefined") {
 
-          //set var for the stringified list of the functions in the script object
+          //loop through scripts and add a stringified function in the script object, for the given key
           let scripts = "";
                 
           for(const [key, val] of Object.entries(moduleResult.script)) {
@@ -76,6 +76,24 @@ export const manageHopper = function() {
         if(typeof moduleResult.script.init ==="function") {
           const initArgs = typeof moduleResult.initArgs === "object" ? JSON.stringify(moduleResult.initArgs) : "";
           scriptResAll += `\n p_p.${moduleName}.init(${initArgs});` 
+        }
+
+        //minify scriptResAll if on production
+        if(typeof scriptResAll === "string") {
+
+          //handle writing a minified string on prod
+          if(process.env.NODE_ENV === "production") {
+
+            const minifiedscriptResAll = UglifyJS.minify(scriptResAll);
+            //minify the JS before we write it to file, if in prod  
+            if(typeof minifiedscriptResAll.code === "string") {
+              scriptResAll = minifiedscriptResAll.code;
+            } else {
+              console.log("JS minified error", minifiedScript.error);
+            }
+              
+          }
+        
         }
 
         //add script to hopper
@@ -165,30 +183,33 @@ export const moduleOrPageCompiler = async function(options) {
 
       if(typeof val === "string") {
 
-        //handle writing differently on prod vs dev
-        //TODO this could likely be tighter but I want to kee it easy to read 
-        if(process.env.NODE_ENV === "production") {
+        //if on dev always write the file, else check if it already exists
+        if(process.env.NODE_ENV === "development" || !fs.existsSync(`${__basedir}/dist/js/${key}.js`)) {
 
-          //on prod only write the file if it doesn't exist
-          if(!fs.existsSync(`${__basedir}/dist/js/${key}.js`)) {
-
-            const miniVal = UglifyJS.minify(val);
-            //minify the JS before we write it to file, if in prod  
-            if(typeof miniVal.code === "string") {
-              fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, miniVal.code);
-            } else {
-              console.log("JS minified error", miniVal.error);
-            }
-            
-          }
-
-        } else {
-
-          //if on dev always write the file, un-minified
           fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
 
-        }
+          // //on prod only write the file if it doesn't exist
+          // if() {
+
+          //   const miniVal = UglifyJS.minify(val);
+          //   //minify the JS before we write it to file, if in prod  
+          //   if(typeof miniVal.code === "string") {
+          //     fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, miniVal.code);
+          //   } else {
+          //     console.log("JS minified error", miniVal.error);
+          //   }
+            
+          // }
+
+        // } else {
+
+        //   //if on dev always write the file, un-minified
+        //   fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
+
+        // }
       
+        }
+
       }
 
     }
