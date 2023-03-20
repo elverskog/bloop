@@ -162,16 +162,35 @@ export const moduleOrPageCompiler = async function(options) {
 
   if(Object.keys(p_p.hopper.script).length) {
     for(const [key, val] of Object.entries(p_p.hopper.script)) {
-      const fileExists = fs.existsSync(`${__basedir}/dist/js/${key}.js`);
-      if(typeof val === "string" && (!fileExists || process.env.NODE_ENV)) {
-        //minify the JS before we write it to file
-        var minifiedVal = UglifyJS.minify(val);
-        if(typeof minifiedVal.code === "string") {
-          fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, minifiedVal.code);
+
+      if(typeof val === "string") {
+
+        //handle writing differently on prod vs dev
+        //TODO this could likely be tighter but I want to kee it easy to read 
+        if(process.env.NODE_ENV === "production") {
+
+          //on prod only write the file if it doesn't exist
+          if(!fs.existsSync(`${__basedir}/dist/js/${key}.js`)) {
+
+            const miniVal = UglifyJS.minify(val);
+            //minify the JS before we write it to file, if in prod  
+            if(typeof miniVal.code === "string") {
+              fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, miniVal.code);
+            } else {
+              console.log("JS minified error", miniVal.error);
+            }
+            
+          }
+
         } else {
-          console.log("JS minified error", minifiedVal.error);
+
+          //if on dev always write the file, un-minified
+          fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
+
         }
+      
       }
+
     }
   }
 
