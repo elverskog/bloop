@@ -15,6 +15,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
-    "postcss-nesting": "^10.2.0"
+    "postcss-nesting": "^10.2.0",
+    "uglify-js": "^3.17.4"
   }
 }

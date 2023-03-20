@@ -1,5 +1,5 @@
 import fs from "fs";
-
+import UglifyJS from "uglify-js";
 
 //manageHopper creates and manages a temporary object "hopper" that stores the CSS, markup and JS, for the request of a:
 //page - for when the site/app is loaded for the first time, going to a specific pathname
@@ -164,7 +164,13 @@ export const moduleOrPageCompiler = async function(options) {
     for(const [key, val] of Object.entries(p_p.hopper.script)) {
       const fileExists = fs.existsSync(`${__basedir}/dist/js/${key}.js`);
       if(typeof val === "string" && (!fileExists || process.env.NODE_ENV)) {
-        fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
+        //minify the JS before we write it to file
+        var minifiedVal = UglifyJS.minify(val);
+        if(typeof minifiedVal.code === "string") {
+          fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, minifiedVal.code);
+        } else {
+          console.log("JS minified error", minifiedVal.error);
+        }
       }
     }
   }
