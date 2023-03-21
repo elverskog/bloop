@@ -1,5 +1,16 @@
 import fs from "fs";
 import UglifyJS from "uglify-js";
+import brotli from "brotli";
+
+//settings for brotli compression - TODO adjust these settings
+const brotliSettings = {
+  extension: 'br',
+  skipLarger: true,
+  mode: 1, // 0 = generic, 1 = text, 2 = font (WOFF2)
+  quality: 10, // 0 - 11,
+  lgwin: 12 // default
+};
+
 
 //manageHopper creates and manages a temporary object "hopper" that stores the CSS, markup and JS, for the request of a:
 //page - for when the site/app is loaded for the first time, going to a specific pathname
@@ -170,12 +181,29 @@ export const moduleOrPageCompiler = async function(options) {
   //and the file does not exist already or in dev mode, overwrite the file
   if(Object.keys(p_p.hopper.css).length) {
     for(const [key, val] of Object.entries(p_p.hopper.css)) {
+
       const fileExists = fs.existsSync(`${__basedir}/dist/css/${key}.css`);
-      //console.log("ENV: ", process.env.NODE_ENV);
-      if(typeof val === "string" && (!fileExists || process.env.NODE_ENV)) {
-        fs.writeFileSync(`${__basedir}/dist/css/${key}.css`, val);
+
+      if(typeof val === "string") {
+
+        //if on prod and the file doesn't exist compress and write the file
+        if(process.env.NODE_ENV === "production" || !fileExists) {
+
+          const result = brotli.compress(val, brotliSettings);
+          fs.writeFileSync(`${__basedir}/dist/css/${key}.css`, val);
+          fs.writeFileSync(`${__basedir}/dist/css/${key}.css.br`, result);
+
+        } else {
+
+          //if on dev always write the file, uncompressed
+          fs.writeFileSync(`${__basedir}/dist/css/${key}.css`, val);
+
+        }
+
       }
+
     }
+
   }
 
   if(Object.keys(p_p.hopper.script).length) {
@@ -187,26 +215,6 @@ export const moduleOrPageCompiler = async function(options) {
         if(process.env.NODE_ENV === "development" || !fs.existsSync(`${__basedir}/dist/js/${key}.js`)) {
 
           fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
-
-          // //on prod only write the file if it doesn't exist
-          // if() {
-
-          //   const miniVal = UglifyJS.minify(val);
-          //   //minify the JS before we write it to file, if in prod  
-          //   if(typeof miniVal.code === "string") {
-          //     fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, miniVal.code);
-          //   } else {
-          //     console.log("JS minified error", miniVal.error);
-          //   }
-            
-          // }
-
-        // } else {
-
-        //   //if on dev always write the file, un-minified
-        //   fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
-
-        // }
       
         }
 

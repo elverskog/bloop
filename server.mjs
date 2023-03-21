@@ -27,10 +27,13 @@ const server = http.createServer(async (req, res) => {
     js: "text/javascript",
     mjs: "text/javascript",
     ico: "image/x-icon",
+    br: "text/css"
   };
 
   //get the extension from the file requested 
   const reqExtension = req.url.split(".")[ req.url.split(".").length - 1 ];
+
+  console.log("reqExtension: ", reqExtension);
 
   //if the request is for an allowed filetype or a node_module
   if(typeof fileTypesObject[reqExtension] === "string" || req.url.indexOf("node_modules") > -1) {
@@ -38,18 +41,36 @@ const server = http.createServer(async (req, res) => {
     //set the contenttype in the header based on extension for now
     //TODO: need to look into a better way to determine the file type
     let contentType = (typeof fileTypesObject[reqExtension] === "string") ? fileTypesObject[reqExtension] : fileTypesObject["js"];
-    res.writeHead(200, {
-      "Content-Type": contentType,
-      "Cache-Control": "private, no-cache, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
-      "Expires": "-1",
-      "Pragma": "no-cache"
-    });
+
+    console.log("CONTENT TYPE: ", contentType);
+
+    //if(contentType === "text/css" || contentType === "text/js") {
+    if(contentType === "text/css") {
+      console.log("WRITE HEAD CSS");
+      res.writeHead(200, {
+        "Content-Type": contentType,
+        "Cache-Control": "private, no-cache, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+        "Expires": "-1",
+        "Pragma": "no-cache",
+        //"Content-Encoding": "br",
+      });
+    } else {
+      res.writeHead(200, {
+        "Content-Type": contentType,
+        "Cache-Control": "private, no-cache, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+        "Expires": "-1",
+        "Pragma": "no-cache",
+      });
+    }
+
+    //"Content-Encoding": "br"
 
     //read and return the static file
     fs.readFile(`${__basedir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
       if(err) {
         console.error(err);
       } else {
+        //console.log("DATA: ", data);
         res.write(data);
         res.end();
       }
