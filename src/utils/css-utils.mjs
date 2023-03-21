@@ -9,17 +9,13 @@ import postcssNesting from 'postcss-nesting';
 export async function processCSS(css) {
   if (!css || typeof css !== "string") return;
   //if on prod minify the CSS
-  let result;
-  if(process.env.NODE_ENV === "production") {
-    result = await postcss([cssnano, autoprefixer, postcssNesting]).process(css);
-  } else {
-    result = await postcss([autoprefixer, postcssNesting]).process(css);
-  }
+  const pluginArray = process.env.NODE_ENV === "production" ? [cssnano, autoprefixer, postcssNesting] : [autoprefixer, postcssNesting] 
+  const result = await postcss(pluginArray).process(css);
   return result.css;
 }
 
 
-//TODO - add auto prefixer back in
+//TODO - see if we want to add auto prefix of module name
 // export function parseCSSOLD(moduleName, css) {
 
 //   //console.log("parseCSS componentName: ", componentName);
