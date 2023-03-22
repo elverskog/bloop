@@ -4,7 +4,7 @@ import brotli from "brotli";
 
 //settings for brotli compression - TODO adjust these settings
 const brotliSettings = {
-  extension: 'br',
+  extension: 'css',
   skipLarger: true,
   mode: 1, // 0 = generic, 1 = text, 2 = font (WOFF2)
   quality: 10, // 0 - 11,
@@ -176,28 +176,25 @@ export const moduleOrPageCompiler = async function(options) {
     await p_p.manageHopper.addToHopper(await wrapperMod(bodyRes.markup, bodyRes.title), "wrapper");
   }
   
-  //write CSS and JS, for each module in hopper
-  //assuming a valid string passed 
-  //and the file does not exist already or in dev mode, overwrite the file
-  if(Object.keys(p_p.hopper.css).length) {
-    for(const [key, val] of Object.entries(p_p.hopper.css)) {
+  //function to compress and write files
+  function compressAndWrite(obj, fileType) {
+    //loop through object
+    for(const [key, val] of Object.entries(obj)) {
 
-      const fileExists = fs.existsSync(`${__basedir}/dist/css/${key}.css`);
+      const fileExists = fs.existsSync(`${__basedir}/dist/${fileType}/${key}.${fileType}`);
 
       if(typeof val === "string") {
 
-        //if on prod and the file doesn't exist compress and write the file
+        //brotli compress the css-string
+        const buff = Buffer.from(val, "utf-8");
+        const compressed = brotli.compress(buff, brotliSettings);
+
+        //if on prod and the file doesn't exist write the file
         if(process.env.NODE_ENV === "production" || !fileExists) {
-
-          const result = brotli.compress(val, brotliSettings);
-          fs.writeFileSync(`${__basedir}/dist/css/${key}.css`, val);
-          fs.writeFileSync(`${__basedir}/dist/css/${key}.css.br`, result);
-
+          fs.writeFileSync(`${__basedir}/dist/${fileType}/${key}.${fileType}`, compressed);
         } else {
-
-          //if on dev always write the file, uncompressed
-          fs.writeFileSync(`${__basedir}/dist/css/${key}.css`, val);
-
+          //if on dev always write the file
+          fs.writeFileSync(`${__basedir}/dist/${fileType}/${key}.${fileType}`, compressed);
         }
 
       }
@@ -206,21 +203,15 @@ export const moduleOrPageCompiler = async function(options) {
 
   }
 
+  //write CSS and JS, for each module in hopper
+  //assuming a valid string passed 
+  //and the file does not exist already or in dev mode, overwrite the file
+  if(Object.keys(p_p.hopper.css).length) {
+    compressAndWrite(p_p.hopper.css, "css");
+  }
+
   if(Object.keys(p_p.hopper.script).length) {
-    for(const [key, val] of Object.entries(p_p.hopper.script)) {
-
-      if(typeof val === "string") {
-
-        //if on dev always write the file, else check if it already exists
-        if(process.env.NODE_ENV === "development" || !fs.existsSync(`${__basedir}/dist/js/${key}.js`)) {
-
-          fs.writeFileSync(`${__basedir}/dist/js/${key}.js`, val);
-      
-        }
-
-      }
-
-    }
+    compressAndWrite(p_p.hopper.script, "js");
   }
 
   return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;

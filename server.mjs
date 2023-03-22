@@ -27,7 +27,6 @@ const server = http.createServer(async (req, res) => {
     js: "text/javascript",
     mjs: "text/javascript",
     ico: "image/x-icon",
-    br: "text/css"
   };
 
   //get the extension from the file requested 
@@ -42,18 +41,22 @@ const server = http.createServer(async (req, res) => {
     //TODO: need to look into a better way to determine the file type
     let contentType = (typeof fileTypesObject[reqExtension] === "string") ? fileTypesObject[reqExtension] : fileTypesObject["js"];
 
-    console.log("CONTENT TYPE: ", contentType);
-
-    //if(contentType === "text/css" || contentType === "text/js") {
-    if(contentType === "text/css") {
+    if(contentType === "text/css" || contentType === "text/javascript") {
+    // if(contentType === "text/css") {
       console.log("WRITE HEAD CSS");
       res.writeHead(200, {
         "Content-Type": contentType,
         "Cache-Control": "private, no-cache, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
         "Expires": "-1",
         "Pragma": "no-cache",
-        //"Content-Encoding": "br",
+        "Content-Encoding": "br",
       });
+
+      //read and return the static file
+      const data = fs.readFileSync(`${__basedir}${req.url}`);
+      res.write(data);
+      res.end();
+
     } else {
       res.writeHead(200, {
         "Content-Type": contentType,
@@ -61,20 +64,18 @@ const server = http.createServer(async (req, res) => {
         "Expires": "-1",
         "Pragma": "no-cache",
       });
+
+      //read and return the static file
+      fs.readFile(`${__basedir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
+        if(err) {
+          console.error(err);
+        } else {
+          res.write(data);
+          res.end();
+        }
+      });
+
     }
-
-    //"Content-Encoding": "br"
-
-    //read and return the static file
-    fs.readFile(`${__basedir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
-      if(err) {
-        console.error(err);
-      } else {
-        //console.log("DATA: ", data);
-        res.write(data);
-        res.end();
-      }
-    });
 
   } else {
 
