@@ -41,7 +41,7 @@ const server = http.createServer(async (req, res) => {
     //TODO: need to look into a better way to determine the file type
     let contentType = (typeof fileTypesObject[reqExtension] === "string") ? fileTypesObject[reqExtension] : fileTypesObject["js"];
 
-    if(contentType === "text/css" || contentType === "text/javascript") {
+    if(reqExtension === "css" || reqExtension === "js") {
     // if(contentType === "text/css") {
       console.log("WRITE HEAD CSS");
       res.writeHead(200, {
