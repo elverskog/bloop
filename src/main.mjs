@@ -187,16 +187,16 @@ export const moduleOrPageCompiler = async function(options) {
 
         //brotli compress the css-string
         const buff = Buffer.from(val, "utf-8");
+
+        console.log("TYPE OF BUFF", typeof buff);
+
         const compressed = brotli.compress(buff, brotliSettings);
 
-        //if on prod and the file doesn't exist write the file
-        if(process.env.NODE_ENV === "production" || !fileExists) {
-          fs.writeFileSync(`${__basedir}/dist/${fileType}/${key}.${fileType}`, compressed);
-        } else {
-          //if on dev always write the file
+        //if on dev, write the file. else (if on prod) and file doesn't exist write the file
+        // if(process.env.NODE_ENV === "development" || !fileExists) {
+        if(process.env.NODE_ENV === "production") {
           fs.writeFileSync(`${__basedir}/dist/${fileType}/${key}.${fileType}`, compressed);
         }
-
       }
 
     }
