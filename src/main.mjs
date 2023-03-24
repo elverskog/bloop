@@ -144,15 +144,17 @@ export const moduleOrPageCompiler = async function(options) {
   
   //add hopper management to p_p and create blank(ish) hopper (see hopper func above)
   p_p.manageHopper = manageHopper();
-  // clear the hopper before we populate it
-  p_p.manageHopper.setHopper();  
+  //if on prodction, clear the hopper before we populate it
+  if(process.env.NODE_ENV === "production") {
+    p_p.manageHopper.setHopper();  
+  }
 
   //TODO for now I hardcode "/pages" but we may want to load a module from "/components"
   //or, likely, have all these module calls just go to a "/modules" dir
   //and have the pages just act as routers loading, usually, just one module
   //OR of course it will probably use wrapper.mjs
 
-  const isFetch = req?.headers["is-fetch"]
+  const isFetch = req?.headers?.is-fetch;
   const modulePath = req.url === "/" ? "/a" : req.url;
   const moduleName = modulePath.split("/").pop();
 
@@ -160,7 +162,6 @@ export const moduleOrPageCompiler = async function(options) {
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
-    console.log("test: ", `${__basedir}/src/pages${modulePath}.mjs`);
     bodyMod = (await import(`${__basedir}/src/pages${modulePath}.mjs`)).default;
   } catch(err) {
     bodyMod = (await import(`${__basedir}/src/pages/fourOhFour.mjs`)).default; 

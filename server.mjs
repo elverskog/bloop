@@ -29,25 +29,20 @@ fsExtra.emptyDirSync(`${__basedir}/dist/js`);
 //in this current location the files will be created right on server start
 //and the request handling defined below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
 function build() {
-  console.log("BUILD");
-
   //get an array of paths to all valid pages
   const allPages = getAllPages(`${__basedir}/src/pages`);
   //loop through said pages/paths
   allPages.forEach( pagePath => {
-    console.log("page path: ", pagePath);
-    //"fabricate" req.url, as that is all we use from the request (for now)
-    const req = { url: pagePath};
+    //fabricate req.url, as that is all we use from the request (for now)
+    const req = { url: pagePath };
     //pass the url/path to our page builder 
     moduleOrPageCompiler({ req, res: null, __basedir });
   });  
 }
 
   //run build script if on prod
-  console.log("NODE_ENV: ", process.env.NODE_ENV);
-
   if(process.env.NODE_ENV === "production") {
-    //build();
+    build();
   }
 
 
