@@ -1,4 +1,8 @@
-export default async function a() {
+export default function a() {
+
+  console.log("A");
+
+
   const result = {
     title: "A",
     css: `
@@ -27,8 +31,10 @@ export default async function a() {
   }
 
   //add result to hopper
-  if(p_p?.isServer) {
-    await p_p.manageHopper.addToHopper(result, "a");
+  if(p_p.isServer) {
+    //await p_p.manageHopper.addToHopper(result, "a");
+    p_p.processModule(result, "a");
+
   }
 
   return result;

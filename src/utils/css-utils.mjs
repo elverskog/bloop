@@ -6,11 +6,12 @@ import cssnano from "cssnano";
 import postcssNesting from 'postcss-nesting';
 
 
-export async function processCSS(css) {
+export function processCSS(css) {
   if (!css || typeof css !== "string") return;
   //if on prod minify the CSS
   const pluginArray = process.env.NODE_ENV === "production" ? [cssnano, autoprefixer, postcssNesting] : [autoprefixer, postcssNesting] 
-  const result = await postcss(pluginArray).process(css);
+  const result = postcss(pluginArray).process(css);
+  //console.log("POSTCSS RESULT", result);
   return result.css;
 }
 

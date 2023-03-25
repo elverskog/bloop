@@ -29,21 +29,32 @@ fsExtra.emptyDirSync(`${__basedir}/dist/js`);
 //in this current location the files will be created right on server start
 //and the request handling defined below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
 function build() {
+
   //get an array of paths to all valid pages
   const allPages = getAllPages(`${__basedir}/src/pages`);
+
   //loop through said pages/paths
   allPages.forEach( pagePath => {
     //fabricate req.url, as that is all we use from the request (for now)
     const req = { url: pagePath };
     //pass the url/path to our page builder 
     moduleOrPageCompiler({ req, res: null, __basedir });
-  });  
+  });
+
 }
 
-  //run build script if on prod
-  if(process.env.NODE_ENV === "production") {
-    build();
-  }
+//test to run just one page for checking optimization
+function buildTest() {
+  const allPages = getAllPages(`${__basedir}/src/pages`);
+  const req = { url: allPages[0] };
+  moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
+}
+
+//run build script if on prod
+if(process.env.NODE_ENV === "production") {
+  // build();
+  //buildTest();
+}
 
 
 const server = http.createServer(async (req, res) => {
@@ -109,7 +120,7 @@ server.listen(PORT, () => {
 });
 
 
-//TODO need to test if async readFile is any faster/better than sync
+//// TODO need to test if async readFile is any faster/better than sync
 // fs.readFile(`${__basedir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
 //   if(err) {
 //     console.error(err);

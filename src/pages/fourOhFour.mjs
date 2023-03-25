@@ -1,4 +1,4 @@
-export default async function home() {
+export default async function fourOhFour() {
 
   const result = {
     title: "404",
@@ -26,7 +26,7 @@ export default async function home() {
 
   //add result to hopper
   if(p_p?.isServer) {
-    await p_p.manageHopper.addToHopper(result, "fourOhFour");
+    //await p_p.manageHopper.addToHopper(result, "fourOhFour--");
   }
 
   return result;
