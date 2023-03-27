@@ -1,6 +1,8 @@
+import link from "./link.mjs";
+
 export default async function menuItem (label, pathname) {
 
-  const link = await (await import(`${p_p.baseDir}/src/components/link.mjs`)).default(label, pathname);
+  const linkRes = await link(label, pathname);
 
   const result = {
     css: `
@@ -12,7 +14,7 @@ export default async function menuItem (label, pathname) {
         font-size: 1em;
         font-weight: 600;
         border-radius: 50%;
-        width: 40px;
+        width: 40px; 
         height: 40px;
         line-height: 40px;
         text-align: center;
@@ -33,7 +35,7 @@ export default async function menuItem (label, pathname) {
     `,
     markup: `
       <menuitem>
-        ${ link.markup }
+        ${ linkRes.markup }
       </menuitem>
     `
   };
@@ -41,6 +43,7 @@ export default async function menuItem (label, pathname) {
   //add result to hopper
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "menuItem");
+    //p_p.processModule(result, "menuItem");
   } 
 
   return result;

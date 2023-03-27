@@ -1,8 +1,10 @@
+import menu from "./menu.mjs";
+
 export default async function wrapper(bodyMarkup, title) {
   
   //get menu module
-  const menuMod = (await import(`${__basedir}/src/components/menu.mjs`)).default;
-  const menu = await menuMod();
+
+  const menuRes = await menu();
   const myTitle = typeof title === "string" ? title : "Bloop";
 
   //we have to add CSS for wrapper and menu as they are not part of body module stack
@@ -15,6 +17,14 @@ export default async function wrapper(bodyMarkup, title) {
   let scriptTags = `<script src="/dist/js/wrapper.js" type="text/javascript"></script>\n`;
 
   //create a css/link tag for each module used in the page, server-side
+  // if(Object.keys(cssPaths).length) {
+  //   Object.keys(cssPaths).forEach( key => {
+  //     // cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`
+  //     cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="${cssPaths[key]}" />\n`
+  //   })
+  // }
+
+
   if(Object.keys(p_p.hopper.css).length) {
     Object.keys(p_p.hopper.css).forEach( key => {
       cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`
@@ -55,7 +65,7 @@ export default async function wrapper(bodyMarkup, title) {
         </head>
         <body id="__body">
           <div id="wrapper">
-            ${menu.markup}
+            ${menuRes.markup}
             <div id="content">
               ${bodyMarkup}
             </div>
@@ -131,6 +141,12 @@ export default async function wrapper(bodyMarkup, title) {
 
   //Note: we don't add result to hopper here
   //as we need to call and add it as the top level, when we call a full page
+  //add result to hopper 
+  //OR DO WE
+  if(p_p.isServer) {
+    p_p.manageHopper.addToHopper(result, "wrapper");
+    //p_p.processModule(result, "wrapper");
+  }
 
   return result;
 

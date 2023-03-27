@@ -83,6 +83,7 @@ export default async function link (label, pathname) {
   //add result to hopper
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "link");
+    //p_p.processModule(result, "link");
   } 
 
   return result;

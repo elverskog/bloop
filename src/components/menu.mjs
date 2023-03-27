@@ -1,6 +1,9 @@
+import menuItem from "./menu-item.mjs";
+
+
 export default async function menu() {
 
-  const menuItemFunc = (await import(`${p_p.baseDir}/src/components/menu-item.mjs`)).default;
+  //const menuItemFunc = (await import(`${p_p.baseDir}/src/components/menu-item.mjs`)).default;
 
   const result = {
     css: `
@@ -14,10 +17,10 @@ export default async function menu() {
     }`,
     markup: `
       <menu class="menu">
-        ${ (await menuItemFunc("A", "/a")).markup }
-        ${ (await menuItemFunc("B", "/b")).markup }
-        ${ (await menuItemFunc("C", "/c")).markup }
-        ${ (await menuItemFunc("?", "/d")).markup }
+        ${ (await menuItem("A", "/a")).markup }
+        ${ (await menuItem("B", "/b")).markup }
+        ${ (await menuItem("C", "/c")).markup }
+        ${ (await menuItem("?", "/d")).markup }
       </menu>
     `
   };
@@ -25,6 +28,7 @@ export default async function menu() {
   //add result to hopper
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "menu");
+    //p_p.processModule(result, "menu");
   }
 
   return result;

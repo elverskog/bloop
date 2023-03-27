@@ -59,6 +59,9 @@ if(process.env.NODE_ENV === "production") {
 
 const server = http.createServer(async (req, res) => {
 
+  //set default status as success
+  let status = 200;
+
   //set holder for final oitput to be served
   let output;
 
@@ -100,7 +103,14 @@ const server = http.createServer(async (req, res) => {
     }
 
     //read and return the static file
-    output = fs.readFileSync(`${__basedir}${req.url}`, readFileOptions);
+    const fileExists = fs.existsSync(`${__basedir}${req.url}`);
+    if(fileExists) {
+      output = fs.readFileSync(`${__basedir}${req.url}`, readFileOptions);
+    } else {
+      console.log("file not found error: ", `${__basedir}${req.url}`);
+      output = "";
+      status = 404;
+    }
     
   } else {
 
@@ -109,7 +119,7 @@ const server = http.createServer(async (req, res) => {
 
   }
 
-  res.writeHead(200, headerOptions);
+  res.writeHead(status, headerOptions);
   res.write(output);
   res.end();
 

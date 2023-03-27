@@ -1,4 +1,4 @@
-export default function a() {
+export default async function a() {
 
   console.log("A");
 
@@ -32,8 +32,8 @@ export default function a() {
 
   //add result to hopper
   if(p_p.isServer) {
-    //await p_p.manageHopper.addToHopper(result, "a");
-    p_p.processModule(result, "a");
+    p_p.manageHopper.addToHopper(result, "a");
+    //p_p.processModule(result, "a");
 
   }
 

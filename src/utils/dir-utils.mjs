@@ -26,8 +26,6 @@ export function runAllPages(dirPath, result) {
 }
 
 
-
-
 //get an array of all valid files paths inside dirPath
 //function will augment an existing array, if passed in
 export function getAllPages(dirPath, result) { 
