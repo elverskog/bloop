@@ -9,7 +9,8 @@ import postcssNesting from 'postcss-nesting';
 export function processCSS(css) {
   if (!css || typeof css !== "string") return;
   //if on prod minify the CSS
-  const pluginArray = process.env.NODE_ENV === "production" ? [cssnano, autoprefixer, postcssNesting] : [autoprefixer, postcssNesting] 
+  // const pluginArray = process.env.NODE_ENV === "production" ? [cssnano, autoprefixer, postcssNesting] : [autoprefixer, postcssNesting] 
+  const pluginArray = process.env.NODE_ENV === "production" ? [autoprefixer, postcssNesting] : [autoprefixer, postcssNesting] 
   const result = postcss(pluginArray).process(css);
   //console.log("POSTCSS RESULT", result);
   return result.css;

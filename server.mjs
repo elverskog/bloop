@@ -46,14 +46,14 @@ function build() {
 //test to run just one page for checking optimization
 function buildTest() {
   const allPages = getAllPages(`${__basedir}/src/pages`);
-  const req = { url: allPages[0] };
+  const req = { url: `${__basedir}/src/pages/a` };
   moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
 }
 
 //run build script if on prod
 if(process.env.NODE_ENV === "production") {
-  // build();
-  //buildTest();
+  //build();
+  buildTest();
 }
 
 

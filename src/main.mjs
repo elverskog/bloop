@@ -4,6 +4,7 @@ import brotli from "brotli";
 import { processCSS } from "./utils/css-utils.mjs";
 import wrapperMod from "./components/wrapper.mjs";
 
+
 //settings for brotli compression - TODO adjust these settings
 const brotliSettings = {
   extension: 'css',
@@ -13,23 +14,24 @@ const brotliSettings = {
   lgwin: 12 // default
 };
 
+
 //function to compress and write files, in subsection of hopper (css vs js)
 function compressAndWrite(contentString, fileType, moduleName) {
 
-    if(typeof contentString === "string" && typeof fileType === "string" && typeof moduleName === "string") {
+  if(typeof contentString === "string" && typeof fileType === "string" && typeof moduleName === "string") {
 
-      //brotli compress the css-string
-      const buff = Buffer.from(contentString, "utf-8");
-      const compressed = brotli.compress(buff, brotliSettings);
+    //brotli compress the css-string
+    const buff = Buffer.from(contentString, "utf-8");
+    const compressed = brotli.compress(buff, brotliSettings);
 
-      //if on dev, always write the file. else (if on prod) and file doesn't exist, then write the file
-      if(process.env.NODE_ENV === "development" || !fileExists) {
-        fs.writeFileSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`, compressed);
-      }
-
-    } else {
-      console.log("compressAndWrite passed invalid values", arguments);
+    //if on dev, always write the file. else (if on prod) and file doesn't exist, then write the file
+    if(process.env.NODE_ENV === "development" || !fs.existsSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`)) {
+      fs.writeFileSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`, compressed);
     }
+
+  } else {
+    console.log("compressAndWrite passed invalid values", arguments);
+  }
 
 }
 
@@ -68,6 +70,7 @@ export const manageHopper = {
 
     //process and add CSS///////////////////////////////////////////////////////
     if(typeof moduleResult.css === "string" && !p_p.hopper.css[moduleName]) {
+      console.log("CALL TO PROCESS CSS");
       p_p.hopper.css[moduleName] = processCSS(moduleResult.css);
     }
 
@@ -165,11 +168,11 @@ export async function moduleOrPageCompiler(options) {
   //and have the pages just act as routers loading, usually, just one module
   //OR of course it will probably use wrapper.mjs
 
-  const isFetch = req?.headers["is-fetch"];
+  const isFetch = req?.headers && req?.headers["is-fetch"];
 
   //need to account for the homepage (whatever "/" should load)
   const modulePath = req.url === "/" ? "/a" : req.url;
-  //need to construct the full path from URL or, if from build, just use what was passed in 
+  //if for build, just use what was passed in, else need to construct the full path from URL  
   const adjustedPath = isBuild ? modulePath : `${__basedir}/src/pages${modulePath}.mjs`;
   let bodyMod;
 
@@ -206,7 +209,6 @@ export async function moduleOrPageCompiler(options) {
       compressAndWrite(p_p.hopper.script[key], "js", key);
     });
   }
-
 
   return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;
 
