@@ -21,6 +21,7 @@ const PORT = 3000;
 fsExtra.emptyDirSync(`${__basedir}/dist/css`);
 fsExtra.emptyDirSync(`${__basedir}/dist/js`);
 
+
 //if on prod, here we run code to request every page
 //this is the actual (main) build process
 //this will create CSS and JS files for each page on run, 
@@ -28,32 +29,38 @@ fsExtra.emptyDirSync(`${__basedir}/dist/js`);
 //TODO: need to decide if this should be run here or elsewhere
 //in this current location the files will be created right on server start
 //and the request handling defined below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
-function build() {
+async function build() {
 
   //get an array of paths to all valid pages
   const allPages = getAllPages(`${__basedir}/src/pages`);
+  let index = 0;
 
-  //loop through said pages/paths
-  allPages.forEach( pagePath => {
-    //fabricate req.url, as that is all we use from the request (for now)
-    const req = { url: pagePath };
-    //pass the url/path to our page builder 
-    moduleOrPageCompiler({ req, res: null, __basedir });
-  });
+  async function buildModule() {
+    if(typeof allPages[index] === "string") {
+      //fabricate req.url, as that is all we use from the request (for now)
+      const req = { url: allPages[index] };
+      //pass the url/path to our page builder 
+      await moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
+      index++;
+      buildModule();
+    } else {
+      return;
+    }
+  }
+
+  buildModule();
 
 }
+
 
 //test to run just one page for checking optimization
-function buildTest() {
-  const allPages = getAllPages(`${__basedir}/src/pages`);
-  const req = { url: `${__basedir}/src/pages/a` };
-  moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
-}
+async function buildTest() {
+  const req = { url: `${__basedir}/src/pages/a.mjs` };
+  await moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
 
-//run build script if on prod
-if(process.env.NODE_ENV === "production") {
-  //build();
-  buildTest();
+  const req2 = { url: `${__basedir}/src/pages/b.mjs` };
+  await moduleOrPageCompiler({ req: req2, res: null, __basedir, isBuild: true });
+
 }
 
 
@@ -119,15 +126,30 @@ const server = http.createServer(async (req, res) => {
 
   }
 
+  console.log("--SERVER GOT RESPONSE");
+
   res.writeHead(status, headerOptions);
   res.write(output);
   res.end();
 
 });
 
-server.listen(PORT, () => {
-  console.log(`listening on port ${PORT}`);
-});
+
+//run build script if on prod
+if(process.env.NODE_ENV === "production") {
+  await build();
+  //await buildTest();
+
+  console.log("HUH?");
+
+  server.listen(PORT, () => {
+    console.log(`PROD listening on port ${PORT}`);
+  });
+} else {
+  server.listen(PORT, () => {
+    console.log(`DEV listening on port ${PORT}`);
+  });
+}
 
 
 //// TODO need to test if async readFile is any faster/better than sync

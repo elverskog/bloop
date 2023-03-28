@@ -29,7 +29,7 @@ export default async function c() {
 
   //add result to hopper
   if(p_p?.isServer) {
-    await p_p.manageHopper.addToHopper(result, "c");
+    p_p.manageHopper.addToHopper(result, "c");
   }
 
   return result;

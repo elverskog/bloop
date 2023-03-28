@@ -22,7 +22,8 @@ function compressAndWrite(contentString, fileType, moduleName) {
 
     //brotli compress the css-string
     const buff = Buffer.from(contentString, "utf-8");
-    const compressed = brotli.compress(buff, brotliSettings);
+    // const compressed = brotli.compress(buff, brotliSettings);
+    const compressed = contentString;
 
     //if on dev, always write the file. else (if on prod) and file doesn't exist, then write the file
     if(process.env.NODE_ENV === "development" || !fs.existsSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`)) {
@@ -46,6 +47,7 @@ function compressAndWrite(contentString, fileType, moduleName) {
 export const manageHopper = {
 
   setHopper: function() {
+    console.log("SET HOPPER");
     p_p.hopper = {
       css: {},
       markup: "",
@@ -55,7 +57,7 @@ export const manageHopper = {
 
   //add a modules result (CSS, markup and JS) to an object
   //this is meant to work for one HTTP request at a time; a full page or a module call 
-  addToHopper: function(moduleResult, moduleName) {
+  addToHopper: async function(moduleResult, moduleName) {
 
     console.log("ADD TO HOPPER P_P: ", moduleName);
     // console.log("ADD TO HOPPER: ", moduleName, moduleResult);
@@ -70,7 +72,6 @@ export const manageHopper = {
 
     //process and add CSS///////////////////////////////////////////////////////
     if(typeof moduleResult.css === "string" && !p_p.hopper.css[moduleName]) {
-      console.log("CALL TO PROCESS CSS");
       p_p.hopper.css[moduleName] = processCSS(moduleResult.css);
     }
 
@@ -79,6 +80,7 @@ export const manageHopper = {
     //and winds up at the request page or module
     //TODO - clean this up so it only writes the returned markup AND have it write to file as well
     if(typeof moduleResult.markup === "string") {
+      console.log("PROCESS MARKUP: ", moduleName);
       p_p.hopper.markup = moduleResult.markup;
     }
 
@@ -152,6 +154,8 @@ export async function moduleOrPageCompiler(options) {
 
   const { req, __basedir, isBuild } = options;
   
+  console.log("PAGE REQUESTED: ", req.url);
+
   //create app to store our global vars in
   global.p_p = {};
   p_p.baseDir = __basedir;
@@ -182,17 +186,26 @@ export async function moduleOrPageCompiler(options) {
     // console.log("BODY MODULE TRY: ", bodyMod);
   } catch(err) {
     bodyMod = (await import(`${__basedir}/src/pages/fourOhFour.mjs`)).default; 
+    console.log("------BODY MODULE NOT VALID: ", bodyMod);
+    return;
   }
 
-  // console.log("BODY MODULE: ", bodyMod);
+  console.log("BODY MODULE: ", bodyMod, adjustedPath);
   
-  //get the body module
+  //get the body module. exit and log if bodyMod is not valid
   // const bodyRes = await bodyMod();
-  const bodyRes = await bodyMod();
+  const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
+  
+  console.log("------TYPEOF BODY RES: ", typeof bodyRes);
+
+  if(typeof bodyRes !== "object") {
+    console.log("------BODY RES NOT OBJECT: ", bodyRes);
+    return;
+  }
 
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
-    console.log("CALL WRAPPER");
+    console.log("CALL WRAPPER FOR: ", bodyRes.title);
     await wrapperMod(bodyRes.markup, bodyRes.title);
   }
 
@@ -209,6 +222,8 @@ export async function moduleOrPageCompiler(options) {
       compressAndWrite(p_p.hopper.script[key], "js", key);
     });
   }
+
+  //console.log("PCP MARKUP FIN: ", p_p.hopper.markup);
 
   return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;
 
