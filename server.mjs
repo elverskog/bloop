@@ -20,6 +20,7 @@ const PORT = 3000;
 //so if in prod mode we don't need to keep writing the files on each page serve
 fsExtra.emptyDirSync(`${__basedir}/dist/css`);
 fsExtra.emptyDirSync(`${__basedir}/dist/js`);
+fsExtra.emptyDirSync(`${__basedir}/dist/pages`);
 
 
 //if on prod, here we run code to request every page
@@ -58,8 +59,8 @@ async function buildTest() {
   const req = { url: `${__basedir}/src/pages/a.mjs` };
   await moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
 
-  const req2 = { url: `${__basedir}/src/pages/b.mjs` };
-  await moduleOrPageCompiler({ req: req2, res: null, __basedir, isBuild: true });
+  // const req2 = { url: `${__basedir}/src/pages/b.mjs` };
+  // await moduleOrPageCompiler({ req: req2, res: null, __basedir, isBuild: true });
 
 }
 
@@ -137,8 +138,8 @@ const server = http.createServer(async (req, res) => {
 
 //run build script if on prod
 if(process.env.NODE_ENV === "production") {
-  await build();
-  //await buildTest();
+  //await build();
+  await buildTest();
 
   console.log("HUH?");
 

@@ -18,20 +18,47 @@ const brotliSettings = {
 //function to compress and write files, in subsection of hopper (css vs js)
 function compressAndWrite(contentString, fileType, moduleName) {
 
+  //if in PROD, exit if the file exists (on dev always write the file)
+  if(process.env.NODE_ENV === "production" && fs.existsSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`)) return;
+
+  console.log("MADE IT PAST FILE EXISTS CHECK");
+
   if(typeof contentString === "string" && typeof fileType === "string" && typeof moduleName === "string") {
 
     //brotli compress the css-string
     const buff = Buffer.from(contentString, "utf-8");
-    // const compressed = brotli.compress(buff, brotliSettings);
-    const compressed = contentString;
+    const compressed = brotli.compress(buff, brotliSettings);
+    //const compressed = contentString;
 
-    //if on dev, always write the file. else (if on prod) and file doesn't exist, then write the file
-    if(process.env.NODE_ENV === "development" || !fs.existsSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`)) {
-      fs.writeFileSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`, compressed);
-    }
+    fs.writeFileSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`, compressed);
 
   } else {
     console.log("compressAndWrite passed invalid values", arguments);
+  }
+
+}
+
+
+//function to compress and write files, in subsection of hopper (css vs js)
+function compressAndWritePage(moduleName, content) {
+
+  //if in PROD, exit if the file exists (on dev always write the file)
+  if(process.env.NODE_ENV === "production" && fs.existsSync(`${__basedir}/dist/pages/${moduleName}.json`)) return;
+
+  if(typeof moduleName === "string" && typeof content === "string") {
+
+    console.log(">>>> WRITE PAGE", moduleName, content);
+
+    //const contentString = JSON.stringify(content);
+    //brotli compress the css-string
+    const buff = Buffer.from(content, "utf-8");
+    //const compressed = brotli.compress(buff, brotliSettings);
+    const compressed = content;
+
+    fs.writeFileSync(`${__basedir}/dist/pages/${moduleName}.json`, compressed);
+
+  } else {
+    console.log("compressAndWrite passed invalid page content", moduleName);
   }
 
 }
@@ -51,7 +78,7 @@ export const manageHopper = {
     p_p.hopper = {
       css: {},
       markup: "",
-      script: {}
+      script: {},
     }
   },
 
@@ -59,7 +86,10 @@ export const manageHopper = {
   //this is meant to work for one HTTP request at a time; a full page or a module call 
   addToHopper: async function(moduleResult, moduleName) {
 
-    console.log("ADD TO HOPPER P_P: ", moduleName);
+    //if we are in DEV or isBuild is true, don't add anything to the hopper
+    //because, presumably, the files needed have all been written to /dist
+    //if(process.env.NODE_ENV === "production" || !isBuild) return;
+
     // console.log("ADD TO HOPPER: ", moduleName, moduleResult);
 
     //exit if the moduleResult or moduleName aren't right or if the key already exists
@@ -72,7 +102,9 @@ export const manageHopper = {
 
     //process and add CSS///////////////////////////////////////////////////////
     if(typeof moduleResult.css === "string" && !p_p.hopper.css[moduleName]) {
-      p_p.hopper.css[moduleName] = processCSS(moduleResult.css);
+      console.log("ADD CSS TO HOPPER: ", moduleName);
+      const cssProcessed = processCSS(moduleResult.css);
+      p_p.hopper.css[moduleName] = cssProcessed;
     }
 
     //process and add markup////////////////////////////////////////////////////
@@ -80,7 +112,7 @@ export const manageHopper = {
     //and winds up at the request page or module
     //TODO - clean this up so it only writes the returned markup AND have it write to file as well
     if(typeof moduleResult.markup === "string") {
-      console.log("PROCESS MARKUP: ", moduleName);
+      console.log("ADD MARKUP TO HOPPER: ", moduleName);
       p_p.hopper.markup = moduleResult.markup;
     }
 
@@ -96,6 +128,8 @@ export const manageHopper = {
       //don't add script if it's module (by key/name) doesn't exist in hopper already
       if(typeof p_p.hopper.script[moduleName] === "undefined") {
 
+        console.log("ADD JS TO HOPPER: ", moduleName);
+        
         //loop through scripts and add a stringified function in the script object, for the given key
         let scripts = "";
               
@@ -154,7 +188,7 @@ export async function moduleOrPageCompiler(options) {
 
   const { req, __basedir, isBuild } = options;
   
-  console.log("PAGE REQUESTED: ", req.url);
+  ///console.log("PAGE REQUESTED: ", req.url);
 
   //create app to store our global vars in
   global.p_p = {};
@@ -164,8 +198,17 @@ export async function moduleOrPageCompiler(options) {
 
   //add hopper management to p_p and create blank(ish) hopper (see hopper func above)
   p_p.manageHopper = manageHopper;
-  //set/clear the hopper before we populate it
-  p_p.manageHopper.setHopper();  
+  
+  //if we are in DEV or isBuild is true, set/clear the hopper before we populate it
+  //meaning for dev write the modules in "realtime" for prod we already wrote them during build
+  //so don't clear and don't write files
+  //if(process.env.NODE_ENV === "development" || isBuild) {
+    //p_p.manageHopper.setHopper();  
+  //}
+
+  //if(isPage) {
+    p_p.manageHopper.setHopper();  
+  //}
 
   //TODO for now I hardcode "/pages" but we may want to load a module from "/components"
   //or, likely, have all these module calls just go to a "/modules" dir
@@ -186,26 +229,26 @@ export async function moduleOrPageCompiler(options) {
     // console.log("BODY MODULE TRY: ", bodyMod);
   } catch(err) {
     bodyMod = (await import(`${__basedir}/src/pages/fourOhFour.mjs`)).default; 
-    console.log("------BODY MODULE NOT VALID: ", bodyMod);
+    //console.log("------BODY MODULE NOT VALID: ", bodyMod);
     return;
   }
 
-  console.log("BODY MODULE: ", bodyMod, adjustedPath);
+  //console.log("BODY MODULE: ", bodyMod, adjustedPath);
   
   //get the body module. exit and log if bodyMod is not valid
   // const bodyRes = await bodyMod();
   const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
-  console.log("------TYPEOF BODY RES: ", typeof bodyRes);
+  //console.log("------TYPEOF BODY RES: ", typeof bodyRes);
 
   if(typeof bodyRes !== "object") {
-    console.log("------BODY RES NOT OBJECT: ", bodyRes);
+    //console.log("------BODY RES NOT OBJECT: ", bodyRes);
     return;
   }
 
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
-    console.log("CALL WRAPPER FOR: ", bodyRes.title);
+    //console.log("CALL WRAPPER FOR: ", bodyRes.title);
     await wrapperMod(bodyRes.markup, bodyRes.title);
   }
 
@@ -223,7 +266,9 @@ export async function moduleOrPageCompiler(options) {
     });
   }
 
-  //console.log("PCP MARKUP FIN: ", p_p.hopper.markup);
+  console.log("HOPPER FIN: ", p_p.hopper);
+
+  compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
 
   return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;
 
