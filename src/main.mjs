@@ -200,8 +200,7 @@ export async function moduleOrPageCompiler(options) {
   if(typeof global !== "object") return; 
 
   const { req, __basedir, isBuild } = options;
-  
-  ///console.log("PAGE REQUESTED: ", req.url);
+  const isFetch = req?.headers && req?.headers["is-fetch"];
 
   //create app to store our global vars in
   global.p_p = {};
@@ -228,13 +227,28 @@ export async function moduleOrPageCompiler(options) {
   //and have the pages just act as routers loading, usually, just one module
   //OR of course it will probably use wrapper.mjs
 
-  const isFetch = req?.headers && req?.headers["is-fetch"];
+
 
   //need to account for the homepage (whatever "/" should load)
   const modulePath = req.url === "/" ? "/a" : req.url;
+
+  console.log("IS BUILD: ", isBuild);
+  console.log("IS FETCH: ", isFetch);
+  console.log("NODE_ENV: ", process.env.NODE_ENV);
+
+  //if we are on PROD and not in build process
+  //just return the (presumably) compiled and compressed JSON files
+  if(process.env.NODE_ENV === "production" && isBuild !== true && isFetch) {
+    console.log("RETURN JSON FILE");
+    return fs.readFileSync(`${__basedir}/dist/pages${modulePath}.json`);
+  }
+
   //if for build, just use what was passed in, else need to construct the full path from URL  
   const adjustedPath = isBuild ? modulePath : `${__basedir}/src/pages${modulePath}.mjs`;
   let bodyMod;
+
+
+
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
@@ -246,22 +260,14 @@ export async function moduleOrPageCompiler(options) {
     return;
   }
 
-  //console.log("BODY MODULE: ", bodyMod, adjustedPath);
-  
   //get the body module. exit and log if bodyMod is not valid
   // const bodyRes = await bodyMod();
   const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
   //console.log("------TYPEOF BODY RES: ", typeof bodyRes);
 
-  if(typeof bodyRes !== "object") {
-    //console.log("------BODY RES NOT OBJECT: ", bodyRes);
-    return;
-  }
-
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
-    //console.log("CALL WRAPPER FOR: ", bodyRes.title);
     await wrapperMod(bodyRes.markup, bodyRes.title);
   }
 
@@ -272,14 +278,15 @@ export async function moduleOrPageCompiler(options) {
     });
   }
 
-  //write CSS for each module in hopper
+  //write script for each module in hopper
   if(Object.keys(p_p.hopper.script).length) { 
     Object.keys(p_p.hopper.script).forEach( key => {
       compressAndWrite(p_p.hopper.script[key], "js", key);
     });
   }
 
-  //console.log("HOPPER FIN: ", p_p.hopper);
+  //if this function got got as part of a build process
+  //write the current compiled page to a JSON file
   if(isBuild) {
     compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
   }

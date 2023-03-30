@@ -127,8 +127,6 @@ const server = http.createServer(async (req, res) => {
 
   }
 
-  console.log("--SERVER GOT RESPONSE");
-
   res.writeHead(status, headerOptions);
   res.write(output);
   res.end();
@@ -140,8 +138,6 @@ const server = http.createServer(async (req, res) => {
 if(process.env.NODE_ENV === "production") {
   await build();
   // await buildTest();
-
-  console.log("HUH?");
 
   server.listen(PORT, () => {
     console.log(`PROD listening on port ${PORT}`);
