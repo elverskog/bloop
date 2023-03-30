@@ -40,25 +40,38 @@ function compressAndWrite(contentString, fileType, moduleName) {
 
 
 //function to compress and write files, in subsection of hopper (css vs js)
-function compressAndWritePage(moduleName, content) {
+function compressAndWritePage(modulePath, content) {
 
-  //if in PROD, exit if the file exists (on dev always write the file)
-  if(process.env.NODE_ENV === "production" && fs.existsSync(`${__basedir}/dist/pages/${moduleName}.json`)) return;
+  if(typeof modulePath === "string" && typeof content === "string") {
 
-  if(typeof moduleName === "string" && typeof content === "string") {
+    //change path of module to that of where we should store the page in /dist
+    const pagePath = modulePath.replace("src", "dist").replace("mjs", "json");
 
-    console.log(">>>> WRITE PAGE", moduleName, content);
+    //if in PROD, exit if the file exists (on dev always write the file)
+    if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
 
-    //const contentString = JSON.stringify(content);
+    //console.log(">>>> WRITE PAGE", pagePath, content);
+
+    //if the dirs in the path don't exist create them
+    const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
+
+    console.log(">>>> PAGE DIR PATH", pageDirPath);
+    console.log(">>>> PAGE DIR PATH EXISTS", fs.existsSync(pageDirPath));
+
+    if(!fs.existsSync(pageDirPath)) {
+      console.log(">>>> CREATE DIR", pageDirPath);
+      fs.mkdirSync(pageDirPath, { recursive: true });
+    }
+
     //brotli compress the css-string
-    const buff = Buffer.from(content, "utf-8");
+    //const buff = Buffer.from(content, "utf-8");
     //const compressed = brotli.compress(buff, brotliSettings);
     const compressed = content;
 
-    fs.writeFileSync(`${__basedir}/dist/pages/${moduleName}.json`, compressed);
+    fs.writeFileSync(pagePath, compressed);
 
   } else {
-    console.log("compressAndWrite passed invalid page content", moduleName);
+    console.log("compressAndWrite passed invalid page content", modulePath);
   }
 
 }
@@ -266,9 +279,10 @@ export async function moduleOrPageCompiler(options) {
     });
   }
 
-  console.log("HOPPER FIN: ", p_p.hopper);
-
-  compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
+  //console.log("HOPPER FIN: ", p_p.hopper);
+  if(isBuild) {
+    compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
+  }
 
   return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;
 

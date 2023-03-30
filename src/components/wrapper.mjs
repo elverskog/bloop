@@ -24,7 +24,6 @@ export default async function wrapper(bodyMarkup, title) {
   //   })
   // }
 
-
   if(Object.keys(p_p.hopper.css).length) {
     Object.keys(p_p.hopper.css).forEach( key => {
       cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`

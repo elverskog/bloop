@@ -138,8 +138,8 @@ const server = http.createServer(async (req, res) => {
 
 //run build script if on prod
 if(process.env.NODE_ENV === "production") {
-  //await build();
-  await buildTest();
+  await build();
+  // await buildTest();
 
   console.log("HUH?");
 
