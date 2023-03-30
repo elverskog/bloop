@@ -195,7 +195,7 @@ export const manageHopper = {
 //creates the output for either a full page (channeling through wrapper)
 //or a single module (which may contain child modules)
 //oily runs on server
-export async function moduleOrPageCompiler(options) {
+export async function moduleCompiler(options) {
 
   if(typeof global !== "object") return; 
 
@@ -227,8 +227,6 @@ export async function moduleOrPageCompiler(options) {
   //and have the pages just act as routers loading, usually, just one module
   //OR of course it will probably use wrapper.mjs
 
-
-
   //need to account for the homepage (whatever "/" should load)
   const modulePath = req.url === "/" ? "/a" : req.url;
 
@@ -247,9 +245,6 @@ export async function moduleOrPageCompiler(options) {
   const adjustedPath = isBuild ? modulePath : `${__basedir}/src/pages${modulePath}.mjs`;
   let bodyMod;
 
-
-
-
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
     bodyMod = (await import(adjustedPath)).default;
@@ -264,6 +259,13 @@ export async function moduleOrPageCompiler(options) {
   // const bodyRes = await bodyMod();
   const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
+  //if this function got got as part of a build process
+  //write the current compiled page to a JSON file
+  //we do this before wrapper is added to the hopper
+  if(isBuild) {
+    compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
+  }
+
   //console.log("------TYPEOF BODY RES: ", typeof bodyRes);
 
   //if we got a full page request, we call wrapper, passing body into it
@@ -283,12 +285,6 @@ export async function moduleOrPageCompiler(options) {
     Object.keys(p_p.hopper.script).forEach( key => {
       compressAndWrite(p_p.hopper.script[key], "js", key);
     });
-  }
-
-  //if this function got got as part of a build process
-  //write the current compiled page to a JSON file
-  if(isBuild) {
-    compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
   }
 
   return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;

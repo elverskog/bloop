@@ -1,5 +1,5 @@
 import http from "http";
-import { moduleOrPageCompiler } from "./src/main.mjs";
+import { moduleCompiler } from "./src/main.mjs";
 import fs from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
@@ -41,7 +41,7 @@ async function build() {
       //fabricate req.url, as that is all we use from the request (for now)
       const req = { url: allPages[index] };
       //pass the url/path to our page builder 
-      await moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
+      await moduleCompiler({ req, res: null, __basedir, isBuild: true });
       index++;
       buildModule();
     } else {
@@ -57,11 +57,7 @@ async function build() {
 //test to run just one page for checking optimization
 async function buildTest() {
   const req = { url: `${__basedir}/src/pages/a.mjs` };
-  await moduleOrPageCompiler({ req, res: null, __basedir, isBuild: true });
-
-  // const req2 = { url: `${__basedir}/src/pages/b.mjs` };
-  // await moduleOrPageCompiler({ req: req2, res: null, __basedir, isBuild: true });
-
+  await moduleCompiler({ req, res: null, __basedir, isBuild: true });
 }
 
 
@@ -123,7 +119,7 @@ const server = http.createServer(async (req, res) => {
   } else {
 
     headerOptions["Content-Type"] = "html";
-    output = await moduleOrPageCompiler({ req, res, __basedir });
+    output = await moduleCompiler({ req, res, __basedir });
 
   }
 
@@ -138,7 +134,6 @@ const server = http.createServer(async (req, res) => {
 if(process.env.NODE_ENV === "production") {
   await build();
   // await buildTest();
-
   server.listen(PORT, () => {
     console.log(`PROD listening on port ${PORT}`);
   });
