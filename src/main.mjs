@@ -18,8 +18,10 @@ const brotliSettings = {
 //function to compress and write files, in subsection of hopper (css vs js)
 function compressAndWrite(contentString, fileType, moduleName) {
 
+  const filePath = `${__basedir}/dist/${fileType}/${moduleName}.${fileType}`;
+
   //if in PROD, exit if the file exists (on dev always write the file)
-  if(process.env.NODE_ENV === "production" && fs.existsSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`)) return;
+  if(process.env.NODE_ENV === "production" && fs.existsSync(filePath)) return;
 
   if(typeof contentString === "string" && typeof fileType === "string" && typeof moduleName === "string") {
 
@@ -28,7 +30,7 @@ function compressAndWrite(contentString, fileType, moduleName) {
     const compressed = brotli.compress(buff, brotliSettings);
     //const compressed = contentString;
 
-    fs.writeFileSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`, compressed);
+    fs.writeFileSync(filePath, compressed);
 
   } else {
     console.log("compressAndWrite passed invalid values", arguments);
@@ -36,14 +38,17 @@ function compressAndWrite(contentString, fileType, moduleName) {
 
 }
 
-
 //function to compress and write files, in subsection of hopper (css vs js)
 function compressAndWritePage(modulePath, content) {
+
+  console.log("MODULE PATH", modulePath);
+  // return;
+
 
   if(typeof modulePath === "string" && typeof content === "string") {
 
     //change path of module to that of where we should store the page in /dist
-    const pagePath = modulePath.replace("src", "dist").replace("mjs", "json");
+    const pagePath = modulePath.replace("src", "dist").replace("mjs", "html");
 
     //if in PROD, exit if the file exists (on dev always write the file)
     if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
@@ -64,6 +69,39 @@ function compressAndWritePage(modulePath, content) {
 
   } else {
     console.log("compressAndWrite passed invalid page content", modulePath);
+  }
+
+}
+
+
+
+//function to compress and write module results ({css, markup,script})
+function compressAndWriteModuleResult(modulePath, content) {
+
+  if(typeof modulePath === "string" && typeof content === "string") {
+
+    //change path of module to that of where we should store the page in /dist
+    const pagePath = modulePath.replace("src", "dist").replace("pages", "modules-res").replace("mjs", "json");
+
+    //if in PROD, exit if the file exists (on dev always write the file)
+    if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
+
+    //if the dirs in the path don't exist create them
+    const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
+
+    if(!fs.existsSync(pageDirPath)) {
+      fs.mkdirSync(pageDirPath, { recursive: true });
+    }
+
+    //brotli compress the css-string
+    //const buff = Buffer.from(content, "utf-8");
+    //const compressed = brotli.compress(buff, brotliSettings);
+    const compressed = content;
+
+    fs.writeFileSync(pagePath, compressed);
+
+  } else {
+    console.log("compressAndWrite passed invalid module output", modulePath);
   }
 
 }
@@ -207,19 +245,14 @@ export async function moduleCompiler(options) {
     p_p.manageHopper.setHopper();  
   //}
 
-  //TODO for now I hardcode "/pages" but we may want to load a module from "/components"
-  //or, likely, have all these module calls just go to a "/modules" dir
-  //and have the pages just act as routers loading, usually, just one module
-  //OR of course it will probably use wrapper.mjs
-
   //need to account for the homepage (whatever "/" should load)
   const modulePath = req.url === "/" ? "/a" : req.url;
 
   //if we are on PROD and not in build process
   //just return the (presumably) compiled and compressed JSON files
   if(process.env.NODE_ENV === "production" && isBuild !== true && isFetch) {
-    const filePath = `${__basedir}/dist/pages${modulePath}.json`;
-    const fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.json`;
+    const filePath = `${__basedir}/dist/modules-res${modulePath}.json`;
+    const fourOhFourPath = `${__basedir}/dist/modules-res/fourOhFour.json`;
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath);
     } else {
@@ -242,11 +275,11 @@ export async function moduleCompiler(options) {
   // const bodyRes = await bodyMod();
   const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
-  //if this function got got as part of a build process
+  //if this function was called as part of a build process
   //write the current compiled page to a JSON file
   //we do this before wrapper is added to the hopper
   if(isBuild) {
-    compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
+    compressAndWriteModuleResult(req.url, JSON.stringify(p_p.hopper));
   }
 
   //if we got a full page request, we call wrapper, passing body into it
@@ -261,6 +294,11 @@ export async function moduleCompiler(options) {
     });
   }
 
+  //write markup for "end result" hopper
+  if(Object.keys(p_p.hopper.markup).length) {
+    compressAndWritePage(req.url, p_p.hopper.markup);
+  }
+  
   //write script for each module in hopper
   if(Object.keys(p_p.hopper.script).length) { 
     Object.keys(p_p.hopper.script).forEach( key => {

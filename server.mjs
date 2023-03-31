@@ -21,6 +21,7 @@ const PORT = 3000;
 fsExtra.emptyDirSync(`${__basedir}/dist/css`);
 fsExtra.emptyDirSync(`${__basedir}/dist/js`);
 fsExtra.emptyDirSync(`${__basedir}/dist/pages`);
+fsExtra.emptyDirSync(`${__basedir}/dist/modules-res`);
 
 
 //if on prod, here we run code to request every page
