@@ -249,10 +249,21 @@ export async function moduleCompiler(options) {
   const modulePath = req.url === "/" ? "/a" : req.url;
 
   //if we are on PROD and not in build process
-  //just return the (presumably) compiled and compressed JSON files
-  if(process.env.NODE_ENV === "production" && isBuild !== true && isFetch) {
-    const filePath = `${__basedir}/dist/modules-res${modulePath}.json`;
-    const fourOhFourPath = `${__basedir}/dist/modules-res/fourOhFour.json`;
+  //for async calls, return either the (presumably) compiled and compressed JSON files
+  //for full-page calls, return either the (presumably) compiled and compressed HTML files
+  if(process.env.NODE_ENV === "production" && isBuild !== true) {
+
+    let filePath;
+    let fourOhFourPath;
+
+    if(isFetch) {
+      filePath = `${__basedir}/dist/modules-res${modulePath}.json`;
+      fourOhFourPath = `${__basedir}/dist/modules-res/fourOhFour.json`;
+    } else {
+      filePath = `${__basedir}/dist/pages${modulePath}.html`;
+      fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.html`;
+    }
+
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath);
     } else {
