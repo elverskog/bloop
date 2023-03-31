@@ -306,7 +306,7 @@ export async function moduleCompiler(options) {
   }
 
   //write markup for "end result" hopper
-  if(Object.keys(p_p.hopper.markup).length) {
+  if(Object.keys(p_p.hopper.markup).length && isBuild) {
     compressAndWritePage(req.url, p_p.hopper.markup);
   }
   
