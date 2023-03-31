@@ -1,29 +1,29 @@
-export default async function test() {
+export default async function test1() {
 
-  console.log("TEST");
+  console.log("TEST 1");
 
   const result = {
-    title: "TEST",
+    title: "TEST 1",
     css: `
-      .test {
+      .test1 {
         font-size: 35em;
         text-align: center;
       }
       @media (max-width: 30em) {
-        .test {
+        .test1 {
           font-size: 20em;
         }
       }
     `,
     markup: `
-      <div id="test" class="test">
-        TEST
+      <div id="test1" class="test1">
+        T1
       </div>    
     `,
     script: {
       init: function() {
         if(typeof window === "object") {
-          console.log("INIT TEST");
+          console.log("INIT TEST 1");
         }
       } 
     } 
@@ -31,7 +31,7 @@ export default async function test() {
 
   //add result to hopper
   if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "test");
+    p_p.manageHopper.addToHopper(result, "test1");
   }
 
   return result;

@@ -21,8 +21,6 @@ function compressAndWrite(contentString, fileType, moduleName) {
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(`${__basedir}/dist/${fileType}/${moduleName}.${fileType}`)) return;
 
-  console.log("MADE IT PAST FILE EXISTS CHECK");
-
   if(typeof contentString === "string" && typeof fileType === "string" && typeof moduleName === "string") {
 
     //brotli compress the css-string
@@ -50,16 +48,10 @@ function compressAndWritePage(modulePath, content) {
     //if in PROD, exit if the file exists (on dev always write the file)
     if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
 
-    //console.log(">>>> WRITE PAGE", pagePath, content);
-
     //if the dirs in the path don't exist create them
     const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
 
-    console.log(">>>> PAGE DIR PATH", pageDirPath);
-    console.log(">>>> PAGE DIR PATH EXISTS", fs.existsSync(pageDirPath));
-
     if(!fs.existsSync(pageDirPath)) {
-      console.log(">>>> CREATE DIR", pageDirPath);
       fs.mkdirSync(pageDirPath, { recursive: true });
     }
 
@@ -87,7 +79,6 @@ function compressAndWritePage(modulePath, content) {
 export const manageHopper = {
 
   setHopper: function() {
-    console.log("SET HOPPER");
     p_p.hopper = {
       css: {},
       markup: "",
@@ -103,8 +94,6 @@ export const manageHopper = {
     //because, presumably, the files needed have all been written to /dist
     //if(process.env.NODE_ENV === "production" || !isBuild) return;
 
-    // console.log("ADD TO HOPPER: ", moduleName, moduleResult);
-
     //exit if the moduleResult or moduleName aren't right or if the key already exists
     if (typeof moduleResult !== "object" || typeof moduleName !== "string") return;
 
@@ -115,7 +104,6 @@ export const manageHopper = {
 
     //process and add CSS///////////////////////////////////////////////////////
     if(typeof moduleResult.css === "string" && !p_p.hopper.css[moduleName]) {
-      console.log("ADD CSS TO HOPPER: ", moduleName);
       const cssProcessed = processCSS(moduleResult.css);
       p_p.hopper.css[moduleName] = cssProcessed;
     }
@@ -125,7 +113,6 @@ export const manageHopper = {
     //and winds up at the request page or module
     //TODO - clean this up so it only writes the returned markup AND have it write to file as well
     if(typeof moduleResult.markup === "string") {
-      console.log("ADD MARKUP TO HOPPER: ", moduleName);
       p_p.hopper.markup = moduleResult.markup;
     }
 
@@ -141,8 +128,6 @@ export const manageHopper = {
       //don't add script if it's module (by key/name) doesn't exist in hopper already
       if(typeof p_p.hopper.script[moduleName] === "undefined") {
 
-        console.log("ADD JS TO HOPPER: ", moduleName);
-        
         //loop through scripts and add a stringified function in the script object, for the given key
         let scripts = "";
               
@@ -230,15 +215,16 @@ export async function moduleCompiler(options) {
   //need to account for the homepage (whatever "/" should load)
   const modulePath = req.url === "/" ? "/a" : req.url;
 
-  console.log("IS BUILD: ", isBuild);
-  console.log("IS FETCH: ", isFetch);
-  console.log("NODE_ENV: ", process.env.NODE_ENV);
-
   //if we are on PROD and not in build process
   //just return the (presumably) compiled and compressed JSON files
   if(process.env.NODE_ENV === "production" && isBuild !== true && isFetch) {
-    console.log("RETURN JSON FILE");
-    return fs.readFileSync(`${__basedir}/dist/pages${modulePath}.json`);
+    const filePath = `${__basedir}/dist/pages${modulePath}.json`;
+    const fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.json`;
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath);
+    } else {
+      return fs.readFileSync(fourOhFourPath);
+    }
   }
 
   //if for build, just use what was passed in, else need to construct the full path from URL  
@@ -248,11 +234,8 @@ export async function moduleCompiler(options) {
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
     bodyMod = (await import(adjustedPath)).default;
-    // console.log("BODY MODULE TRY: ", bodyMod);
   } catch(err) {
     bodyMod = (await import(`${__basedir}/src/pages/fourOhFour.mjs`)).default; 
-    //console.log("------BODY MODULE NOT VALID: ", bodyMod);
-    return;
   }
 
   //get the body module. exit and log if bodyMod is not valid
@@ -265,8 +248,6 @@ export async function moduleCompiler(options) {
   if(isBuild) {
     compressAndWritePage(req.url, JSON.stringify(p_p.hopper));
   }
-
-  //console.log("------TYPEOF BODY RES: ", typeof bodyRes);
 
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
