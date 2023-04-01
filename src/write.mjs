@@ -55,9 +55,9 @@ export function writePage(modulePath, content) {
     }
 
     //brotli compress the css-string
-    //const buff = Buffer.from(content, "utf-8");
-    //const compressed = brotli.compress(buff, brotliSettings);
-    const compressed = content;
+    const buff = Buffer.from(content, "utf-8");
+    const compressed = brotli.compress(buff, brotliSettings);
+    //const compressed = content;
 
     fs.writeFileSync(pagePath, compressed);
 
@@ -86,7 +86,10 @@ export function writeModuleResult(modulePath, content) {
       fs.mkdirSync(pageDirPath, { recursive: true });
     }
 
-    const compressed = content;
+    //brotli compress the string
+    const buff = Buffer.from(content, "utf-8");
+    const compressed = brotli.compress(buff, brotliSettings);
+    //const compressed = content;
 
     fs.writeFileSync(pagePath, compressed);
 

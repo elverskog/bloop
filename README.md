@@ -1,7 +1,5 @@
 # Bloop testbed site
 
-_IMPT: Current code/commit breaks. I'm currently doing some major restructuring I wanted to store/archive on github_
-
 This is just a very sparse Node based site to explore few goals and ideas. It is far from complete.
 
 _Goals_
