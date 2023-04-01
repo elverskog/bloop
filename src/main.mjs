@@ -5,7 +5,7 @@ import manageHopper from "./hopper.mjs";
 
 //creates the output for either a full page (channeling through wrapper)
 //or a single module (which may contain child modules)
-//oily runs on server
+//only runs on server
 export async function moduleCompiler(options) {
 
   if(typeof global !== "object") return; 

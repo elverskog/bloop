@@ -33,8 +33,6 @@ export default async function a() {
   //add result to hopper
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "a");
-    //p_p.processModule(result, "a");
-
   }
 
   return result;

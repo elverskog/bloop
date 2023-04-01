@@ -30,7 +30,6 @@ export default async function menu() {
   //add result to hopper
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "menu");
-    //p_p.processModule(result, "menu");
   }
 
   return result;

@@ -144,7 +144,6 @@ export default async function wrapper(bodyMarkup, title) {
   //OR DO WE
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "wrapper");
-    //p_p.processModule(result, "wrapper");
   }
 
   return result;
