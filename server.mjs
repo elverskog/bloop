@@ -24,13 +24,13 @@ fsExtra.emptyDirSync(`${__basedir}/dist/pages`);
 fsExtra.emptyDirSync(`${__basedir}/dist/modules-res`);
 
 
-//if on prod, here we run code to request every page
-//this is the actual (main) build process
+//if on prod, here we run code to request (build) every page
 //this will create CSS and JS files for each page on run, 
 //so that said file creation will be skipped on request
-//TODO: need to decide if this should be run here or elsewhere
 //in this current location the files will be created right on server start
 //and the request handling defined below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
+//TODO: need to decide if this should be in this file or split off
+
 async function build() {
 
   //get an array of paths to all valid pages
@@ -88,8 +88,8 @@ const server = http.createServer(async (req, res) => {
     "Pragma": "no-cache",
   };
 
-  //if the request is for an allowed filetype or a node_module (which I will likely not server anyways)
-  if(typeof fileTypesObject[reqExtension] === "string" || req.url.indexOf("node_modules") > -1) {
+  //if the request is for an allowed filetype
+  if(typeof fileTypesObject[reqExtension] === "string") {
 
     //set the contenttype in the header based on extension for now
     //TODO: need to look into a better way to determine the file type
