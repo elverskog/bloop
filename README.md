@@ -1,19 +1,25 @@
 # Bloop testbed site
 
-A sparse Node based site to explore few ideas. For now, it is a "sketch" that serves a few absurdly simple (and literally static) pages. There is no specific use-case. It's far from complete and isn't working towards being a framework but is merely (trying) to define a design pattern with a _very_ small footprint. It can also request and serve and insert partial markup, via fetch. For example, it can update the main content area of a page, and load any needed CSS and JS, without overwriting the head, menus etc.
+A sketch of a site in vanilla Node and JS, that I created just to explore a few ideas and make decisions that frameworks obviate. I'm not building a framework but may use this as a base for some personal projects. The code is far from production ready. For now, the site serves a few absurdly simple and (literally) static pages. There is no specific use-case but a general approach...
 
-The general approach to the site is to not have the browser receive data and then render markup dynamically there but rather to have the server render the markup, passing that and the needed dependencies to the browser.
+**General Approach**
+* Rather than have the browser receive data and render markup dynamically, the browser receives markup. 
+* The markup may be a full HTML document or it may be a string that is a part of a document. 
+* Where it makes sense, the browser can of course update the DOM but in general dynamic rendering is done server side.
+* State should be defined in the URL/pathname as much as possible. After having _updated partial page content_ (via a fetch call) the user should be able to refresh and see what they last saw.
 
-The code is "pseudo isomorphic". In that the JS, markup and CSS, for a given page or widget, is contained in one src file. However, the server side code for rendering the result is generally separate from the JS that is loaded into the browser. With the idea that the browser should not (likely cannot) import the JS module file directly. 
+This approach is of course going to be good for some things and not others. I'm merely (trying) to define a design pattern with a _very_ small footprint. 
+
+The code is "pseudo isomorphic". In that the JS, markup and CSS, for a given page or component, is contained in one module. However, the server-side JS for rendering the markup is generally not accessible in the browser (unless deliberately included the the module's result). The browser cannot import the JS module file directly. 
 
 For anything more complex, say a blog, a data source could be integrated. Repercussions of that, like generating static markup when relevant data changes, would be added in a way that stayed within the goals defined below.
 
-**Goals**
-* Play to the web's strengths. Avoid the paradigm of web-apps emulating mobile apps but rather seek to deliver some of the "responsive feel" of a mobile app, without server side bloat, a large initial JS bundle, delays in "hydrating" etc.
+**Other Goals**
+* Avoid emulating mobile apps that can cause server side (dependency) bloat, a large initial JS bundle, delays in "hydrating" etc.
+* Play to the web's strengths. Seek to deliver _some_ of the "responsive feel" of a mobile app but remember what playing field I am on. 
 * Use as few dependencies as possible; no NodeJS framework (express etc), no build tool (webpack etc), no templating library/language (JSX etc).
 * Serve pre-rendered minified and compressed markup for _full page requests_ and minified and compressed CSS and JS for request made from said page.
-* Serve and update _partial page content_ (e.g. load a new page into the content area or insert a widget/component) via one request/response, that includes all the CSS, markup and JS in one response/file.
-* A page should be able to be refreshed, after having _updated partial page content_ and the page response, with any functionality should match what previously in the window. 
+* When updating _partial page content_, the response for that content should include the CSS, markup and JS in _one_ response.
 * Pass minimal JS and CSS to the browser and do so in as modular a manner as possible
 
 **Implementation**
