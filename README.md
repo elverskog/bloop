@@ -10,7 +10,7 @@ For now, the site serves a few absurdly simple and (literally) static pages. The
 * This markup may be delivered as a full HTML document or as part of a document which can be inserted into the DOM from a string. 
 * Bindings to DOM elements should be attached to markup delivered as described above.
 * Where it makes sense, the browser can of course render the DOM dynamically but in general that (meaning loops, filling in variables etc) is done server side.
-* State should be defined in the URL as much as possible. So for example, after having _updated partial page content_ (via a fetch call) the user should be able to refresh and see what they last saw.
+* State should be defined in the URL as much as possible. So for example, after having _updated partial page content_ (via a fetch call) the user should be able to refresh and see what they last saw, after that update.
 * It is better to have "things that need to happen" _not_ abstracted way but rather require said thing to be called explicitly. E.g.  "wouldn't it be nice if just by formatting it like..." winds up creating something like a framework.
 
 The code is "pseudo isomorphic" in that JavaScript, markup and CSS, for a given page or component, is contained in one module/file. However, the module's default function is only ever run server-side. The JS for rendering the markup is generally not accessible in the browser (unless deliberately inserted into the module's result). The browser should not import the JS module file directly (to-do: need to restrict this). 
