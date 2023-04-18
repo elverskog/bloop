@@ -11,12 +11,14 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development nodemon --watch ./src -e css,mjs --experimental-network-imports -r dotenv/config server.mjs",
-    "prod": "NODE_ENV=production node --experimental-network-imports ./server.mjs"
+    "prod": "NODE_ENV=production node --experimental-network-imports ./server.mjs",
+    "test": "tap"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
     "postcss-nesting": "^10.2.0",
+    "tap": "^16.3.4",
     "uglify-js": "^3.17.4"
   }
 }

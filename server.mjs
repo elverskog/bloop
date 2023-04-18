@@ -4,7 +4,7 @@ import fs from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
 import {fileURLToPath} from "url";
-import {getAllPages} from "./src/utils/dir-utils.mjs";
+import {getAllPages} from "./src/utils/dir-utils/dir-utils.mjs";
 
 
 //for node set a base directory as full path

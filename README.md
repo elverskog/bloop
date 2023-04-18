@@ -44,6 +44,9 @@ There are four types of responses the server can give:
 
 There's currently no handling for other types of errors, re-routing approach etc.
 
+### Router
+
+There is no formal routing declaration. The site just expects a URL for a page to be available as a path in `/pages` and a file to be available in `/dist`. If the path is not found it should just return a 404 page. As there is no data, there is currently no support for URL parameters (e.g. /shoe/a6s5d). It actually existed in the code but has been removed to keep things simple.
 
 ### The "Hopper"
 
@@ -88,8 +91,6 @@ Note: In this "sketch" only the main content area can be updated. Loading other 
 
 ### Caveats
 
-* No tests yet but this site is deliberately a "rabbit  hole". So TDD was off the table.
-* Because of wanting to keep the CSS modular, on full page load, the site may request more CSS files than seems optimal. However the goal is to (eventually) use HTTP2 to serve both the initial HTML and required CSS files in the same response. 
-* There is no formal routing declaration scheme. The site just expects a route and file to be available in /pages. If the path is not found it will just return a 404 page.
-* As there is no data there is currently no support for URL parameters (e.g. /shoe/a6s5d). It actually existed in the code but has been removed to, again, keep things simple. 
+* Only a few tests as of writing. Adding them using node-tap. That said, this site is deliberately a "rabbit hole". So TDD was off the table.
+* Because of wanting to keep the CSS modular, on full page load, the site may request more CSS files than seems optimal. However the goal is to (eventually) use HTTP2 to serve both the initial HTML and required CSS files in the same response.  
 * There are several redundancies and known (major and minor) flaws in the code. 
