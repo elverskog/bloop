@@ -4,9 +4,18 @@ I'm just exploring a few ideas in this sketch of a site in vanilla Node and JS. 
 
 For now, the site serves a few absurdly simple and (literally) static pages. There is no specific use-case but a general approach...
 
+## Goals
+* Play to the browser's and web's strengths (remember what playing field I am on). Avoid emulating the delivery mechanism(s) of mobile apps.
+* Deliver initial page loads quickly but thereafter try and offer or at least allow, some of the "responsive feel" of a SPA. 
+* Pass minimal JS and CSS to the browser and do so in as modular a manner as possible.
+* Limit dependencies - No NodeJS framework (express etc), build tool (webpack etc) or templating library/language (JSX etc).
+* When possible, all responses should be pre-rendered, minified and compressed markup.
+* When updating _partial page content_, a _single_ response for that content should include the CSS, markup and JS. E.g. Loading a new piece of content or widget should not trigger calling multiple files.
 
-**General Approach**
-* The browser receives markup. Avoid having the browser receiving data and rendering the markup dynamically.
+
+## Content Delivery Approach
+
+The browser receives markup. Avoid having the browser receiving data and rendering the markup dynamically.
 * This markup may be delivered as a full HTML document or as part of a document which can be inserted into the DOM from a string. 
 * Bindings to DOM elements should be attached to markup delivered as described above.
 * Where it makes sense, the browser can of course render the DOM dynamically but in general that (meaning loops, filling in variables etc) is done server side.
@@ -17,22 +26,15 @@ The code is "pseudo isomorphic" in that JavaScript, markup and CSS, for a given 
 
 All of the above approach is, of course, going to be good for some things and not others.
 
-**Data**
+
+## Data
 
 For anything more complex, say a blog, a data source could be integrated. Repercussions of that, like generating static markup when relevant data changes, would be added in a way that stayed within the general approach and goals defined below.
 
-**Other Goals**
-* Play to the browser's and web's strengths (remember what playing field I am on). Avoid emulating the delivery mechanism(s) of mobile apps.
-* Deliver initial page loads quickly but thereafter try and offer or at least allow, some of the "responsive feel" of a SPA. 
-* Pass minimal JS and CSS to the browser and do so in as modular a manner as possible.
-* Limit dependencies - No NodeJS framework (express etc), build tool (webpack etc) or templating library/language (JSX etc).
-* When possible, all responses should be pre-rendered, minified and compressed markup.
-* When updating _partial page content_, a _single_ response for that content should include the CSS, markup and JS. E.g. Loading a new piece of content or widget should not trigger calling multiple files.
 
+## Implementation
 
-**Implementation**
-
-_Server_
+### Server
 
 There are four types of responses the server can give:
 1. Files: If the requested path has an extension, of a few accepted types, then try to return a file (to-do: handle file 404 errors).
@@ -43,7 +45,7 @@ There are four types of responses the server can give:
 There's currently no handling for other types of errors, re-routing approach etc.
 
 
-_The "Hopper"_
+### The "Hopper"
 
 Perhaps the core (and most unique) aspect of this wacky little site, is what I call the ["hopper"](https://en.wikipedia.org/wiki/Hopper_(particulate_collection_container)). For a request on any old site, it is fairly simple to have a request/route call one "top level" template which imports and embeds another, etc. One winds up with one or more a strings of markup and/or CSS. However, I found this hard to manage. I wanted more clarity per which CSS and JS belonged to which module (for reasons discussed below).
 
@@ -60,17 +62,17 @@ For example, if the pathname "/" is requested: The hopper object's `css` node ma
 _Note: There's redundancy in my current approach that I may want to address. It is useful and workable to load the CSS and JS for each module into the hopper, under a key for each module, as the order doesn't really matter and there should be no duplicate keys. Javascript for a component included five times should not (and does not need to be) be loaded five times. It may be instantiated many times, with different arguments, however. Markup is a different story. The final string depends on where child templates are inserted and how many times. For now the `markup` node in the hopper is simply a string that keeps getting overwritten until the top most template calls `addToHopper`. I've explored ASTs, creating a DOM server side and document fragments but they all seem unnecessary to date. There may be a away to only add the markup to the hopper when the template is the first template called (and hence the last template completed)._
 
 
-_Modes_
+### Modes
 
 There is a dev mode and a prod mode. In prod mode the site should serve already rendered pages and files. In dev mode it should render, minimize (uglify) and compress (brotli) said files and then serve them.
 
 
-_Build_
+### Build
 
 The build script simply gathers an array of all the paths in `/pages`, then runs the default function in the module for each page. Essentially mimicking dev mode described above. This results in all the files needed for full page requests, singular dependency calls (say a CSS file) as well as the JSON response describe below, for a partial page update, being written to disk.
 
 
-_Partial Page Updates_
+### Partial Page Updates
 
 These are a discussed above but the current process is the below. 
 
@@ -84,7 +86,8 @@ These are a discussed above but the current process is the below.
 Note: In this "sketch" only the main content area can be updated. Loading other "widgets" is not there yet. How this could be handled and how complex UI state is maintained is "in process" but the likely solution is state for the main content area in the pathname and other UI states in search parameters or maybe a hash of a JSON object.
 
 
-**Caveats**
+### Caveats
+
 * No tests yet but this site is deliberately a "rabbit  hole". So TDD was off the table.
 * Because of wanting to keep the CSS modular, on full page load, the site may request more CSS files than seems optimal. However the goal is to (eventually) use HTTP2 to serve both the initial HTML and required CSS files in the same response. 
 * There is no formal routing declaration scheme. The site just expects a route and file to be available in /pages. If the path is not found it will just return a 404 page.
