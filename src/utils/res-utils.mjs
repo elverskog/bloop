@@ -1,5 +1,5 @@
 //accept a stream, parse it and set it as the content inside 
-export async function parseAndOutputStream(res, targetEl) {
+export async function parseAndOutputStream(res) {
 
   //this function is only for browser
   if(typeof window !== "object") return;

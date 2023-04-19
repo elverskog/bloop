@@ -1,5 +1,5 @@
 import http from "http";
-import { moduleCompiler } from "./src/main.mjs";
+import moduleCompiler from "./src/moduleCompiler.mjs";
 import fs from "fs";
 import fsExtra from "fs-extra";
 import path from "path";
@@ -99,8 +99,7 @@ const server = http.createServer(async (req, res) => {
     headerOptions["Content-Type"] = contentType;
 
     if(reqExtension === "css" || reqExtension === "js") {
-      //add compression flag for CSS and JS
-      headerOptions["Content-Encoding"] = "br";
+      // headerOptions["Content-Encoding"] = "br";
     } else {
       //add options for reading non-compressed files
       readFileOptions.encoding = "utf8";
@@ -124,6 +123,10 @@ const server = http.createServer(async (req, res) => {
 
   }
 
+  //add compression flag for all current file types served
+  //we may need to alter this later
+  headerOptions["Content-Encoding"] = "br";
+  
   res.writeHead(status, headerOptions);
   res.write(output);
   res.end();

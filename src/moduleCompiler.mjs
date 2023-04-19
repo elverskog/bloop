@@ -6,7 +6,7 @@ import manageHopper from "./hopper.mjs";
 //creates the output for either a full page (channeling through wrapper)
 //or a single module (which may contain child modules)
 //only runs on server
-export async function moduleCompiler(options) {
+export default async function moduleCompiler(options) {
 
   if(typeof global !== "object") return; 
 
@@ -28,32 +28,11 @@ export async function moduleCompiler(options) {
   //need to account for the homepage (whatever "/" should load)
   const modulePath = req.url === "/" ? "/a" : req.url;
 
-  //if we are on PROD and not in build process
-  //for async calls, return either the (presumably) compiled and compressed JSON files
-  //for full-page calls, return either the (presumably) compiled and compressed HTML files
-  if(process.env.NODE_ENV === "production" && isBuild !== true) {
-
-    let filePath;
-    let fourOhFourPath;
-
-    if(isFetch) {
-      filePath = `${__basedir}/dist/modules-res${modulePath}.json`;
-      fourOhFourPath = `${__basedir}/dist/modules-res/fourOhFour.json`;
-    } else {
-      filePath = `${__basedir}/dist/pages${modulePath}.html`;
-      fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.html`;
-    }
-
-    if (fs.existsSync(filePath)) {
-      return fs.readFileSync(filePath);
-    } else {
-      return fs.readFileSync(fourOhFourPath);
-    }
-  }
-
   //if for build, just use what was passed in, else need to construct the full path from URL  
   const adjustedPath = isBuild ? modulePath : `${__basedir}/src/pages${modulePath}.mjs`;
   let bodyMod;
+
+  console.log("ADJUSTED PATH: ", adjustedPath);
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
@@ -66,16 +45,12 @@ export async function moduleCompiler(options) {
   // const bodyRes = await bodyMod();
   const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
-  //if this function was called as part of a build process
-  //write the current compiled page to a JSON file
-  //we do this before wrapper is added to the hopper
-  if(isBuild) {
-    writeModuleResult(req.url, JSON.stringify(p_p.hopper));
-  }
-
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
     await wrapperMod(bodyRes.markup, bodyRes.title);
+  } else {
+    //write the current compiled page to a JSON file
+    writeModuleResult(adjustedPath, JSON.stringify(p_p.hopper));
   }
 
   //write CSS for each module in hopper
@@ -85,9 +60,9 @@ export async function moduleCompiler(options) {
     });
   }
 
-  //write markup for "end result" hopper
-  if(Object.keys(p_p.hopper.markup).length && isBuild) {
-    writePage(req.url, p_p.hopper.markup);
+  //write markup/HTML for "end result" hopper
+  if(Object.keys(p_p.hopper.markup).length) {
+    writePage(adjustedPath, p_p.hopper.markup);
   }
   
   //write script for each module in hopper
@@ -97,11 +72,24 @@ export async function moduleCompiler(options) {
     });
   }
 
-  //if we made it this far we are in dev and either we
-  //if request is for a module, return the whole hopper/module results
-  //else return the full page
-  //TODO it likely makes more sense to have dev write and serve from a file
-  //it will be slower but may avoid bugs caused by handling dev vs prod differently
-  return isFetch ? JSON.stringify(p_p.hopper) : p_p.hopper.markup;
+  //always return a "compiled" file for all call types
+  
+  let filePath;
+  let fourOhFourPath;
+
+  if(isFetch) {
+    filePath = `${__basedir}/dist/modules-res${modulePath}.json`;
+    fourOhFourPath = `${__basedir}/dist/modules-res/fourOhFour.json`;
+  } else {
+    filePath = `${__basedir}/dist/pages${modulePath}.html`;
+    fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.html`;
+  }
+
+  //set another fallback 
+  if (fs.existsSync(filePath)) {
+    return fs.readFileSync(filePath);
+  } else {
+    return fs.readFileSync(fourOhFourPath);
+  }
 
 }

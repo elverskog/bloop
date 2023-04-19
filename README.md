@@ -65,19 +65,17 @@ For example, if the pathname "/" is requested: The hopper object's `css` node ma
 _Note: There's redundancy in my current approach that I may want to address. It is useful and workable to load the CSS and JS for each module into the hopper, under a key for each module, as the order doesn't really matter and there should be no duplicate keys. Javascript for a component included five times should not (and does not need to be) be loaded five times. It may be instantiated many times, with different arguments, however. Markup is a different story. The final string depends on where child templates are inserted and how many times. For now the `markup` node in the hopper is simply a string that keeps getting overwritten until the top most template calls `addToHopper`. I've explored ASTs, creating a DOM server side and document fragments but they all seem unnecessary to date. There may be a away to only add the markup to the hopper when the template is the first template called (and hence the last template completed)._
 
 
-### Modes
+### Modes & Building
 
-There is a dev mode and a prod mode. In prod mode the site should serve already rendered pages and files. In dev mode it should render, minimize (uglify) and compress (brotli) said files and then serve them.
+In **prod mode** the server should run a build script on start. This creates files for all the dependencies for every possible page. Then serve already rendered pages and files, on request. The build script simply gathers an array of all the paths in `/pages`, then runs the default function in the module for each page. Triggering the steps described elsewhere in this document; importing child components, each adding its output to the hopper, etc.
 
+In **dev mode** the server skips the build step. It should render, minimize and compress only the files needed for the current request and then serve them.
 
-### Build
-
-The build script simply gathers an array of all the paths in `/pages`, then runs the default function in the module for each page. Essentially mimicking dev mode described above. This results in all the files needed for full page requests, singular dependency calls (say a CSS file) as well as the JSON response describe below, for a partial page update, being written to disk.
-
+Whether in dev or prod mode, when writing results to disk, the code should minimize and compress said files and then serve them. It currently uses [uglify-js](https://www.npmjs.com/package/uglify-js) and the PostCSS plugin [postcss-minify](https://www.npmjs.com/package/postcss-minify) for minification and [brotli](https://github.com/google/brotli) for compression.
 
 ### Partial Page Updates
 
-These are a discussed above but the current process is the below. 
+Updating part of a page is discussed above but the specific process is the below. 
 
 1. There's a `link` module that should be used for any anchor tags with an `href`. On instantiation, each of these modules attaches an event listener to itself. When clicked the link should now just change the URL pathname to match it's `href` attribute. It also dispatches an event, saying that the pathname has changed. 
 2. The `wrapper` template adds a listener for this event. When the event is "heard" there's a fetch call made to the server, requesting the pathname passed in.  
@@ -94,3 +92,4 @@ Note: In this "sketch" only the main content area can be updated. Loading other 
 * Only a few tests as of writing. Adding them using node-tap. That said, this site is deliberately a "rabbit hole". So TDD was off the table.
 * Because of wanting to keep the CSS modular, on full page load, the site may request more CSS files than seems optimal. However the goal is to (eventually) use HTTP2 to serve both the initial HTML and required CSS files in the same response.  
 * There are several redundancies and known (major and minor) flaws in the code. 
+* Writing needed files to disk can likely be improved or replaced by writing "files" to memory.
