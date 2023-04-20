@@ -85,11 +85,19 @@ export default async function moduleCompiler(options) {
     fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.html`;
   }
 
-  //set another fallback 
-  if (fs.existsSync(filePath)) {
-    return fs.readFileSync(filePath);
+  //if in build just return (as the point then is to just write the files)
+  if(isBuild) {
+    return;
   } else {
-    return fs.readFileSync(fourOhFourPath);
+    //return the markup file we wrote above 
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath);
+    } else {
+      //set another fallback in case the file is missing
+      //TODO - this should maybe be something besides a 404
+      return fs.readFileSync(fourOhFourPath);
+    }
   }
+
 
 }

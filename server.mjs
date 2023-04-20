@@ -35,6 +35,9 @@ async function build() {
 
   //get an array of paths to all valid pages
   const allPages = getAllPages(`${__basedir}/src/pages`);
+
+  //console.log("ALL PAGES: ", allPages);
+
   let index = 0;
 
   async function buildModule() {
@@ -52,13 +55,6 @@ async function build() {
 
   buildModule();
 
-}
-
-
-//test to run just one page for checking optimization
-async function buildTest() {
-  const req = { url: `${__basedir}/src/pages/a.mjs` };
-  await moduleCompiler({ req, res: null, __basedir, isBuild: true });
 }
 
 
@@ -91,20 +87,10 @@ const server = http.createServer(async (req, res) => {
   //if the request is for an allowed filetype
   if(typeof fileTypesObject[reqExtension] === "string") {
 
-    //set the contenttype in the header based on extension for now
+    //set the content-type in the header based on extension for now
     //TODO: need to look into a better way to determine the file type
     let contentType = (typeof fileTypesObject[reqExtension] === "string") ? fileTypesObject[reqExtension] : fileTypesObject["js"];
     const readFileOptions = {};
-
-    headerOptions["Content-Type"] = contentType;
-
-    if(reqExtension === "css" || reqExtension === "js") {
-      // headerOptions["Content-Encoding"] = "br";
-    } else {
-      //add options for reading non-compressed files
-      readFileOptions.encoding = "utf8";
-      readFileOptions.flag = "r";
-    }
 
     //read and return the static file
     const fileExists = fs.existsSync(`${__basedir}${req.url}`);
@@ -115,18 +101,29 @@ const server = http.createServer(async (req, res) => {
       output = "";
       status = 404;
     }
-    
+
+    //add brotli header if file is JS or CSS
+    if(reqExtension === "css" || reqExtension === "js") {
+      headerOptions["Content-Encoding"] = "br";
+    }
+
+    headerOptions["Content-Type"] = contentType;
+
+    //console.log("OUTPUT: ", req.url, "\n", output);
+
   } else {
+
+    //add compression flag for all current file types served
+    //we may need to alter this later
+    headerOptions["Content-Encoding"] = "br";
 
     headerOptions["Content-Type"] = "html";
     output = await moduleCompiler({ req, res, __basedir });
 
   }
 
-  //add compression flag for all current file types served
-  //we may need to alter this later
-  headerOptions["Content-Encoding"] = "br";
-  
+  console.log("HEADER OPTIONS: ", headerOptions);
+
   res.writeHead(status, headerOptions);
   res.write(output);
   res.end();
@@ -134,18 +131,15 @@ const server = http.createServer(async (req, res) => {
 });
 
 
-//run build script if on prod
+//run build script if on prod on start
 if(process.env.NODE_ENV === "production") {
+  console.log("BUILD");
   await build();
-  // await buildTest();
-  server.listen(PORT, () => {
-    console.log(`PROD listening on port ${PORT}`);
-  });
-} else {
-  server.listen(PORT, () => {
-    console.log(`DEV listening on port ${PORT}`);
-  });
 }
+
+server.listen(PORT, () => {
+  console.log(`PROD listening on port ${PORT}`);
+});
 
 
 //// TODO need to test if async readFile is any faster/better than sync

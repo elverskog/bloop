@@ -36,10 +36,10 @@ export function writeCssOrJs(contentString, fileType, moduleName) {
 }
 
 
-//function to compress and write files, in subsection of hopper (css vs js)
+//function to compress and write markup files for a full page request
 export function writePage(modulePath, content) {
 
-  console.log("WRITE PAGE: ", modulePath);
+  //console.log("WRITE PAGE: ", modulePath);
 
   if(typeof modulePath === "string" && typeof content === "string") {
 
