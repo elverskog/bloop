@@ -127,17 +127,14 @@ export default async function wrapper(bodyMarkup, title) {
               p_p.wrapper.insertScripts(resParsed.script, success => {
                 if(success) {
                   console.log("insert scripts succeeded");
-                  //window.p_p[id].init();
                 } else {
                   console.log("insert scripts failed");
                 }
-              }, this);
-
-              
+              });
             } else {
               console.log("insert styles failed");
             }
-          }, this);
+          });
         }
 
       }

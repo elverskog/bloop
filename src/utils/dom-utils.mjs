@@ -17,8 +17,6 @@
 
 export function insertStyleSheets(cssObj, fn, scope) {
 
-  //console.log("cssObj: ", cssObj);
-
   //create an array that just lists the key of each succesfully inserted 
   //I use an object to just automatically avoid duplicates, that would come with an array
   //TODO maybe this can just be a count or a boolean?
@@ -28,7 +26,6 @@ export function insertStyleSheets(cssObj, fn, scope) {
   const intervalAll = setInterval( () =>  {
     try {
       //I don't check one by one here as completedArray can't have dupes
-      //console.log(Object.keys(completed).length, " vs ", Object.keys(cssObj).length);
       if (Object.keys(completed).length === Object.keys(cssObj).length) {
         //based on if each element in cssObj has "loaded" set (as true)
         clearInterval(intervalAll);
@@ -49,13 +46,10 @@ export function insertStyleSheets(cssObj, fn, scope) {
   //function to load, validate and insert each into DOM, and update the list of completed modules
   function insertEach(moduleName, css) {
 
-    // console.log("insertEach: ", moduleName, css);
-
     //if there is already a link with the ID passed, 
     //mark that module as done in "completed" and exit
     const existingMatch = document.getElementById(`${moduleName}Styles`);
     if(existingMatch) {
-      // console.log("EXISTING MATCH: ", moduleName);
       completed[moduleName] = true;
       return;
     }
@@ -86,13 +80,12 @@ export function insertStyleSheets(cssObj, fn, scope) {
     }, 10),                                                   
       //set another slower timer for when to abandon effort
       timeoutEach = setTimeout(() => {
-        // console.log(`${ moduleName } failed`);   
         //our style sheet has failed, clear the counters, fire the callback with success as false
         clearInterval(intervalEach);            
         clearTimeout(timeoutEach);
         //the style sheet didn't load, remove the link node from the DOM and return
         //we just compare length so marking it as false in "completed" is not need (TODO maybe)
-        //document.head.removeChild(linkEl);                
+        document.head.removeChild(linkEl);                
         return;
       }, 15000);
 
@@ -110,14 +103,25 @@ export function insertStyleSheets(cssObj, fn, scope) {
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //module/util to add scripts/js to head client side
 //accept an object with a string for each module needed
 //turn each string of JS into a blob (in memory) and create a link in head
 //only running fn once the JS is actually "initialized"
-////////////////////////////////////////////////////////////////////////////////////////////
+//arguments:
+//scriptsObj - key equals the module name, value is the script as a string
+//fn - a callback function - see utilization of function for clarity
+//scope - the scope the callabck function is called (TODO - may get rid of this)
+//document - this is really just needed for unit testing. Where puppeteer is used to create a DOM on the server
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function insertScripts(scriptsObj, fn, scope) {
+export function insertScripts(scriptsObj, fn, window = window) {
+
+
+  //for unit testing (test uses JSDOM to pass in a "fake" window)
+  const document = window.document;
+
+  console.log("DOCUMENT: ", document);
 
   //create an array that just lists the key of each succesfully inserted 
   //I use an object to just automatically avoid duplicates, that would come with an array
@@ -128,12 +132,11 @@ export function insertScripts(scriptsObj, fn, scope) {
   const intervalAll = setInterval( () =>  {
     try {
       //I don't check the value here, one by one here as completedArray can't have dupes
-      console.log(Object.keys(completed).length, " vs ", Object.keys(scriptsObj).length);
       if (Object.keys(completed).length === Object.keys(scriptsObj).length) {
         //based on if each element in cssObj has "loaded" set (as true)
         clearInterval(intervalAll);
         clearTimeout(timeoutAll);
-        fn.call(scope || window, true);
+        fn.call(window, true);
       }
     } catch (e) { } finally { }
   }, 10),                                                   
@@ -142,7 +145,7 @@ export function insertScripts(scriptsObj, fn, scope) {
       //our style sheets process has failed, so clear the the above interval, fire the callback with success as false
       clearInterval(intervalAll);            
       clearTimeout(timeoutAll);              
-      fn.call(scope || window, false);
+      fn.call(window, false);
     }, 7000);
 
   //function to load, validate and insert each into DOM, and update the list of completed modules

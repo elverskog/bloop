@@ -122,8 +122,6 @@ const server = http.createServer(async (req, res) => {
 
   }
 
-  console.log("HEADER OPTIONS: ", headerOptions);
-
   res.writeHead(status, headerOptions);
   res.write(output);
   res.end();

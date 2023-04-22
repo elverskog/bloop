@@ -45,3 +45,7 @@ sessions
 #database files
 /rawtest
 rawtest
+
+#block test coverage logging
+.nyc_output
+/.nyc_output

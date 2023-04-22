@@ -11,7 +11,7 @@ For now, the site serves a few absurdly simple and (literally) static pages. The
 * Limit dependencies - No NodeJS framework (express etc), build tool (webpack etc) or templating library/language (JSX etc).
 * When possible, all responses should be pre-rendered, minified and compressed markup.
 * When updating _partial page content_, a _single_ response for that content should include the CSS, markup and JS. E.g. Loading a new piece of content or widget should not trigger calling multiple files.
-
+* Have the development and production modes share as much code and process as possible; minimizing errors that can occur when making updates.
 
 ## Content Delivery Approach
 
