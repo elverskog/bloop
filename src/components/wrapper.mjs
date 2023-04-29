@@ -1,13 +1,11 @@
 import menu from "./menu.mjs";
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
-import { insertStyleSheets } from "../utils/dom-utils.mjs";
-import { insertScripts } from "../utils/dom-utils.mjs";
+import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
 
 
 export default async function wrapper(bodyMarkup, title) {
   
   //get menu module
-
   const menuRes = await menu();
   const myTitle = typeof title === "string" ? title : "Bloop";
 
@@ -130,7 +128,7 @@ export default async function wrapper(bodyMarkup, title) {
                 } else {
                   console.log("insert scripts failed");
                 }
-              });
+              }, window);
             } else {
               console.log("insert styles failed");
             }

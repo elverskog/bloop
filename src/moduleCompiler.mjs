@@ -32,8 +32,6 @@ export default async function moduleCompiler(options) {
   const adjustedPath = isBuild ? modulePath : `${__basedir}/src/pages${modulePath}.mjs`;
   let bodyMod;
 
-  console.log("ADJUSTED PATH: ", adjustedPath);
-
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
     bodyMod = (await import(adjustedPath)).default;

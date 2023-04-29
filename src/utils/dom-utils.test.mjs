@@ -5,23 +5,23 @@ import { insertScripts } from "./dom-utils.mjs";
 
 tap.test('insertScripts function', t => {
 
-  t.test('insertScripts should insert all scripts into DOM', async (t2) => {
+  t.test('insertScripts should insert all scripts into DOM', async t2 => {
 
+    //our fake window
+    const window = (new JSDOM(`<!DOCTYPE html><html><body></body></html>`)).window;
+    
     //insertScripts needs a script object, the value on the right will be the script
     //but we don't care here if the script is valid JS
     //note: the src will be hash-blob pointing at this "script"
     const scriptsObj = {
-      script1: 'script1',
-      script2: 'script2")',
-      script3: 'script3")'
+      scriptA: () => "window.p_p.a = {}",
+      scriptB: () => "window.p_p.b = {}",
+      scriptC: () => "window.p_p.c = {}"
     };
-
-    //our fake window
-    const window = (new JSDOM(`<!DOCTYPE html><html><body></body></html>`)).window;
 
     //insertScripts wants a callback
     const fn = function(success) {
-      console.log("I'm a callback function");
+      console.log("I'm just an empty callback function");
     };
 
     // Wait for the window to finish loading
@@ -55,6 +55,45 @@ tap.test('insertScripts function', t => {
     t2.end();
 
   });
+
+
+  t.test('insertScripts should run callback after all scripts are inserted into DOM', t2 => {
+
+    //our fake window
+    const window = (new JSDOM(`<!DOCTYPE html><html><body></body></html>`)).window;
+
+    //insertScripts needs a script object, the value on the right will be the script
+    //but we don't care here if the script is valid JS
+    //note: the src will be hash-blob pointing at this "script"
+    const scriptsObj = {
+      scriptA: () => "window.p_p.a = {}",
+      scriptB: () => "window.p_p.b = {}",
+      scriptC: () => "window.p_p.c = {}"
+    };
+
+    //insertScripts wants a callback
+    const fn = function(success) {
+      console.log("I'm a callback function being tested", JSON.stringify(success));
+      t2.ok(success, 'callback should be called with success=true');
+      //close the fake window we creatd
+      window.close();
+      //end the test
+      t2.end();
+    };
+
+    //call the function we are testing
+    insertScripts(scriptsObj, fn, window);
+
+    //window.setTimeout(() => {}, 7000);
+
+  });
+
+
+
+
+
+
+
 
 
 

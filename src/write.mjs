@@ -73,8 +73,6 @@ export function writePage(modulePath, content) {
 //function to compress and write module results ({css, markup,script})
 export function writeModuleResult(modulePath, content) {
 
-  console.log("WRITE MODULE: ", modulePath);
-
   if(typeof modulePath === "string" && typeof content === "string") {
 
     //change path of module to that of where we should store the page in /dist

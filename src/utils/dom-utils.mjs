@@ -39,7 +39,7 @@ export function insertStyleSheets(cssObj, fn, scope) {
       //our style sheets process has failed, so clear the the above interval, fire the callback with success as false
       clearInterval(intervalAll);            
       clearTimeout(timeoutAll);              
-      fn.call(scope || window, false);
+      fn.call(scope || window, "false");
     //}, 15000);
     }, 7000);
 
@@ -115,25 +115,35 @@ export function insertStyleSheets(cssObj, fn, scope) {
 //document - this is really just needed for unit testing. Where puppeteer is used to create a DOM on the server
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function insertScripts(scriptsObj, fn, window = window) {
+export function insertScripts(scriptsObj, fn, window) {
 
+  //run callback with false if window doesn't exist
+  if(typeof window !== "object") {
+    fn.call(window, false);
+  };
+
+  //if window.p_p doesn't exist create it
+  if(typeof window.p_p !== "object") {
+    window.p_p = {};
+  }
 
   //for unit testing (test uses JSDOM to pass in a "fake" window)
   const document = window.document;
-
-  console.log("DOCUMENT: ", document);
 
   //create an array that just lists the key of each succesfully inserted 
   //I use an object to just automatically avoid duplicates, that would come with an array
   //TODO maybe this can just be a count or a boolean?
   const completed = {};
 
-  //create a interval loop that checks if a stylesheet has been properly added for each module cssObj
+  //interval to check the completed object, to see if it matches the length of the passed in scriptsObj 
   const intervalAll = setInterval( () =>  {
+
+    //console.log("COMPLETED: ", completed);
+
     try {
-      //I don't check the value here, one by one here as completedArray can't have dupes
+      //I don't check the value here, one by one here, as completedArray can't have dupes
       if (Object.keys(completed).length === Object.keys(scriptsObj).length) {
-        //based on if each element in cssObj has "loaded" set (as true)
+        //based on if each element in script has "loaded" set (as true)
         clearInterval(intervalAll);
         clearTimeout(timeoutAll);
         fn.call(window, true);
@@ -142,7 +152,7 @@ export function insertScripts(scriptsObj, fn, window = window) {
   }, 10),                                                   
     //set another slower timer for when to abandon effort
     timeoutAll = setTimeout(() => {       
-      //our style sheets process has failed, so clear the the above interval, fire the callback with success as false
+      //our script insertion process has failed, so clear the the above interval, fire the callback with success as false
       clearInterval(intervalAll);            
       clearTimeout(timeoutAll);              
       fn.call(window, false);
@@ -159,7 +169,7 @@ export function insertScripts(scriptsObj, fn, window = window) {
     }
     
     //create blob for value (JS string) and turn it into a DOM link element
-    const scriptBlob = new Blob([script], { type: 'text/javascript' });
+    const scriptBlob = new Blob([script], { type: "text/javascript" });
     const objectUrl = URL.createObjectURL(scriptBlob);
     const scriptEl = document.createElement("script");
     scriptEl.setAttribute("type", "module");
@@ -169,13 +179,19 @@ export function insertScripts(scriptsObj, fn, window = window) {
     //start loop to check if script was loaded (every 10 milliseconds)
     const intervalEach = setInterval( () =>  {
       try {
-        if (typeof window.p_p[moduleName] === "object") {
+        //TODO: I'm not sure if this is OK (or maybe better)
+        //here we just test if the script element was created but we don't know if the script got atached to window
+        //the problem is that for unit testing, it seems JSDOM doesn't actually run the script inserted???
+        //also not testing the script being attached to window is actually more agnostic because the script may conceivably not do that 
+        //if (typeof window.p_p[moduleName] === "object") {
+        if (typeof document.getElementById(`#{moduleName}Script`) === "object") {
           // our style sheet has loaded, clear the counters, mark that module as done in "completed" and exit
           clearInterval(intervalEach);
           clearTimeout(timeoutEach);
           completed[moduleName] = true;
         }
-      } catch (e) { } finally { }
+      } catch (err) {
+      } finally { }
     }, 10),                                                   
       //set another slower timer for when to abandon effort
       timeoutEach = setTimeout(() => {
@@ -196,5 +212,3 @@ export function insertScripts(scriptsObj, fn, window = window) {
   }
 
 }
-
-
