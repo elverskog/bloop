@@ -103,6 +103,8 @@ export default {
 
     }
 
+    console.log("HOPPER", p_p.hopper);
+
     return;
 
   }

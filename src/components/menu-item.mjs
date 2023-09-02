@@ -13,12 +13,11 @@ export default async function menuItem (label, pathname) {
         display: block;
         font-size: 1em;
         font-weight: 600;
-        border-radius: 50%;
-        width: 40px; 
+        border-radius: 30px;
+        padding: 0 20px;
         height: 40px;
         line-height: 40px;
         text-align: center;
-
         & a.active {
           background-color: #666;
         }

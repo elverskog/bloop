@@ -20,8 +20,8 @@ export default async function menu() {
         ${ (await menuItem("A", "/a")).markup }
         ${ (await menuItem("B", "/b")).markup }
         ${ (await menuItem("C", "/c")).markup }
-        ${ (await menuItem("T1", "/test/test1")).markup }
-        ${ (await menuItem("T2", "/test/test2")).markup }
+        ${ (await menuItem("Lev1", "/level1/test1")).markup }
+        ${ (await menuItem("Lev2", "/level1/level2/test2")).markup }
         ${ (await menuItem("?", "/asdasd")).markup }
       </menu>
     `

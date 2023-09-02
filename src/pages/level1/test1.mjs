@@ -1,6 +1,6 @@
 export default async function test1() {
 
-  console.log("TEST 1");
+  console.log("LEVEL TEST 1");
 
   const result = {
     title: "TEST 1",
@@ -17,7 +17,7 @@ export default async function test1() {
     `,
     markup: `
       <div id="test1" class="test1">
-        T1
+        LEV1
       </div>    
     `,
     script: {
