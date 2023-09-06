@@ -1,6 +1,7 @@
 export default async function c() {
 
   const result = {
+    name: "c",
     title: "C",
     css: `
       .c {

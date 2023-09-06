@@ -83,11 +83,12 @@ export default {
 
       //minify (remove breaks etc) the JS before we write it to file, if in prod  
       if(typeof scriptResAll === "string" && process.env.NODE_ENV === "production") {
-        const minifiedscriptResAll = UglifyJS.minify(scriptResAll);
-        if(typeof minifiedscriptResAll.code === "string") {
-          scriptResAll = minifiedscriptResAll.code;
+        const minifiedScriptResAll = UglifyJS.minify(scriptResAll);
+        if(typeof minifiedScriptResAll.code === "string") {
+          scriptResAll = minifiedScriptResAll.code;
         } else {
-          console.log("JS minified error", minifiedScript.error);
+          console.log("JS minified error", moduleName, "\n", minifiedScriptResAll.error);
+          console.log("JS minified error", moduleName, "\n", scriptResAll);
         }
       }
 
@@ -103,7 +104,7 @@ export default {
 
     }
 
-    console.log("HOPPER", p_p.hopper);
+    //console.log("HOPPER", p_p.hopper);
 
     return;
 

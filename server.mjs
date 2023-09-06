@@ -24,11 +24,10 @@ fsExtra.emptyDirSync(`${__basedir}/dist/pages`);
 fsExtra.emptyDirSync(`${__basedir}/dist/modules-res`);
 
 
-//if on prod, here we run code to request (build) every page
-//this will create CSS and JS files for each page on run, 
-//so that said file creation will be skipped on request
-//in this current location the files will be created right on server start
-//and the request handling defined below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
+//if the command "npm prod" is run, here we run code to build every page found in /pages
+//this will create CSS and JS files for each 
+//for each page the hHTML, CSS and JS for each will be stored in an analogous location in /dist
+//and the request handling defined further below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
 //TODO: need to decide if this should be in this file or split off
 
 async function build() {
@@ -36,7 +35,7 @@ async function build() {
   //get an array of paths to all valid pages
   const allPages = getAllPages(`${__basedir}/src/pages`);
 
-  //console.log("ALL PAGES: ", allPages);
+  //console.log("ALL PAGES: ", allPages);`n
 
   let index = 0;
 

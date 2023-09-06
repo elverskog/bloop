@@ -1,12 +1,13 @@
-import menu from "./menu.mjs";
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
 import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
-
+import manageHopper from "../hopper.mjs"
+import loadModule from "../utils/module-utils.mjs";
 
 export default async function wrapper(bodyMarkup, title) {
   
   //get menu module
-  const menuRes = await menu();
+  const menuRes = await loadModule(`${p_p.baseDir}/src/components/menu.mjs`);
+
   const myTitle = typeof title === "string" ? title : "Bloop";
 
   //we have to add CSS for wrapper and menu as they are not part of body module stack
@@ -15,9 +16,9 @@ export default async function wrapper(bodyMarkup, title) {
     <link id="menuStyles" rel="stylesheet" type="text/css" href="/dist/css/menu.css" />\n
   `;
 
+
   //we have to add scripts for wrapper as it are not part of body module stack
   let scriptTags = `<script src="/dist/js/wrapper.js" type="text/javascript"></script>\n`;
-
   //create a css/link tag for each module used in the page, server-side
   // if(Object.keys(cssPaths).length) {
   //   Object.keys(cssPaths).forEach( key => {
@@ -40,6 +41,7 @@ export default async function wrapper(bodyMarkup, title) {
   }
 
   const result = {
+    name: "wrapper",
     css: `
       body {
         font-family: sans;
@@ -145,7 +147,7 @@ export default async function wrapper(bodyMarkup, title) {
   //add result to hopper 
   //OR DO WE
   if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "wrapper");
+    manageHopper.addToHopper(result, "wrapper");
   }
 
   return result;

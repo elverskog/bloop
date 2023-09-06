@@ -39,6 +39,7 @@ export default async function link (label, pathname) {
   }
 
   const result = {
+    name: "link",
     css: `
       a.link {
         text-decoration: none;

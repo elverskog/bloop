@@ -2,8 +2,8 @@ export default async function a() {
 
   console.log("A");
 
-
   const result = {
+    name: "a",
     title: "A",
     css: `
       .a {
@@ -28,11 +28,6 @@ export default async function a() {
         }
       } 
     } 
-  }
-
-  //add result to hopper
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "a");
   }
 
   return result;

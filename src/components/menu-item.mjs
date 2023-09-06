@@ -5,6 +5,7 @@ export default async function menuItem (label, pathname) {
   const linkRes = await link(label, pathname);
 
   const result = {
+    name: "menu-item",
     css: `
       .menu menuitem a {
         margin: 10px;

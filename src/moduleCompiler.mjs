@@ -1,50 +1,48 @@
 import fs from "fs";
 import wrapperMod from "./components/wrapper.mjs";
 import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
-import manageHopper from "./hopper.mjs";
+import setP_P from "./setGlobal.mjs";
+import loadModule from "./utils/module-utils.mjs";
 
-//creates the output for either a full page (channeling through wrapper)
+
+//creates the output for either a full page ("channeling" the result through wrapper)
 //or a single module (which may contain child modules)
 //only runs on server
 export default async function moduleCompiler(options) {
 
-  if(typeof global !== "object") return; 
-
-  const { req, __basedir, isBuild } = options;
-  const isFetch = req?.headers && req?.headers["is-fetch"];
-
-  //create app to store our global vars in
-  global.p_p = {};
-  p_p.baseDir = __basedir;
-  p_p.isServer = typeof global === "object";
-  p_p.req = req;
-
-  //add hopper management to p_p and create blank(ish) hopper (see hopper func above)
-  p_p.manageHopper = manageHopper;
+  let bodyRes;
   
-  //clear the hopper before we populate it
+  //make call to set some globals
+  setP_P(options);
+  if(!global.p_p) return;
+
+  //reset the hopper to blank "css", "markup", "script" nodes
+  //TODO - is this even needed if a new app is started on each request?
   p_p.manageHopper.setHopper();
 
-  //need to account for the homepage (whatever "/" should load)
-  const modulePath = req.url === "/" ? "/a" : req.url;
+  //set modulePath to the URL pathname
+  //need to account for the homepage or whatever the pathname "/" should load
+  //TODO - may want to move 
+  const modulePath = p_p.req.url === "/" ? "/a" : p_p.req.url;
 
   //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = isBuild ? modulePath : `${__basedir}/src/pages${modulePath}.mjs`;
+  const adjustedPath = p_p.isBuild ? modulePath : `${p_p.baseDir}/src/pages${modulePath}.mjs`;
   let bodyMod;
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
-    bodyMod = (await import(adjustedPath)).default;
+    // bodyMod = (await import(adjustedPath)).default;
+    bodyRes = await loadModule(adjustedPath);
   } catch(err) {
-    bodyMod = (await import(`${__basedir}/src/pages/fourOhFour.mjs`)).default; 
+    // bodyMod = (await import(`${p_p.baseDir}/src/pages/fourOhFour.mjs`)).default; 
+    bodyRes = await loadModule(`${p_p.baseDir}/src/pages/fourOhFour.mjs`); 
   }
 
   //get the body module. exit and log if bodyMod is not valid
-  // const bodyRes = await bodyMod();
-  const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
+  // const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
   //if we got a full page request, we call wrapper, passing body into it
-  if(!isFetch) {
+  if(!p_p.isFetch) {
     await wrapperMod(bodyRes.markup, bodyRes.title);
   } else {
     //write the current compiled page to a JSON file
@@ -75,16 +73,16 @@ export default async function moduleCompiler(options) {
   let filePath;
   let fourOhFourPath;
 
-  if(isFetch) {
-    filePath = `${__basedir}/dist/modules-res${modulePath}.json`;
-    fourOhFourPath = `${__basedir}/dist/modules-res/fourOhFour.json`;
+  if(p_p.isFetch) {
+    filePath = `${p_p.baseDir}/dist/modules-res${modulePath}.json`;
+    fourOhFourPath = `${p_p.baseDir}/dist/modules-res/fourOhFour.json`;
   } else {
-    filePath = `${__basedir}/dist/pages${modulePath}.html`;
-    fourOhFourPath = `${__basedir}/dist/pages/fourOhFour.html`;
+    filePath = `${p_p.baseDir}/dist/pages${modulePath}.html`;
+    fourOhFourPath = `${p_p.baseDir}/dist/pages/fourOhFour.html`;
   }
 
   //if in build just return (as the point then is to just write the files)
-  if(isBuild) {
+  if(p_p.isBuild) {
     return;
   } else {
     //return the markup file we wrote above 
@@ -96,6 +94,5 @@ export default async function moduleCompiler(options) {
       return fs.readFileSync(fourOhFourPath);
     }
   }
-
 
 }

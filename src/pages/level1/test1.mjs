@@ -1,8 +1,7 @@
 export default async function test1() {
 
-  console.log("LEVEL TEST 1");
-
   const result = {
+    name: "test1",
     title: "TEST 1",
     css: `
       .test1 {
@@ -21,17 +20,14 @@ export default async function test1() {
       </div>    
     `,
     script: {
-      init: function() {
+      init: function(args) {
+      
         if(typeof window === "object") {
-          console.log("INIT TEST 1");
+          console.log("INIT LINK");
         }
-      } 
-    } 
-  }
 
-  //add result to hopper
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "test1");
+      }
+    }
   }
 
   return result;

@@ -6,6 +6,7 @@ export default async function menu() {
   //const menuItemFunc = (await import(`${p_p.baseDir}/src/components/menu-item.mjs`)).default;
 
   const result = {
+    name: "menu",
     css: `
     menu.menu {
       display: flex;
@@ -28,9 +29,9 @@ export default async function menu() {
   };
 
   //add result to hopper
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "menu");
-  }
+  // if(p_p.isServer) {
+  //   p_p.manageHopper.addToHopper(result, "menu");
+  // }
 
   return result;
 

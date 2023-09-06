@@ -3,6 +3,7 @@ export default async function test2() {
   console.log("TEST 2");
 
   const result = {
+    name: "test2",
     title: "TEST 2",
     css: `
       .test2 {
