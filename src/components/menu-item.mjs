@@ -1,11 +1,18 @@
-import link from "./link.mjs";
+// import link from "./link.mjs";
+import loadModule from "../utils/module-utils.mjs";
 
-export default async function menuItem (label, pathname) {
+export default async function menuItem (args) {
 
-  const linkRes = await link(label, pathname);
+  // import loadModule from "../utils/module-utils.mjs";
+  // const linkRes = await link(label, pathname);
+  
+  //get link module
+  const { label, pathname} = args; 
+
+  console.log("menuItem args", args);
 
   const result = {
-    name: "menu-item",
+    name: "menuitem",
     css: `
       .menu menuitem a {
         margin: 10px;
@@ -35,15 +42,14 @@ export default async function menuItem (label, pathname) {
     `,
     markup: `
       <menuitem>
-        ${ linkRes.markup }
+        ${ (await loadModule(`${p_p.baseDir}/src/components/link.mjs`, { label, pathname })).markup }
       </menuitem>
     `
   };
 
-  //add result to hopper
   if(p_p.isServer) {
     p_p.manageHopper.addToHopper(result, "menuItem");
-  } 
+  }
 
   return result;
 

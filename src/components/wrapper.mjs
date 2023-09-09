@@ -1,6 +1,5 @@
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
 import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
-import manageHopper from "../hopper.mjs"
 import loadModule from "../utils/module-utils.mjs";
 
 export default async function wrapper(bodyMarkup, title) {
@@ -147,7 +146,7 @@ export default async function wrapper(bodyMarkup, title) {
   //add result to hopper 
   //OR DO WE
   if(p_p.isServer) {
-    manageHopper.addToHopper(result, "wrapper");
+    p_p.manageHopper.addToHopper(result, "wrapper");
   }
 
   return result;

@@ -23,11 +23,6 @@ export default async function fourOhFour() {
     `
   }
 
-  //add result to hopper
-  if(p_p?.isServer) {
-    p_p.manageHopper.addToHopper(result, "fourOhFour");
-  }
-
   return result;
 
 }

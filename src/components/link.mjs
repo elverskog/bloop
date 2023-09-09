@@ -1,18 +1,11 @@
-export default async function link (label, pathname) {
+export default async function link (args) {
 
   const domReady = (await import(`${p_p.baseDir}/src/utils/dom-utils.mjs`)).domReady;
   
-  let link;
-  let html = `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`;
+  let { label, pathname } = args;
+  // let html = `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`;
 
   if(typeof window === "object") {
-    
-    // const frag = document.createRange().createContextualFragment(html);
-    // frag.addEventListener("click", event => {
-    //   event.preventDefault();
-    // });
-    //link = frag;
-    // const el = document.getElementById(id);
 
     domReady(() => {
       
@@ -44,7 +37,7 @@ export default async function link (label, pathname) {
       a.link {
         text-decoration: none;
       }`,
-    markup: html,
+    markup: `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`,
     script: {
       init: function(args) {
       
@@ -82,10 +75,10 @@ export default async function link (label, pathname) {
   };
 
   //add result to hopper
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "link");
-  } 
-
+  // if(p_p?.isServer) {
+  //   p_p.manageHopper.addToHopper(result, "link");
+  // }
+  
   return result;
   
 }

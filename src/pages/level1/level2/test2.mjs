@@ -30,11 +30,6 @@ export default async function test2() {
     } 
   }
 
-  //add result to hopper
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "test2");
-  }
-
   return result;
   
 }
