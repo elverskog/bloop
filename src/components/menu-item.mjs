@@ -47,10 +47,6 @@ export default async function menuItem (args) {
     `
   };
 
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "menuItem");
-  }
-
   return result;
 
 }

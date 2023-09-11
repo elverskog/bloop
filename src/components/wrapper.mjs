@@ -2,8 +2,10 @@ import { parseAndOutputStream } from "../utils/res-utils.mjs";
 import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
 import loadModule from "../utils/module-utils.mjs";
 
-export default async function wrapper(bodyMarkup, title) {
+export default async function wrapper(args) {
   
+  const { bodyMarkup, title } = args;
+
   //get menu module
   const menuRes = await loadModule(`${p_p.baseDir}/src/components/menu.mjs`);
 
@@ -139,14 +141,6 @@ export default async function wrapper(bodyMarkup, title) {
       }
     }
 
-  }
-
-  //Note: we don't add result to hopper here
-  //as we need to call and add it as the top level, when we call a full page
-  //add result to hopper 
-  //OR DO WE
-  if(p_p.isServer) {
-    p_p.manageHopper.addToHopper(result, "wrapper");
   }
 
   return result;

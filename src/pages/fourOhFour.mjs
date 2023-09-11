@@ -1,6 +1,7 @@
 export default async function fourOhFour() {
 
   const result = {
+    name: "404",
     title: "404",
     css: `
       .fourOhFour {

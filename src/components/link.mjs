@@ -74,11 +74,6 @@ export default async function link (args) {
     initArgs: { pathname }
   };
 
-  //add result to hopper
-  // if(p_p?.isServer) {
-  //   p_p.manageHopper.addToHopper(result, "link");
-  // }
-  
   return result;
   
 }

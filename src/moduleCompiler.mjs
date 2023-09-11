@@ -3,6 +3,7 @@ import wrapperMod from "./components/wrapper.mjs";
 import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
 import setP_P from "./setGlobal.mjs";
 import loadModule from "./utils/module-utils.mjs";
+import manageHopper from "./hopper.mjs";
 
 
 //creates the output for either a full page ("channeling" the result through wrapper)
@@ -18,7 +19,7 @@ export default async function moduleCompiler(options) {
 
   //reset the hopper to blank "css", "markup", "script" nodes
   //TODO - is this even needed if a new app is started on each request?
-  p_p.manageHopper.setHopper();
+  manageHopper.setHopper();
 
   //set modulePath to the URL pathname
   //need to account for the homepage or whatever the pathname "/" should load
@@ -43,7 +44,10 @@ export default async function moduleCompiler(options) {
   
   //if we got a full page request, we call wrapper, passing body into it
   if(!p_p.isFetch) {
-    await wrapperMod(bodyRes.markup, bodyRes.title);
+    // await wrapperMod(bodyRes.markup, bodyRes.title);
+    const args = { bodyMarkup: bodyRes.markup, title: bodyRes.title };
+    await loadModule(`${p_p.baseDir}/src/components/wrapper.mjs`, args);
+
   } else {
     //write the current compiled page to a JSON file
     writeModuleResult(adjustedPath, JSON.stringify(p_p.hopper));
