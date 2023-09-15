@@ -4,10 +4,10 @@ import loadModule from "../utils/module-utils.mjs";
 
 export default async function wrapper(args) {
   
-  const { bodyMarkup, title } = args;
+  const { hopper, bodyMarkup, title } = args;
 
   //get menu module
-  const menuRes = await loadModule(`${p_p.baseDir}/src/components/menu.mjs`);
+  const menuRes = await loadModule(`${baseDir}/src/components/menu.mjs`);
 
   const myTitle = typeof title === "string" ? title : "Bloop";
 
@@ -28,15 +28,15 @@ export default async function wrapper(args) {
   //   })
   // }
 
-  if(Object.keys(p_p.hopper.css).length) {
-    Object.keys(p_p.hopper.css).forEach( key => {
+  if(Object.keys(hopper.css).length) {
+    Object.keys(hopper.css).forEach( key => {
       cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`
     })
   }
 
   //create a script tag for each module used in the page, server-side
-  if(Object.keys(p_p.hopper.script).length) {
-    Object.keys(p_p.hopper.script).forEach( key => {
+  if(Object.keys(hopper.script).length) {
+    Object.keys(hopper.script).forEach( key => {
       scriptTags += `<script id="${key}Script" src="/dist/js/${key}.js" type="text/javascript"></script>\n`
     })
   }

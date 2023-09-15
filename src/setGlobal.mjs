@@ -7,11 +7,10 @@ export default function setGlobals(options) {
   if(typeof global !== "object") return; 
 
   global.p_p = {
-    baseDir: options?.__basedir, //make __baseDir available across app
-    req: options?.req, //make request available across app
+    // baseDir: options?.__basedir, //make __baseDir available across app
+    // req: options?.req, //make request available across app
     // isFetch: options.req?.headers && options.req?.headers["is-fetch"]
-    isFetch: options?.req?.headers ? options?.req?.headers["is-fetch"] : false,
-    isBuild: options.isBuild
+    // isBuild: options.isBuild
   };
 
 }

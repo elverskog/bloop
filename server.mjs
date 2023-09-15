@@ -12,16 +12,16 @@ import {getAllPages} from "./src/utils/dir-utils/dir-utils.mjs";
 //so we can use the same import path in node as in browser
 
 const __filename = fileURLToPath(import.meta.url);
-global.__basedir = path.dirname(__filename);
+global.baseDir = path.dirname(__filename);
 
 const PORT = 3000;
 
 //clear the JS and CSS directories in /src
 //so if in prod mode we don't need to keep writing the files on each page serve
-fsExtra.emptyDirSync(`${__basedir}/dist/css`);
-fsExtra.emptyDirSync(`${__basedir}/dist/js`);
-fsExtra.emptyDirSync(`${__basedir}/dist/pages`);
-fsExtra.emptyDirSync(`${__basedir}/dist/modules-res`);
+fsExtra.emptyDirSync(`${baseDir}/dist/css`);
+fsExtra.emptyDirSync(`${baseDir}/dist/js`);
+fsExtra.emptyDirSync(`${baseDir}/dist/pages`);
+fsExtra.emptyDirSync(`${baseDir}/dist/modules-res`);
 
 
 //if the command "npm prod" is run, here we run code to build every page found in /pages
@@ -33,7 +33,7 @@ fsExtra.emptyDirSync(`${__basedir}/dist/modules-res`);
 async function build() {
 
   //get an array of paths to all valid pages
-  const allPages = getAllPages(`${__basedir}/src/pages`);
+  const allPages = getAllPages(`${baseDir}/src/pages`);
 
   //console.log("ALL PAGES: ", allPages);`n
 
@@ -44,7 +44,7 @@ async function build() {
       //fabricate req.url, as that is all we use from the request (for now)
       const req = { url: allPages[index] };
       //pass the url/path to our page builder 
-      await moduleCompiler({ req, res: null, __basedir, isBuild: true });
+      await moduleCompiler({ req, res: null, baseDir, isBuild: true });
       index++;
       buildModule();
     } else {
@@ -92,11 +92,11 @@ const server = http.createServer(async (req, res) => {
     const readFileOptions = {};
 
     //read and return the static file
-    const fileExists = fs.existsSync(`${__basedir}${req.url}`);
+    const fileExists = fs.existsSync(`${baseDir}${req.url}`);
     if(fileExists) {
-      output = fs.readFileSync(`${__basedir}${req.url}`, readFileOptions);
+      output = fs.readFileSync(`${baseDir}${req.url}`, readFileOptions);
     } else {
-      console.log("file not found error: ", `${__basedir}${req.url}`);
+      console.log("file not found error: ", `${baseDir}${req.url}`);
       output = "";
       status = 404;
     }
@@ -117,7 +117,7 @@ const server = http.createServer(async (req, res) => {
     headerOptions["Content-Encoding"] = "br";
 
     headerOptions["Content-Type"] = "html";
-    output = await moduleCompiler({ req, res, __basedir });
+    output = await moduleCompiler({ req, res, baseDir });
 
   }
 
@@ -140,7 +140,7 @@ server.listen(PORT, () => {
 
 
 //// TODO need to test if async readFile is any faster/better than sync
-// fs.readFile(`${__basedir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
+// fs.readFile(`${baseDir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
 //   if(err) {
 //     console.error(err);
 //   } else {

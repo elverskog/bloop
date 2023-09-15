@@ -13,21 +13,21 @@ export default async function moduleCompiler(options) {
 
   let bodyRes;
   
-  //make call to set some globals
-  setP_P(options);
-  if(!global.p_p) return;
+  const { isBuild } = options;
+
+  const isFetch = options?.req?.headers ? options?.req?.headers["is-fetch"] : false;
+
+  //set modulePath to the URL pathname
+  //need to account for the homepage or whatever the pathname "/" should load
+  //TODO - may want to move 
+  const modulePath = options.req.url === "/" ? "/a" : options.req.url;
 
   //reset the hopper to blank "css", "markup", "script" nodes
   //TODO - is this even needed if a new app is started on each request?
   manageHopper.setHopper();
 
-  //set modulePath to the URL pathname
-  //need to account for the homepage or whatever the pathname "/" should load
-  //TODO - may want to move 
-  const modulePath = p_p.req.url === "/" ? "/a" : p_p.req.url;
-
   //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = p_p.isBuild ? modulePath : `${p_p.baseDir}/src/pages${modulePath}.mjs`;
+  const adjustedPath = isBuild ? modulePath : `${baseDir}/src/pages${modulePath}.mjs`;
   let bodyMod;
 
   //if we can't find the module/page that matches the path, use a 404 page/module
@@ -35,18 +35,18 @@ export default async function moduleCompiler(options) {
     // bodyMod = (await import(adjustedPath)).default;
     bodyRes = await loadModule(adjustedPath);
   } catch(err) {
-    // bodyMod = (await import(`${p_p.baseDir}/src/pages/fourOhFour.mjs`)).default; 
-    bodyRes = await loadModule(`${p_p.baseDir}/src/pages/fourOhFour.mjs`); 
+    // bodyMod = (await import(`${baseDir}/src/pages/fourOhFour.mjs`)).default; 
+    bodyRes = await loadModule(`${baseDir}/src/pages/fourOhFour.mjs`); 
   }
 
   //get the body module. exit and log if bodyMod is not valid
   // const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
   
   //if we got a full page request, we call wrapper, passing body into it
-  if(!p_p.isFetch) {
+  if(!isFetch) {
     // await wrapperMod(bodyRes.markup, bodyRes.title);
     const args = { bodyMarkup: bodyRes.markup, title: bodyRes.title };
-    await loadModule(`${p_p.baseDir}/src/components/wrapper.mjs`, args);
+    await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
 
   } else {
     //write the current compiled page to a JSON file
@@ -77,16 +77,16 @@ export default async function moduleCompiler(options) {
   let filePath;
   let fourOhFourPath;
 
-  if(p_p.isFetch) {
-    filePath = `${p_p.baseDir}/dist/modules-res${modulePath}.json`;
-    fourOhFourPath = `${p_p.baseDir}/dist/modules-res/fourOhFour.json`;
+  if(isFetch) {
+    filePath = `${baseDir}/dist/modules-res${modulePath}.json`;
+    fourOhFourPath = `${baseDir}/dist/modules-res/fourOhFour.json`;
   } else {
-    filePath = `${p_p.baseDir}/dist/pages${modulePath}.html`;
-    fourOhFourPath = `${p_p.baseDir}/dist/pages/fourOhFour.html`;
+    filePath = `${baseDir}/dist/pages${modulePath}.html`;
+    fourOhFourPath = `${baseDir}/dist/pages/fourOhFour.html`;
   }
 
   //if in build just return (as the point then is to just write the files)
-  if(p_p.isBuild) {
+  if(isBuild) {
     return;
   } else {
     //return the markup file we wrote above 

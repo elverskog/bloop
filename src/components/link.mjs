@@ -1,6 +1,6 @@
 export default async function link (args) {
 
-  const domReady = (await import(`${p_p.baseDir}/src/utils/dom-utils.mjs`)).domReady;
+  const domReady = (await import(`${baseDir}/src/utils/dom-utils.mjs`)).domReady;
   
   let { label, pathname } = args;
   // let html = `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`;

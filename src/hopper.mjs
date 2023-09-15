@@ -1,9 +1,9 @@
-//manageHopper creates and manages a temporary object "hopper" that stores the CSS, markup and JS, for the request of a:
+//manageHopper creates and manages a temporary object "this.hopper" that stores the CSS, markup and JS, for the request of a:
 //page - for when the site/app is loaded for the first time, going to a specific pathname
 //module - for fetching a new part of the UI, often by a pathname/page change (loadinga new page SPA style) or for getting some new UI element or feature
-//in both cases all the child modules (say a field or button module) need to be loaded into the hopper
+//in both cases all the child modules (say a field or button module) need to be loaded into the this.hopper
 //hence returning all the CSS and JS needed for said page or module (html is just concated in the string literal)
-//whenever a page or module's "compile" is completed, the hopper should be cleared 
+//whenever a page or module's "compile" is completed, the this.hopper should be cleared 
 //it only should run on server
 import UglifyJS from "uglify-js";
 import { processCSS } from "./utils/css-utils.mjs";
@@ -11,8 +11,9 @@ import { processCSS } from "./utils/css-utils.mjs";
 
 export default {
 
+
   setHopper: function() {
-    p_p.hopper = {
+    this.hopper = {
       css: {},
       markup: "",
       script: {},
@@ -23,7 +24,7 @@ export default {
   //this is meant to work for one HTTP request at a time; a full page or a module call 
   addToHopper: async function(moduleResult, moduleName) {
 
-    //if we are in DEV or isBuild is true, don't add anything to the hopper
+    //if we are in DEV or isBuild is true, don't add anything to the this.hopper
     //because, presumably, the files needed have all been written to /dist
     //if(process.env.NODE_ENV === "production" || !isBuild) return;
 
@@ -32,13 +33,13 @@ export default {
 
     //add the page title, if passed (there should only be one)
     if(typeof moduleResult.title === "string") {
-      p_p.hopper.title = moduleResult.title;
+      this.hopper.title = moduleResult.title;
     }     
 
     //process and add CSS///////////////////////////////////////////////////////
-    if(typeof moduleResult.css === "string" && !p_p.hopper.css[moduleName]) {
+    if(typeof moduleResult.css === "string" && !this.hopper.css[moduleName]) {
       const cssProcessed = processCSS(moduleResult.css);
-      p_p.hopper.css[moduleName] = cssProcessed;
+      this.hopper.css[moduleName] = cssProcessed;
     }
 
     //process and add markup////////////////////////////////////////////////////
@@ -46,7 +47,7 @@ export default {
     //and winds up at the request page or module
     //TODO - clean this up so it only writes the returned markup AND have it write to file as well
     if(typeof moduleResult.markup === "string") {
-      p_p.hopper.markup = moduleResult.markup;
+      this.hopper.markup = moduleResult.markup;
     }
 
     //process and add script////////////////////////////////////////////////////
@@ -58,8 +59,8 @@ export default {
     //if it has been added, still add any init functions (for event listeners for repeated modules etc)
     if(typeof moduleResult.script === "object") {
 
-      //don't add script if it's module (by key/name) doesn't exist in hopper already
-      if(typeof p_p.hopper.script[moduleName] === "undefined") {
+      //don't add script if it's module (by key/name) doesn't exist in this.hopper already
+      if(typeof this.hopper.script[moduleName] === "undefined") {
 
         //loop through scripts and add a stringified function in the script object, for the given key
         let scripts = "";
@@ -92,19 +93,19 @@ export default {
         }
       }
 
-      //add script to hopper
+      //add script to this.hopper
       if(typeof scriptResAll === "string") {
         //if the node/key exists, add to it, else create it  
-        if(typeof p_p.hopper.script[moduleName] === "string") {
-          p_p.hopper.script[moduleName] += scriptResAll;
+        if(typeof this.hopper.script[moduleName] === "string") {
+          this.hopper.script[moduleName] += scriptResAll;
         } else {
-          p_p.hopper.script[moduleName] = scriptResAll;
+          this.hopper.script[moduleName] = scriptResAll;
         }
       }
 
     }
 
-    //console.log("HOPPER", p_p.hopper);
+    //console.log("HOPPER", this.hopper);
 
     return;
 

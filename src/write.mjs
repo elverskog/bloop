@@ -15,7 +15,7 @@ const brotliSettings = {
 //function to compress and write files, in subsection of hopper (css vs js)
 export function writeCssOrJs(contentString, fileType, moduleName) {
 
-  const filePath = `${__basedir}/dist/${fileType}/${moduleName}.${fileType}`;
+  const filePath = `${baseDir}/dist/${fileType}/${moduleName}.${fileType}`;
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(filePath)) return;
