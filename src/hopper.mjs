@@ -12,6 +12,12 @@ import { processCSS } from "./utils/css-utils.mjs";
 export default {
 
 
+  hopper: {},
+
+  getHopper: function () {
+    return this.hopper;
+  },
+
   setHopper: function() {
     this.hopper = {
       css: {},

@@ -9,8 +9,6 @@ export default async function menuItem (args) {
   //get link module
   const { label, pathname} = args; 
 
-  console.log("menuItem args", args);
-
   const result = {
     name: "menuitem",
     css: `

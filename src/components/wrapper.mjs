@@ -6,6 +6,9 @@ export default async function wrapper(args) {
   
   const { hopper, bodyMarkup, title } = args;
 
+ console.log("args", args);
+
+
   //get menu module
   const menuRes = await loadModule(`${baseDir}/src/components/menu.mjs`);
 

@@ -41,34 +41,36 @@ export default async function moduleCompiler(options) {
 
   //get the body module. exit and log if bodyMod is not valid
   // const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
-  
+ 
+  const hopper = manageHopper.getHopper();
+
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
     // await wrapperMod(bodyRes.markup, bodyRes.title);
-    const args = { bodyMarkup: bodyRes.markup, title: bodyRes.title };
+    const args = { hopper, bodyMarkup: bodyRes.markup, title: bodyRes.title };
     await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
 
   } else {
     //write the current compiled page to a JSON file
-    writeModuleResult(adjustedPath, JSON.stringify(p_p.hopper));
+    writeModuleResult(adjustedPath, JSON.stringify(hopper));
   }
 
   //write CSS for each module in hopper
-  if(Object.keys(p_p.hopper.css).length) {
-    Object.keys(p_p.hopper.css).forEach( key => {
-      writeCssOrJs(p_p.hopper.css[key], "css", key);
+  if(Object.keys(hopper.css).length) {
+    Object.keys(hopper.css).forEach( key => {
+      writeCssOrJs(hopper.css[key], "css", key);
     });
   }
 
   //write markup/HTML for "end result" hopper
-  if(Object.keys(p_p.hopper.markup).length) {
-    writePage(adjustedPath, p_p.hopper.markup);
+  if(Object.keys(hopper.markup).length) {
+    writePage(adjustedPath, hopper.markup);
   }
   
   //write script for each module in hopper
-  if(Object.keys(p_p.hopper.script).length) { 
-    Object.keys(p_p.hopper.script).forEach( key => {
-      writeCssOrJs(p_p.hopper.script[key], "js", key);
+  if(Object.keys(hopper.script).length) { 
+    Object.keys(hopper.script).forEach( key => {
+      writeCssOrJs(hopper.script[key], "js", key);
     });
   }
 
