@@ -1,7 +1,6 @@
 import fs from "fs";
 import wrapperMod from "./components/wrapper.mjs";
 import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
-import setP_P from "./setGlobal.mjs";
 import loadModule from "./utils/module-utils.mjs";
 import manageHopper from "./hopper.mjs";
 

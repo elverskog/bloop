@@ -5,7 +5,7 @@ export default async function test1() {
     title: "TEST 1",
     css: `
       .test1 {
-        font-size: 35em;
+        font-size: 25em;
         text-align: center;
       }
       @media (max-width: 30em) {
@@ -16,7 +16,7 @@ export default async function test1() {
     `,
     markup: `
       <div id="test1" class="test1">
-        LEV1
+        LV1
       </div>    
     `,
     script: {
