@@ -3,8 +3,8 @@ export default async function test2() {
   console.log("TEST 2");
 
   const result = {
-    name: "test2",
-    title: "TEST 2",
+    name: "lev2Page",
+    title: "Level 2 Page",
     css: `
       .test2 {
         font-size: 25em;
