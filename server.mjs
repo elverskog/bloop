@@ -35,8 +35,6 @@ async function build() {
   //get an array of paths to all valid pages
   const allPages = getAllPages(`${baseDir}/src/pages`);
 
-  //console.log("ALL PAGES: ", allPages);`n
-
   let index = 0;
 
   async function buildModule() {
@@ -137,13 +135,3 @@ if(process.env.NODE_ENV === "production") {
 server.listen(PORT, () => {
   console.log(`PROD listening on port ${PORT}`);
 });
-
-
-//// TODO need to test if async readFile is any faster/better than sync
-// fs.readFile(`${baseDir}${req.url}`, {encoding:'utf8', flag:'r'}, (err, data) => {
-//   if(err) {
-//     console.error(err);
-//   } else {
-//     output = data;
-//   }
-// });

@@ -48,7 +48,6 @@ export default async function moduleCompiler(options) {
     // await wrapperMod(bodyRes.markup, bodyRes.title);
     const args = { hopper, bodyMarkup: bodyRes.markup, title: bodyRes.title };
     await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
-
   } else {
     //write the current compiled page to a JSON file
     writeModuleResult(adjustedPath, JSON.stringify(hopper));

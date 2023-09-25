@@ -1,19 +1,28 @@
 import hopper from "../hopper.mjs"
 
 //function to simply import a module
-//but at the same time add it's run results to the hopper
+//but at the same time, add its results to the hopper
 
 export default async function loadModule(path, args) {
 
   let module;
   let moduleRes;
 
-  module = (await import(path)).default; 
+  if(typeof path === "string") {
 
-  moduleRes = await module(args);
+    module = (await import(path)).default; 
 
-  hopper.addToHopper(moduleRes, moduleRes.name);
+    moduleRes = await module(args);
 
+    hopper.addToHopper(moduleRes, moduleRes.name);
+
+  } else {
+
+    console.log("loadModule called with invalid arguments: ");
+    console.log("path: ", path);
+    console.log("args: ", args);
+  }
+  
   return moduleRes;
-
+    
 }
