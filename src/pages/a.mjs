@@ -1,7 +1,5 @@
 export default async function a() {
 
-  console.log("A");
-
   const result = {
     name: "a",
     title: "A",

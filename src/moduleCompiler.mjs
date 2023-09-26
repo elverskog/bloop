@@ -33,6 +33,7 @@ export default async function moduleCompiler(options) {
   try {
     // bodyMod = (await import(adjustedPath)).default;
     bodyRes = await loadModule(adjustedPath);
+    // console.log("bodyRes: ", bodyRes);
   } catch(err) {
     // bodyMod = (await import(`${baseDir}/src/pages/fourOhFour.mjs`)).default; 
     bodyRes = await loadModule(`${baseDir}/src/pages/fourOhFour.mjs`); 
@@ -47,7 +48,9 @@ export default async function moduleCompiler(options) {
   if(!isFetch) {
     // await wrapperMod(bodyRes.markup, bodyRes.title);
     const args = { hopper, bodyMarkup: bodyRes.markup, title: bodyRes.title };
-    await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
+    const inWrapper = await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
+    console.log("inWrapper: ", inWrapper);
+    // await loadModule(`${baseDir}/src/components/wrapper.mjs`, bodyRes);
   } else {
     //write the current compiled page to a JSON file
     writeModuleResult(adjustedPath, JSON.stringify(hopper));
