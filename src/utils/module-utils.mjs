@@ -35,6 +35,7 @@ export default async function loadModule(path, args) {
     } catch(err){
 
       console.log("loadModule import path failed: ", err);
+      moduleRes = await loadModule(`${baseDir}/src/pages/fourOhFour.mjs`); 
       return;
 
     }
@@ -47,6 +48,5 @@ export default async function loadModule(path, args) {
     return;
 
   }
-  
     
 }

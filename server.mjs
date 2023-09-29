@@ -1,10 +1,10 @@
 import http from "http";
-import moduleCompiler from "./src/moduleCompiler.mjs";
 import fs from "fs";
-import fsExtra from "fs-extra";
 import path from "path";
-import {fileURLToPath} from "url";
-import {getAllPages} from "./src/utils/dir-utils/dir-utils.mjs";
+import { fileURLToPath } from "url";
+import moduleCompiler from "./src/moduleCompiler.mjs";
+import { build } from "./src/utils/build-utils.mjs";
+import { getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
 
 
 //for node set a base directory as full path
@@ -16,50 +16,14 @@ global.baseDir = path.dirname(__filename);
 
 const PORT = 3000;
 
-//clear the JS and CSS directories in /src
-//so if in prod mode we don't need to keep writing the files on each page serve
-fsExtra.emptyDirSync(`${baseDir}/dist/css`);
-fsExtra.emptyDirSync(`${baseDir}/dist/js`);
-fsExtra.emptyDirSync(`${baseDir}/dist/pages`);
-fsExtra.emptyDirSync(`${baseDir}/dist/modules-res`);
-
-
-//if the command "npm prod" is run, here we run code to build every page found in /pages
-//this will create CSS and JS files for each 
-//for each page the hHTML, CSS and JS for each will be stored in an analogous location in /dist
-//and the request handling defined further below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
-//TODO: need to decide if this should be in this file or split off
-
-async function build() {
-
-  //get an array of paths to all valid pages
-  const allPages = getAllPages(`${baseDir}/src/pages`);
-
-  let index = 0;
-
-  async function buildModule() {
-    if(typeof allPages[index] === "string") {
-      //fabricate req.url, as that is all we use from the request (for now)
-      const req = { url: allPages[index] };
-      //pass the url/path to our page builder 
-      await moduleCompiler({ req, res: null, baseDir, isBuild: true });
-      index++;
-      buildModule();
-    } else {
-      return;
-    }
-  }
-
-  buildModule();
-
-}
-
-
 const server = http.createServer(async (req, res) => {
 
   //set default status as success
   let status = 200;
 
+  //set if the call is a fetch (non-fullpage call)
+  const isFetch = req?.headers ? req?.headers["is-fetch"] : false;
+  
   //set holder for final oitput to be served
   let output;
 
@@ -106,17 +70,44 @@ const server = http.createServer(async (req, res) => {
 
     headerOptions["Content-Type"] = contentType;
 
-    //console.log("OUTPUT: ", req.url, "\n", output);
+  } else if(!isFetch) {
+
+    //add compression flag for all current file types served
+    //we may need to alter this later
+    headerOptions["Content-Encoding"] = "br";
+    headerOptions["Content-Type"] = "html";
+    const readFileOptions = {};
+
+    //if there is a file found for the pathname, return it
+    //else compile the module(s) and write the related files
+    try {
+      output = fs.readFileSync(`${baseDir}/dist/pages${req.url}.html`, readFileOptions);
+    } catch (error) {
+      console.log("server.mjs read HTML page error: ", error);
+    }
+
+    if (typeof output !== "object") {
+      try {
+        output = fs.readFileSync(`${baseDir}/dist/pages/fourOhFour.html`, readFileOptions);
+      } catch (error) {
+        console.log("server.mjs read HTML 404 page error: ", error);
+      }
+    }
+
+    if (typeof output !== "object") {
+      output = await moduleCompiler({ req, res, baseDir });
+    }
 
   } else {
 
     //add compression flag for all current file types served
     //we may need to alter this later
     headerOptions["Content-Encoding"] = "br";
+    headerOptions["Content-Type"] = "json";
 
-    headerOptions["Content-Type"] = "html";
+
     output = await moduleCompiler({ req, res, baseDir });
-
+  
   }
 
   res.writeHead(status, headerOptions);
@@ -129,7 +120,9 @@ const server = http.createServer(async (req, res) => {
 //run build script if on prod on start
 if(process.env.NODE_ENV === "production") {
   console.log("BUILD");
-  await build();
+  //get an array of paths to all valid pages
+  const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
+  await build(pagePathsArray);
 }
 
 server.listen(PORT, () => {

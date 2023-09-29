@@ -31,12 +31,10 @@ export default async function moduleCompiler(options) {
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
-    // bodyMod = (await import(adjustedPath)).default;
+    console.log("TRY TRY TRY");
     bodyRes = await loadModule(adjustedPath);
-    // console.log("bodyRes: ", bodyRes);
   } catch(err) {
-    // bodyMod = (await import(`${baseDir}/src/pages/fourOhFour.mjs`)).default; 
-    bodyRes = await loadModule(`${baseDir}/src/pages/fourOhFour.mjs`); 
+    console.log("moduleCompiler.mjs load module error: ", error);
   }
 
   //get the body module. exit and log if bodyMod is not valid
@@ -49,7 +47,6 @@ export default async function moduleCompiler(options) {
     // await wrapperMod(bodyRes.markup, bodyRes.title);
     const args = { hopper, bodyMarkup: bodyRes.markup, title: bodyRes.title };
     const inWrapper = await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
-    console.log("inWrapper: ", inWrapper);
     // await loadModule(`${baseDir}/src/components/wrapper.mjs`, bodyRes);
   } else {
     //write the current compiled page to a JSON file
@@ -80,6 +77,8 @@ export default async function moduleCompiler(options) {
   let filePath;
   let fourOhFourPath;
 
+  //if a fetch call, return JSON
+  //else pass the full HTML
   if(isFetch) {
     filePath = `${baseDir}/dist/modules-res${modulePath}.json`;
     fourOhFourPath = `${baseDir}/dist/modules-res/fourOhFour.json`;
