@@ -1,5 +1,23 @@
 import fs from "fs";
 
+//a simple util (a singleton? oh no!) to pass the base file path around
+let baseDir; 
+
+export const utilBaseDir = {
+ 
+  //takes a function that should return a base directory 
+  setBaseDir: function(genBaseDir) {
+    baseDir = genBaseDir();
+  },
+
+  getBaseDir: () => {
+    console.log("dfsdf ", baseDir);
+    return baseDir;
+  }
+
+};
+
+
 //get an array of all valid files paths inside dirPath
 //function will augment an existing array, if passed in
 export function getAllPages(dirPath, result = [], extension = "mjs") { 
@@ -20,7 +38,7 @@ export function getAllPages(dirPath, result = [], extension = "mjs") {
         // with something like https://www.npmjs.com/package/mime-types?
         result.push(`${dirPath}/${file}`);
       }
-    })
+    });
 
   } catch (err) {
     throw new Error(`Error while reading directory ${dirPath}: ${err.message}`);

@@ -1,5 +1,5 @@
-import s from "fs";
-import hopper from "../hopper.mjs"
+import hopper from "../hopper.mjs";
+import { utilBaseDir } from "./dir-utils/dir-utils.mjs";
 
 //function to simply import a module
 //but at the same time, add its results to the hopper
@@ -8,6 +8,7 @@ export default async function loadModule(path, args) {
 
   let module;
   let moduleRes;
+  const baseDir = utilBaseDir.getBaseDir();
 
   //is the import path a string
   //and if args was passed, is it an object
@@ -16,7 +17,7 @@ export default async function loadModule(path, args) {
     try {
       
       //import and run the module's default function
-      module = (await import(path)).default; 
+      module = (await import(`${baseDir}/${path}`)).default; 
 
       //if the module's default is a function, run it
       if(typeof module === "function") {
@@ -35,7 +36,7 @@ export default async function loadModule(path, args) {
     } catch(err){
 
       console.log("loadModule import path failed: ", err);
-      moduleRes = await loadModule(`${baseDir}/src/pages/fourOhFour.mjs`); 
+      moduleRes = await loadModule("src/pages/fourOhFour.mjs"); 
       return;
 
     }

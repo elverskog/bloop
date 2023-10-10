@@ -1,5 +1,4 @@
 import fs from "fs";
-import wrapperMod from "./components/wrapper.mjs";
 import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
 import loadModule from "./utils/module-utils.mjs";
 import manageHopper from "./hopper.mjs";
@@ -11,9 +10,7 @@ import manageHopper from "./hopper.mjs";
 export default async function moduleCompiler(options) {
 
   let bodyRes;
-  
   const { isBuild } = options;
-
   const isFetch = options?.req?.headers ? options?.req?.headers["is-fetch"] : false;
 
   //set modulePath to the URL pathname
@@ -26,15 +23,13 @@ export default async function moduleCompiler(options) {
   manageHopper.setHopper();
 
   //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = isBuild ? modulePath : `${baseDir}/src/pages${modulePath}.mjs`;
-  let bodyMod;
+  const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
-    console.log("TRY TRY TRY");
     bodyRes = await loadModule(adjustedPath);
   } catch(err) {
-    console.log("moduleCompiler.mjs load module error: ", error);
+    console.log("moduleCompiler.mjs load module error: ", err);
   }
 
   //get the body module. exit and log if bodyMod is not valid
@@ -44,11 +39,11 @@ export default async function moduleCompiler(options) {
 
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
+    console.log("IS NOT FETCH");
     // await wrapperMod(bodyRes.markup, bodyRes.title);
-    const args = { hopper, bodyMarkup: bodyRes.markup, title: bodyRes.title };
-    const inWrapper = await loadModule(`${baseDir}/src/components/wrapper.mjs`, args);
-    // await loadModule(`${baseDir}/src/components/wrapper.mjs`, bodyRes);
+    await loadModule("src/components/wrapper.mjs", bodyRes);
   } else {
+    console.log("IS FETCH");
     //write the current compiled page to a JSON file
     writeModuleResult(adjustedPath, JSON.stringify(hopper));
   }
@@ -80,11 +75,11 @@ export default async function moduleCompiler(options) {
   //if a fetch call, return JSON
   //else pass the full HTML
   if(isFetch) {
-    filePath = `${baseDir}/dist/modules-res${modulePath}.json`;
-    fourOhFourPath = `${baseDir}/dist/modules-res/fourOhFour.json`;
+    filePath = `../dist/modules-res${modulePath}.json`;
+    fourOhFourPath = "./dist/modules-res/fourOhFour.json";
   } else {
-    filePath = `${baseDir}/dist/pages${modulePath}.html`;
-    fourOhFourPath = `${baseDir}/dist/pages/fourOhFour.html`;
+    filePath = `../dist/pages${modulePath}.html`;
+    fourOhFourPath = "../dist/pages/fourOhFour.html";
   }
 
   //if in build just return (as the point then is to just write the files)

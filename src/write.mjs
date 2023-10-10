@@ -1,10 +1,11 @@
 import fs from "fs";
 import brotli from "brotli";
+import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
 
 //settings for brotli compression - TODO adjust these settings
 const brotliSettings = {
-  extension: 'css',
+  extension: "css",
   skipLarger: true,
   mode: 1, // 0 = generic, 1 = text, 2 = font (WOFF2)
   quality: 10, // 0 - 11,
@@ -15,6 +16,7 @@ const brotliSettings = {
 //function to compress and write files, in subsection of hopper (css vs js)
 export function writeCssOrJs(contentString, fileType, moduleName) {
 
+  const baseDir = utilBaseDir.getBaseDir();
   const filePath = `${baseDir}/dist/${fileType}/${moduleName}.${fileType}`;
 
   //if in PROD, exit if the file exists (on dev always write the file)
@@ -39,7 +41,7 @@ export function writeCssOrJs(contentString, fileType, moduleName) {
 //function to compress and write markup files for a full page request
 export function writePage(modulePath, content) {
 
-  //console.log("WRITE PAGE: ", modulePath);
+  console.log("WRITE PAGE: ", modulePath);
 
   if(typeof modulePath === "string" && typeof content === "string") {
 

@@ -6,9 +6,11 @@
 
 import fsExtra from "fs-extra";
 import moduleCompiler from "../moduleCompiler.mjs";
-// import {getAllPages} from "./dir-utils/dir-utils.mjs";
+import { utilBaseDir } from "./dir-utils/dir-utils.mjs";
 
 export async function build(pagePathsArray) {
+
+  const baseDir = utilBaseDir.getBaseDir();
 
   //if in build mode, clear the JS and CSS directories in /src
   //so if in prod mode we don't need to keep writing the files on each page serve

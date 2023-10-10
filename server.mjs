@@ -4,15 +4,19 @@ import path from "path";
 import { fileURLToPath } from "url";
 import moduleCompiler from "./src/moduleCompiler.mjs";
 import { build } from "./src/utils/build-utils.mjs";
-import { getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
+import { utilBaseDir, getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
 
 
 //for node set a base directory as full path
 //for browser we set it in ./src/components/main.js 
 //so we can use the same import path in node as in browser
 
-const __filename = fileURLToPath(import.meta.url);
-global.baseDir = path.dirname(__filename);
+utilBaseDir.setBaseDir(() => {
+  const __filename = fileURLToPath(import.meta.url);
+  return path.dirname(__filename);
+});
+
+const baseDir = utilBaseDir.getBaseDir();
 
 const PORT = 3000;
 
@@ -70,6 +74,7 @@ const server = http.createServer(async (req, res) => {
 
     headerOptions["Content-Type"] = contentType;
 
+  //if thls is a full page request
   } else if(!isFetch) {
 
     //add compression flag for all current file types served
@@ -98,6 +103,9 @@ const server = http.createServer(async (req, res) => {
       output = await moduleCompiler({ req, res, baseDir });
     }
 
+  //if this is a fetch request, output a module/component JSON file
+  //TODO make this not the default
+    //TODO check for an already rendered module and return that, if found
   } else {
 
     //add compression flag for all current file types served
