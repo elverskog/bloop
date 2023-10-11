@@ -15,7 +15,9 @@ export default async function loadModule(path, args) {
   if(typeof path === "string") {
 
     try {
-      
+
+      console.log("module-utils path: ", `${baseDir}/${path}`);
+
       //import and run the module's default function
       module = (await import(`${baseDir}/${path}`)).default; 
 

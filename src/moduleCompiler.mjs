@@ -25,6 +25,9 @@ export default async function moduleCompiler(options) {
   //if for build, just use what was passed in, else need to construct the full path from URL  
   const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
 
+
+  console.log("PATH SENT: ", adjustedPath);
+
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
     bodyRes = await loadModule(adjustedPath);

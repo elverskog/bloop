@@ -24,7 +24,9 @@ export function getAllPages(dirPath, result = [], extension = "mjs") {
 
   //get the files in the root of dirPath
   
+
   try {
+
     const currentFiles = fs.readdirSync(dirPath);
     
     //loop through the files found
@@ -32,11 +34,12 @@ export function getAllPages(dirPath, result = [], extension = "mjs") {
       //if the file is a dir, call this function with that dir as dirPath
       if (fs.statSync(dirPath + "/" + file).isDirectory()) {
         getAllPages(`${dirPath}/${file}`, result);
-      //if the file is an MJS file add it to results
+        //if the file is an MJS file add it to results
       } else if (file.split(".")[ file.split(".").length - 1 ] === extension) {
         //TODO should I check the mime-type?
         // with something like https://www.npmjs.com/package/mime-types?
         result.push(`${dirPath}/${file}`);
+        // result.push(`${file}`);
       }
     });
 
@@ -44,6 +47,8 @@ export function getAllPages(dirPath, result = [], extension = "mjs") {
     throw new Error(`Error while reading directory ${dirPath}: ${err.message}`);
   }
 
+  
+  console.log("//////////////////// getAllPages res: ", result);
   return result;
 
 }

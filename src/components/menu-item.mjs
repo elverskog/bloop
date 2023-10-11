@@ -40,7 +40,7 @@ export default async function menuItem (args) {
     `,
     markup: `
       <menuitem>
-        ${ (await loadModule(`${baseDir}/src/components/link.mjs`, { label, pathname })).markup }
+        ${ (await loadModule("src/components/link.mjs", { label, pathname })).markup }
       </menuitem>
     `
   };

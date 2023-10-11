@@ -7,7 +7,7 @@ export default async function wrapper(args) {
   const { hopper, bodyMarkup, title } = args;
 
   //get menu module
-  const menuRes = await loadModule(`${baseDir}/src/components/menu.mjs`);
+  const menuRes = await loadModule("src/components/menu.mjs");
 
   const myTitle = typeof title === "string" ? title : "Bloop";
 
@@ -19,7 +19,7 @@ export default async function wrapper(args) {
 
 
   //we have to add scripts for wrapper as it are not part of body module stack
-  let scriptTags = `<script src="/dist/js/wrapper.js" type="text/javascript"></script>\n`;
+  let scriptTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
   //create a css/link tag for each module used in the page, server-side
   // if(Object.keys(cssPaths).length) {
   //   Object.keys(cssPaths).forEach( key => {
@@ -30,15 +30,15 @@ export default async function wrapper(args) {
 
   if(Object.keys(hopper.css).length) {
     Object.keys(hopper.css).forEach( key => {
-      cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`
-    })
+      cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`;
+    });
   }
 
   //create a script tag for each module used in the page, server-side
   if(Object.keys(hopper.script).length) {
     Object.keys(hopper.script).forEach( key => {
-      scriptTags += `<script id="${key}Script" src="/dist/js/${key}.js" type="text/javascript"></script>\n`
-    })
+      scriptTags += `<script id="${key}Script" src="/dist/js/${key}.js" type="text/javascript"></script>\n`;
+    });
   }
 
   const result = {
@@ -84,7 +84,7 @@ export default async function wrapper(args) {
     script: {
       init: function() {
         //for forward and back buttons
-        window.addEventListener("popstate", event => {
+        window.addEventListener("popstate", () => {
           p_p.wrapper.getBody(window.location.pathname);
         });
         //for script based changes to change current page
@@ -141,7 +141,7 @@ export default async function wrapper(args) {
       }
     }
 
-  }
+  };
 
   return result;
 
