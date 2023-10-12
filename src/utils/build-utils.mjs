@@ -21,17 +21,14 @@ export async function build(pagePathsArray) {
     fsExtra.emptyDirSync(`${baseDir}/dist/modules-res`);
   }
 
-  // //get an array of paths to all valid pages
-  // const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
-
-  //then loop through all paths
+  //then loop through all paths in as arg
   let index = 0;
   async function buildModule() {
     if(typeof pagePathsArray[index] === "string") {
       //fabricate req.url, as that is all we use from the request (for now)
-      const req = { url: pagePathsArray[index] };
+      const url = pagePathsArray[index];
       //pass the url/path to our page builder 
-      await moduleCompiler({ req, res: null, baseDir, isBuild: true });
+      await moduleCompiler({ url, isFetch: false, res: null, baseDir, isBuild: true });
       index++;
       //recursively call this function
       buildModule();

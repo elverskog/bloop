@@ -1,10 +1,15 @@
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
 import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
 import loadModule from "../utils/module-utils.mjs";
+import hopper from "../hopper.mjs";
+
 
 export default async function wrapper(args) {
-  
-  const { hopper, bodyMarkup, title } = args;
+ 
+
+  const thisHopper = hopper.getHopper(); 
+
+  const { bodyMarkup, title } = args;
 
   //get menu module
   const menuRes = await loadModule("src/components/menu.mjs");
@@ -28,15 +33,15 @@ export default async function wrapper(args) {
   //   })
   // }
 
-  if(Object.keys(hopper.css).length) {
-    Object.keys(hopper.css).forEach( key => {
+  if(thisHopper && Object.keys(thisHopper.css).length) {
+    Object.keys(thisHopper.css).forEach( key => {
       cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`;
     });
   }
 
   //create a script tag for each module used in the page, server-side
-  if(Object.keys(hopper.script).length) {
-    Object.keys(hopper.script).forEach( key => {
+  if(thisHopper && Object.keys(thisHopper.script).length) {
+    Object.keys(thisHopper.script).forEach( key => {
       scriptTags += `<script id="${key}Script" src="/dist/js/${key}.js" type="text/javascript"></script>\n`;
     });
   }

@@ -24,7 +24,6 @@ export function getAllPages(dirPath, result = [], extension = "mjs") {
 
   //get the files in the root of dirPath
   
-
   try {
 
     const currentFiles = fs.readdirSync(dirPath);
@@ -40,15 +39,15 @@ export function getAllPages(dirPath, result = [], extension = "mjs") {
         // with something like https://www.npmjs.com/package/mime-types?
         result.push(`${dirPath}/${file}`);
         // result.push(`${file}`);
+        
       }
     });
 
   } catch (err) {
     throw new Error(`Error while reading directory ${dirPath}: ${err.message}`);
   }
-
   
-  console.log("//////////////////// getAllPages res: ", result);
+  // console.log("//////////////////// getAllPages res: ", result);
   return result;
 
 }

@@ -10,13 +10,9 @@ import manageHopper from "./hopper.mjs";
 export default async function moduleCompiler(options) {
 
   let bodyRes;
-  const { isBuild } = options;
-  const isFetch = options?.req?.headers ? options?.req?.headers["is-fetch"] : false;
+  const { url, isFetch, isBuild } = options;
 
-  //set modulePath to the URL pathname
-  //need to account for the homepage or whatever the pathname "/" should load
-  //TODO - may want to move 
-  const modulePath = options.req.url === "/" ? "/a" : options.req.url;
+  const modulePath = url === "/" ? "/a" : url;
 
   //reset the hopper to blank "css", "markup", "script" nodes
   //TODO - is this even needed if a new app is started on each request?
@@ -24,7 +20,6 @@ export default async function moduleCompiler(options) {
 
   //if for build, just use what was passed in, else need to construct the full path from URL  
   const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
-
 
   console.log("PATH SENT: ", adjustedPath);
 
@@ -44,7 +39,8 @@ export default async function moduleCompiler(options) {
   if(!isFetch) {
     console.log("IS NOT FETCH");
     // await wrapperMod(bodyRes.markup, bodyRes.title);
-    await loadModule("src/components/wrapper.mjs", bodyRes);
+    //const { bodyMarkup, title } = args;
+    await loadModule("src/components/wrapper.mjs", { bodyMarkup: bodyRes.markup, title: bodyRes.title });
   } else {
     console.log("IS FETCH");
     //write the current compiled page to a JSON file

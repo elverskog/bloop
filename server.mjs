@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import moduleCompiler from "./src/moduleCompiler.mjs";
-import { build } from "./src/utils/build-utils.mjs";
+// import { build } from "./src/utils/build-utils.mjs";
+import { build } from "#src/utils/build-utils.mjs";
 import { utilBaseDir, getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
 
 
@@ -22,12 +23,14 @@ const PORT = 3000;
 
 const server = http.createServer(async (req, res) => {
 
+  //need to account for the homepage or whatever the pathname "/" should load
+  const url = req.url === "/" ? "/a" : req.url;
+
+  const isFetch = req?.headers ? req?.headers["is-fetch"] : false;
+
   //set default status as success
   let status = 200;
 
-  //set if the call is a fetch (non-fullpage call)
-  const isFetch = req?.headers ? req?.headers["is-fetch"] : false;
-  
   //set holder for final oitput to be served
   let output;
 
@@ -40,7 +43,7 @@ const server = http.createServer(async (req, res) => {
   };
 
   //get the extension from the file requested 
-  const reqExtension = req.url.split(".")[ req.url.split(".").length - 1 ];
+  const reqExtension = url.split(".")[ url.split(".").length - 1 ];
 
   //set baseline header for all file/response types
   const headerOptions = {
@@ -58,11 +61,11 @@ const server = http.createServer(async (req, res) => {
     const readFileOptions = {};
 
     //read and return the static file
-    const fileExists = fs.existsSync(`${baseDir}${req.url}`);
+    const fileExists = fs.existsSync(`${baseDir}${url}`);
     if(fileExists) {
-      output = fs.readFileSync(`${baseDir}${req.url}`, readFileOptions);
+      output = fs.readFileSync(`${baseDir}${url}`, readFileOptions);
     } else {
-      console.log("file not found error: ", `${baseDir}${req.url}`);
+      console.log("file not found error: ", `${baseDir}${url}`);
       output = "";
       status = 404;
     }
@@ -86,7 +89,7 @@ const server = http.createServer(async (req, res) => {
     //if there is a file found for the pathname, return it
     //else compile the module(s) and write the related files
     try {
-      output = fs.readFileSync(`${baseDir}/dist/pages${req.url}.html`, readFileOptions);
+      output = fs.readFileSync(`${baseDir}/dist/pages${url}.html`, readFileOptions);
     } catch (error) {
       console.log("server.mjs read HTML page error: ", error);
     }
@@ -100,7 +103,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (typeof output !== "object") {
-      output = await moduleCompiler({ req, res, baseDir });
+      output = await moduleCompiler({ url, isFetch, res, baseDir });
     }
 
   //if this is a fetch request, output a module/component JSON file
@@ -113,8 +116,7 @@ const server = http.createServer(async (req, res) => {
     headerOptions["Content-Encoding"] = "br";
     headerOptions["Content-Type"] = "json";
 
-
-    output = await moduleCompiler({ req, res, baseDir });
+    output = await moduleCompiler({ url, isFetch, res, baseDir });
   
   }
 

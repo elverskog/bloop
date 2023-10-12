@@ -1,12 +1,12 @@
 export default async function link (args) {
 
-  const domReady = (await import(`${baseDir}/src/utils/dom-utils.mjs`)).domReady;
-  
   let { label, pathname } = args;
   // let html = `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`;
 
   if(typeof window === "object") {
 
+    const domReady = (await import("src/utils/dom-utils.mjs")).domReady;
+    
     domReady(() => {
       
       const el = document.getElementById(pathname);
