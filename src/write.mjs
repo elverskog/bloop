@@ -65,6 +65,8 @@ export function writePage(modulePath, content) {
 
     fs.writeFileSync(pagePath, compressed);
 
+    return true;
+    
   } else {
     console.log("compressAndWrite passed invalid page content", modulePath);
   }

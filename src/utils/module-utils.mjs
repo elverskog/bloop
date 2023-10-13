@@ -20,8 +20,7 @@ export default async function loadModule(path, moduleArgs) {
 
     try {
 
-      // console.log("module-utils path: ", `${baseDir}/${path}`);
-      console.log("module-utils path: ", path);
+      // console.log("module-utils path: ", path);
 
       //import and run the module's default function
       

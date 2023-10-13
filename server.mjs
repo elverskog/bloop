@@ -52,7 +52,7 @@ const server = http.createServer(async (req, res) => {
     "Pragma": "no-cache",
   };
 
-  //if the request is for an allowed filetype
+  //if the request is for an allowed filetype (CSS, image etc)
   if(typeof fileTypesObject[reqExtension] === "string") {
 
     //set the content-type in the header based on extension for now
@@ -77,47 +77,50 @@ const server = http.createServer(async (req, res) => {
 
     headerOptions["Content-Type"] = contentType;
 
-  //if thls is a full page request
-  } else if(!isFetch) {
+  //if thls is a full page or module request
+  } else {
 
-    //add compression flag for all current file types served
-    //we may need to alter this later
+    //add compression and type flags for current file types served
     headerOptions["Content-Encoding"] = "br";
-    headerOptions["Content-Type"] = "html";
-    const readFileOptions = {};
+    headerOptions["Content-Type"] = isFetch ? "json" : "html";
+
+    //path to rendered files changes based on if request is for a page or a module
+    const path = isFetch ? `${baseDir}/dist/modules-res${url}.json` : `${baseDir}/dist/pages/${url}.html`;
+    const fallbackPath = isFetch ? `${baseDir}/dist/modules-res/fourOhFour.json` : `${baseDir}/dist/pages/fourOhFour.html`;
 
     //if there is a file found for the pathname, return it
     //else compile the module(s) and write the related files
     try {
-      output = fs.readFileSync(`${baseDir}/dist/pages${url}.html`, readFileOptions);
+      output = fs.readFileSync(path, {});
     } catch (error) {
-      console.log("server.mjs read HTML page error: ", error);
+      console.log("server.mjs read file error: ", error);
     }
 
+    //if no file was found, try to create it and return the result
     if (typeof output !== "object") {
       try {
-        output = fs.readFileSync(`${baseDir}/dist/pages/fourOhFour.html`, readFileOptions);
+        output = await moduleCompiler({ url, isFetch, res, baseDir });
+      } catch (error) {
+        console.log("server.js module compile error", error); 
+      }
+    }
+
+    //if no file was found and we couldn't create it, try to return a 404 page or module from dist
+    if (typeof output !== "object") {
+      try {
+        output = fs.readFileSync(fallbackPath, {});
       } catch (error) {
         console.log("server.mjs read HTML 404 page error: ", error);
       }
     }
 
+    //if we couldn't find and return a 404 page or module from dist, return a simple error message
     if (typeof output !== "object") {
-      output = await moduleCompiler({ url, isFetch, res, baseDir });
+      output = "Sorry, an error occured trying to return this page"; 
+      console.log("server.mjs falling back to plain error message");
     }
 
-  //if this is a fetch request, output a module/component JSON file
-  //TODO make this not the default
-    //TODO check for an already rendered module and return that, if found
-  } else {
 
-    //add compression flag for all current file types served
-    //we may need to alter this later
-    headerOptions["Content-Encoding"] = "br";
-    headerOptions["Content-Type"] = "json";
-
-    output = await moduleCompiler({ url, isFetch, res, baseDir });
-  
   }
 
   res.writeHead(status, headerOptions);

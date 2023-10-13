@@ -29,6 +29,8 @@ export async function build(pagePathsArray) {
       const url = pagePathsArray[index];
       //pass the url/path to our page builder 
       await moduleCompiler({ url, isFetch: false, res: null, baseDir, isBuild: true });
+      //pass the url/path to our module builder 
+      await moduleCompiler({ url, isFetch: true, res: null, baseDir, isBuild: true });
       index++;
       //recursively call this function
       buildModule();

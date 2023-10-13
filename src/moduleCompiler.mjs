@@ -2,6 +2,7 @@ import fs from "fs";
 import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
 import loadModule from "./utils/module-utils.mjs";
 import manageHopper from "./hopper.mjs";
+import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
 
 //creates the output for either a full page ("channeling" the result through wrapper)
@@ -11,8 +12,8 @@ export default async function moduleCompiler(options) {
 
   let bodyRes;
   const { url, isFetch, isBuild } = options;
-
   const modulePath = url === "/" ? "/a" : url;
+  const baseDir = utilBaseDir.getBaseDir();
 
   //reset the hopper to blank "css", "markup", "script" nodes
   //TODO - is this even needed if a new app is started on each request?
@@ -74,21 +75,24 @@ export default async function moduleCompiler(options) {
   //if a fetch call, return JSON
   //else pass the full HTML
   if(isFetch) {
-    filePath = `../dist/modules-res${modulePath}.json`;
-    fourOhFourPath = "./dist/modules-res/fourOhFour.json";
+    filePath = `${ baseDir }/dist/modules-res${modulePath}.json`;
+    fourOhFourPath = `${ baseDir }/dist/modules-res/fourOhFour.json`;
   } else {
-    filePath = `../dist/pages${modulePath}.html`;
-    fourOhFourPath = "../dist/pages/fourOhFour.html";
+    filePath = `${ baseDir }/dist/pages${modulePath}.html`;
+    fourOhFourPath = `${ baseDir }/dist/pages/fourOhFour.html`;
   }
 
   //if in build just return (as the point then is to just write the files)
+  console.log("isBuild: ", isBuild);
   if(isBuild) {
     return;
   } else {
+    console.log("filePath: ", filePath);
     //return the markup file we wrote above 
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath);
     } else {
+      console.log("moduleCompiler - return file missing", );
       //set another fallback in case the file is missing
       //TODO - this should maybe be something besides a 404
       return fs.readFileSync(fourOhFourPath);

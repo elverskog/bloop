@@ -11,7 +11,6 @@ export const utilBaseDir = {
   },
 
   getBaseDir: () => {
-    console.log("dfsdf ", baseDir);
     return baseDir;
   }
 
