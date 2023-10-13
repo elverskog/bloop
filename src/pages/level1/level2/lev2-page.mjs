@@ -1,7 +1,5 @@
 export default async function test2() {
 
-  console.log("TEST 2");
-
   const result = {
     name: "lev2Page",
     title: "Level 2 Page",
@@ -28,7 +26,7 @@ export default async function test2() {
         }
       } 
     } 
-  }
+  };
 
   return result;
   

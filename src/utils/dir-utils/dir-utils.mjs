@@ -1,13 +1,40 @@
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-//a simple util (a singleton? oh no!) to pass the base file path around
+//a simple util module (a singleton? oh no!) to set and pass the base file path around
 let baseDir; 
 
 export const utilBaseDir = {
  
-  //takes a function that should return a base directory 
-  setBaseDir: function(genBaseDir) {
-    baseDir = genBaseDir();
+  //takes a function as an arg that should return a base directory 
+  setBaseDir: function(metaUrl) {
+   
+    let baseDirTemp;     
+
+    if (typeof metaUrl === "string" && metaUrl.substring(0, 7) === "file://") {
+
+      try {
+        baseDirTemp = path.dirname(fileURLToPath(metaUrl));
+      } catch (error) {
+        console.log("setBaseDir - genBaseDir failed", error);
+      }
+
+      if (typeof baseDirTemp === "string") {
+        baseDir = baseDirTemp;
+        return baseDir;
+      } else {
+        console.log("setBaseDir produced non-string", );
+        return false;
+      }
+     
+    } else {
+      
+      console.log("setBaseDir passed non-string or a invalid file://");
+      return false;
+
+    }
+
   },
 
   getBaseDir: () => {

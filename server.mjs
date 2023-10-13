@@ -1,7 +1,5 @@
 import http from "http";
 import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import moduleCompiler from "./src/moduleCompiler.mjs";
 // import { build } from "./src/utils/build-utils.mjs";
 import { build } from "#src/utils/build-utils.mjs";
@@ -12,10 +10,12 @@ import { utilBaseDir, getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
 //for browser we set it in ./src/components/main.js 
 //so we can use the same import path in node as in browser
 
-utilBaseDir.setBaseDir(() => {
-  const __filename = fileURLToPath(import.meta.url);
-  return path.dirname(__filename);
-});
+// utilBaseDir.setBaseDir((() => {
+//   const __filename = fileURLToPath(import.meta.url);
+//   return path.dirname(__filename);
+// }))();
+
+utilBaseDir.setBaseDir(import.meta.url);
 
 const baseDir = utilBaseDir.getBaseDir();
 

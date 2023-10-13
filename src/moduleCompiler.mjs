@@ -22,8 +22,6 @@ export default async function moduleCompiler(options) {
   //if for build, just use what was passed in, else need to construct the full path from URL  
   const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
 
-  console.log("PATH SENT: ", adjustedPath);
-
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
     bodyRes = await loadModule(adjustedPath);
@@ -38,12 +36,10 @@ export default async function moduleCompiler(options) {
 
   //if we got a full page request, we call wrapper, passing body into it
   if(!isFetch) {
-    console.log("IS NOT FETCH");
     // await wrapperMod(bodyRes.markup, bodyRes.title);
     //const { bodyMarkup, title } = args;
     await loadModule("src/components/wrapper.mjs", { bodyMarkup: bodyRes.markup, title: bodyRes.title });
   } else {
-    console.log("IS FETCH");
     //write the current compiled page to a JSON file
     writeModuleResult(adjustedPath, JSON.stringify(hopper));
   }
@@ -83,11 +79,9 @@ export default async function moduleCompiler(options) {
   }
 
   //if in build just return (as the point then is to just write the files)
-  console.log("isBuild: ", isBuild);
   if(isBuild) {
     return;
   } else {
-    console.log("filePath: ", filePath);
     //return the markup file we wrote above 
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath);
