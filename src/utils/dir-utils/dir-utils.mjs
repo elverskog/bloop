@@ -9,7 +9,9 @@ export const utilBaseDir = {
  
   //takes a function as an arg that should return a base directory 
   setBaseDir: function(metaUrl) {
-   
+
+    console.log("METAURL: ", metaUrl);
+
     let baseDirTemp;     
 
     if (typeof metaUrl === "string" && metaUrl.substring(0, 7) === "file://") {

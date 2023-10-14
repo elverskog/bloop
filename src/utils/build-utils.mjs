@@ -1,8 +1,5 @@
 //if the command "npm prod" is run, here we run code to build every page found in /pages
-//this will create CSS and JS files for each 
-//for each page the hHTML, CSS and JS for each will be stored in an analogous location in /dist
-//and the request handling defined further below will skip writing any CSS and JS files, as they should already exist (again, if on prod) 
-//TODO: need to decide if this should be in this file or split off
+//for each page the HTML, CSS and JS for each will be stored in an analogous location in /dist
 
 import fsExtra from "fs-extra";
 import moduleCompiler from "../moduleCompiler.mjs";
@@ -42,3 +39,10 @@ export async function build(pagePathsArray) {
   buildModule();
 
 }
+
+
+//Note - rework moduleCompiler so that it returns an object with markup, css, js
+//have server.js (or whatever) then write files, then return result
+//
+//I guess for build...?
+//need to decide where/when to write 

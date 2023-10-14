@@ -1,3 +1,4 @@
+import fs from "fs";
 import tap from "tap";
 import path from "path";
 import {fileURLToPath} from "url";
@@ -60,3 +61,8 @@ tap.test("utilBaseDir setBaseDir should return false when not passed a valid URL
   t.end();
 });
 
+tap.test("utilBaseDir setBaseDir should return return a valid absolute path when passed a valid URL", t => {
+  const baseDir = utilBaseDir.setBaseDir("file:///home/ee/code/bloop/server.mjs");
+  t.match(fs.statSync(baseDir).isDirectory(), true);
+  t.end();
+});

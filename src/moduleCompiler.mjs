@@ -79,10 +79,10 @@ export default async function moduleCompiler(options) {
   }
 
   //if in build just return (as the point then is to just write the files)
+  //return the markup file we wrote above 
   if(isBuild) {
     return;
   } else {
-    //return the markup file we wrote above 
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath);
     } else {
