@@ -44,53 +44,57 @@ export default async function moduleCompiler(options) {
     writeModuleResult(adjustedPath, JSON.stringify(hopper));
   }
 
-  //write CSS for each module in hopper
-  if(Object.keys(hopper.css).length) {
-    Object.keys(hopper.css).forEach( key => {
-      writeCssOrJs(hopper.css[key], "css", key);
-    });
-  }
 
-  //write markup/HTML for "end result" hopper
-  if(Object.keys(hopper.markup).length) {
-    writePage(adjustedPath, hopper.markup);
-  }
+  return hopper;
+
+
+  // //write CSS for each module in hopper
+  // if(Object.keys(hopper.css).length) {
+  //   Object.keys(hopper.css).forEach( key => {
+  //     writeCssOrJs(hopper.css[key], "css", key);
+  //   });
+  // }
+
+  // //write markup/HTML for "end result" hopper
+  // if(Object.keys(hopper.markup).length) {
+  //   writePage(adjustedPath, hopper.markup);
+  // }
   
-  //write script for each module in hopper
-  if(Object.keys(hopper.script).length) { 
-    Object.keys(hopper.script).forEach( key => {
-      writeCssOrJs(hopper.script[key], "js", key);
-    });
-  }
+  // //write script for each module in hopper
+  // if(Object.keys(hopper.script).length) { 
+  //   Object.keys(hopper.script).forEach( key => {
+  //     writeCssOrJs(hopper.script[key], "js", key);
+  //   });
+  // }
 
-  //always return a "compiled" file for all call types
+  // //always return a "compiled" file for all call types
   
-  let filePath;
-  let fourOhFourPath;
+  // let filePath;
+  // let fourOhFourPath;
 
-  //if a fetch call, return JSON
-  //else pass the full HTML
-  if(isFetch) {
-    filePath = `${ baseDir }/dist/modules-res${modulePath}.json`;
-    fourOhFourPath = `${ baseDir }/dist/modules-res/fourOhFour.json`;
-  } else {
-    filePath = `${ baseDir }/dist/pages${modulePath}.html`;
-    fourOhFourPath = `${ baseDir }/dist/pages/fourOhFour.html`;
-  }
+  // //if a fetch call, return JSON
+  // //else pass the full HTML
+  // if(isFetch) {
+  //   filePath = `${ baseDir }/dist/modules-res${modulePath}.json`;
+  //   fourOhFourPath = `${ baseDir }/dist/modules-res/fourOhFour.json`;
+  // } else {
+  //   filePath = `${ baseDir }/dist/pages${modulePath}.html`;
+  //   fourOhFourPath = `${ baseDir }/dist/pages/fourOhFour.html`;
+  // }
 
-  //if in build just return (as the point then is to just write the files)
-  //return the markup file we wrote above 
-  if(isBuild) {
-    return;
-  } else {
-    if (fs.existsSync(filePath)) {
-      return fs.readFileSync(filePath);
-    } else {
-      console.log("moduleCompiler - return file missing", );
-      //set another fallback in case the file is missing
-      //TODO - this should maybe be something besides a 404
-      return fs.readFileSync(fourOhFourPath);
-    }
-  }
+  // //if in build just return (as the point then is to just write the files)
+  // //return the markup file we wrote above 
+  // if(isBuild) {
+  //   return;
+  // } else {
+  //   if (fs.existsSync(filePath)) {
+  //     return fs.readFileSync(filePath);
+  //   } else {
+  //     console.log("moduleCompiler - return file missing", );
+  //     //set another fallback in case the file is missing
+  //     //TODO - this should maybe be something besides a 404
+  //     return fs.readFileSync(fourOhFourPath);
+  //   }
+  // }
 
 }
