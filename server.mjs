@@ -2,8 +2,8 @@ import http from "http";
 import fs from "fs";
 import moduleCompiler from "./src/moduleCompiler.mjs";
 // import { build } from "./src/utils/build-utils.mjs";
-import { build } from "#src/utils/build-utils.mjs";
-import { utilBaseDir, getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
+import { build } from "./src/utils/build-utils/build-utils.mjs";
+import { utilBaseDir, getAllFiles } from "./src/utils/dir-utils/dir-utils.mjs";
 
 
 //for node set a base directory as full path
@@ -16,6 +16,7 @@ import { utilBaseDir, getAllPages } from "./src/utils/dir-utils/dir-utils.mjs";
 // }))();
 
 utilBaseDir.setBaseDir(import.meta.url);
+console.log("META URL", import.meta.url);
 
 const baseDir = utilBaseDir.getBaseDir();
 
@@ -134,9 +135,10 @@ const server = http.createServer(async (req, res) => {
 if(process.env.NODE_ENV === "production") {
   console.log("BUILD");
   //get an array of paths to all valid pages
-  const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
-  const distFiles = await build(pagePathsArray);
-  console.log("DIST FILES: ", distFiles);
+  //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
+  const pagePathsArray = getAllFiles("src/pages");
+  console.log("PAGE PATHS ARRAY: ", pagePathsArray);
+  // const distFiles = await build(pagePathsArray);
 }
 
 server.listen(PORT, () => {

@@ -2,14 +2,18 @@
 //for each page the HTML, CSS and JS for each will be stored in an analogous location in /dist
 
 // import fsExtra from "fs-extra";
-import moduleCompiler from "../moduleCompiler.mjs";
-import { utilBaseDir } from "./dir-utils/dir-utils.mjs";
+import moduleCompiler from "../../moduleCompiler.mjs";
+import { utilBaseDir } from "../dir-utils/dir-utils.mjs";
 
 
 function validateArgsBuild(args) {
   
   const errors = [];
-  try { args[0].flat(); } catch(err) { errors.push(err); }
+  try { 
+    args[0].flat(); } 
+  catch(err) { 
+    errors.push(err); 
+  }
   console.log("BUILD ARGS FAIL: ", errors.length);    
   return (errors.length > 0);
 
@@ -18,9 +22,9 @@ function validateArgsBuild(args) {
 
 export async function build(pagePathsArray) {
 
-  if(validateArgsBuild(arguments)) return;
+  console.log("PAGEPATHSARRAY: ", pagePathsArray);
 
-  const baseDir = utilBaseDir.getBaseDir();
+  if(validateArgsBuild(arguments)) return;
 
   return Promise.all(pagePathsArray.map( async path => {
     return await moduleCompiler({ url: path, path, isFetch: false, res: null, baseDir, isBuild: true });

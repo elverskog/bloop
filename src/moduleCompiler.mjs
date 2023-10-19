@@ -2,7 +2,6 @@ import fs from "fs";
 import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
 import loadModule from "./utils/module-utils.mjs";
 import manageHopper from "./hopper.mjs";
-import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
 
 //creates the output for either a full page ("channeling" the result through wrapper)
@@ -13,20 +12,34 @@ export default async function moduleCompiler(options) {
   let bodyRes;
   const { url, isFetch, isBuild } = options;
   const modulePath = url === "/" ? "/a" : url;
-  const baseDir = utilBaseDir.getBaseDir();
+
+  //if for build, just use what was passed in, else need to construct the full path from URL  
+  const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
+
+
+  if (!fs.existsSync(adjustedPath)) {
+    console.log("FILE IS NOT FOUND: ", adjustedPath);
+    return {
+      css: {},
+      markup: {},
+      style: {},
+    };
+  } else {
+
+    console.log("HMM FILE IS THERE", );
+
+  }
 
   //reset the hopper to blank "css", "markup", "script" nodes
   //TODO - is this even needed if a new app is started on each request?
   manageHopper.setHopper();
-
-  //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
     bodyRes = await loadModule(adjustedPath);
   } catch(err) {
     console.log("moduleCompiler.mjs load module error: ", err);
+    return;
   }
 
   //get the body module. exit and log if bodyMod is not valid

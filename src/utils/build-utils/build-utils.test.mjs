@@ -1,13 +1,45 @@
 import tap from "tap";
 import { build } from "./build-utils.mjs";
+import { utilBaseDir } from "../dir-utils/dir-utils.mjs";
 
 
-tap.test("build should return undefined if pagePathArray is not passed", async t => {
-  console.log("WAEEEEEE: " , await build());
+
+// const metaUrl = import.meta.url.split("src")[0];
+// utilBaseDir.setBaseDir(metaUrl);
+
+
+
+console.log("META URL", metaUrl);
+
+tap.test("build should return undefined if a valid pagePathArray is not passed", async t => {
   t.match(await build(), undefined);
+  t.match(await build(null), undefined);
+  t.match(await build("This is a string"), undefined);
+  t.match(await build({ here: "there"}), undefined);
   t.end();
 });
 
+// tap.test("build, when passed an array of paths with an invalid path, should return an error", async t => {
+//   const pagesPathArray = [
+//     "./bad-path/bad-page.mjs"
+//   ];
+//   t.match(await build(pagesPathArray), undefined);
+//   t.end();
+// });
+
+tap.test("build, when passed proper array of valid paths, should return an object with nodes for css, markup and script", async t => {
+  const pagesPathArray = [
+    "src/utils/build-utils/mocks/mock-page.mjs"
+  ];
+  const result = await build(pagesPathArray);
+  t.match(undefined, undefined);
+  // t.match(result, {
+  //   css: Object,
+  //   markup: Object,
+  //   style: Object
+  // }, "build result object should have css, markup, style");
+  // t.end();
+});
 
 
 
@@ -49,8 +81,8 @@ tap.test("build should return undefined if pagePathArray is not passed", async t
 // tap.test("getAllPages should not take too long to execute with a large directory", t => {
 //   const start = performance.now();
 //   getAllPages(`${ currentDir }/mocks`);
-//   const end = performance.now();
-//   const timeTaken = end - start;
+  //   const end = performance.now();
+  //   const timeTaken = end - start;
 //   t.ok(timeTaken < 50, "Function should take less than 50ms to execute");
 //   t.end();
 // });

@@ -10,8 +10,6 @@ export const utilBaseDir = {
   //takes a function as an arg that should return a base directory 
   setBaseDir: function(metaUrl) {
 
-    console.log("METAURL: ", metaUrl);
-
     let baseDirTemp;     
 
     if (typeof metaUrl === "string" && metaUrl.substring(0, 7) === "file://") {
@@ -45,6 +43,42 @@ export const utilBaseDir = {
 
 };
 
+
+//get an array of all valid file paths inside dirPath
+//function will augment an existing array, if passed in
+export function getAllFiles(dirPath, result = [], extension = "mjs") { 
+
+  console.log("URL HERE: ", import.meta.url);
+
+  try {
+
+    const currentFiles = fs.readdirSync(`./${dirPath}`);
+    // const currentFiles = fs.readdirSync(`./`);
+   
+    console.log("CURRENT FILES: ", currentFiles);
+
+    //loop through the files found
+    currentFiles.forEach(function(file) {
+      //if the file is a dir, call this function with that dir as dirPath
+      if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+        getAllPages(`${dirPath}/${file}`, result);
+        //if the file is an MJS file add it to results
+      } else if (file.split(".")[ file.split(".").length - 1 ] === extension) {
+        //TODO should I check the mime-type?
+        // with something like https://www.npmjs.com/package/mime-types?
+        result.push(`${dirPath}/${file}`);
+        // result.push(`${file}`);
+      }
+    });
+
+  } catch (err) {
+    throw new Error(`Error while reading directory ${dirPath}: ${err.message}`);
+  }
+  
+  // console.log("//////////////////// getAllPages res: ", result);
+  return result;
+
+}
 
 //get an array of all valid files paths inside dirPath
 //function will augment an existing array, if passed in
