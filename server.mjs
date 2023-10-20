@@ -137,8 +137,9 @@ if(process.env.NODE_ENV === "production") {
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");
-  console.log("PAGE PATHS ARRAY: ", pagePathsArray);
-  // const distFiles = await build(pagePathsArray);
+  //console.log("PAGE PATHS ARRAY: ", pagePathsArray);
+  const distFiles = await build(pagePathsArray);
+  //console.log("DIST FILES: ", distFiles);
 }
 
 server.listen(PORT, () => {

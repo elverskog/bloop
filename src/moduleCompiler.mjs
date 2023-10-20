@@ -9,6 +9,7 @@ import manageHopper from "./hopper.mjs";
 //only runs on server
 export default async function moduleCompiler(options) {
 
+
   let bodyRes;
   const { url, isFetch, isBuild } = options;
   const modulePath = url === "/" ? "/a" : url;
@@ -18,16 +19,8 @@ export default async function moduleCompiler(options) {
 
 
   if (!fs.existsSync(adjustedPath)) {
-    console.log("FILE IS NOT FOUND: ", adjustedPath);
-    return {
-      css: {},
-      markup: {},
-      style: {},
-    };
-  } else {
-
-    console.log("HMM FILE IS THERE", );
-
+    console.log("moduleCompiler FILE IS NOT FOUND: ", adjustedPath);
+    return;
   }
 
   //reset the hopper to blank "css", "markup", "script" nodes
@@ -56,7 +49,6 @@ export default async function moduleCompiler(options) {
     //write the current compiled page to a JSON file
     writeModuleResult(adjustedPath, JSON.stringify(hopper));
   }
-
 
   return hopper;
 

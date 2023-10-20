@@ -26,8 +26,16 @@ export async function build(pagePathsArray) {
 
   if(validateArgsBuild(arguments)) return;
 
+  // return {
+  //   css: {},
+  //   markup: {},
+  //   style: {}
+  // };
+
+  // return await moduleCompiler({ url: pagePathsArray[0], isFetch: false, res: null, isBuild: true });
+
   return Promise.all(pagePathsArray.map( async path => {
-    return await moduleCompiler({ url: path, path, isFetch: false, res: null, baseDir, isBuild: true });
+    return await moduleCompiler({ url: path, path, isFetch: false, res: null, isBuild: true });
   }));
 
   // //if in build mode, clear the JS and CSS directories in /src

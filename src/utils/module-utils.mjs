@@ -1,10 +1,12 @@
 import hopper from "../hopper.mjs";
-import { utilBaseDir } from "./dir-utils/dir-utils.mjs";
+
 
 //function to simply import a module
 //but at the same time, add its results to the hopper
 
 export default async function loadModule(path, moduleArgs) {
+
+  console.log("LOAD MODULE PATH: ", path);
 
   //is the import path a string
   //and if moduleArgs was passed, is it an object
@@ -12,16 +14,17 @@ export default async function loadModule(path, moduleArgs) {
 
     let module;
     let moduleRes;
-    //get absolute path to ./src
-    const baseDir = utilBaseDir.getBaseDir();
 
-    //if the module path is already absolute, use it, else add baseDir
-    const modulePath = path.at(0) === "/" ? path :`${baseDir}/${path}`;
+    // //if the module path is already absolute, use it, else add baseDir
+    // const modulePath = path.at(0) === "/" ? path :`${baseDir}/${path}`;
+    const modulePath = path.at(0) === "/" ? path :`../../${path}`;
+
+
+    console.log("MODULE PATH: ", modulePath);
 
     try {
 
       // console.log("module-utils path: ", path);
-
       //import and run the module's default function
       
       module = (await import(modulePath)).default; 
