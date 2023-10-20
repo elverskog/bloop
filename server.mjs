@@ -4,6 +4,12 @@ import moduleCompiler from "./src/moduleCompiler.mjs";
 // import { build } from "./src/utils/build-utils.mjs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
 import { utilBaseDir, getAllFiles } from "./src/utils/dir-utils/dir-utils.mjs";
+import { 
+  clearDistFiles, 
+  writeCssOrJs, 
+  writeModuleResult, 
+  writePage
+} from "./src/utils/write-utils.mjs";
 
 
 //for node set a base directory as full path
@@ -140,6 +146,7 @@ if(process.env.NODE_ENV === "production") {
   //console.log("PAGE PATHS ARRAY: ", pagePathsArray);
   const distFiles = await build(pagePathsArray);
   //console.log("DIST FILES: ", distFiles);
+  clearDistFiles(["css", "js", "pages", "modules-res"]);
 }
 
 server.listen(PORT, () => {

@@ -1,4 +1,5 @@
 import fs from "fs";
+import { fsExtra } from "fs-extra";
 import brotli from "brotli";
 import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
@@ -12,6 +13,16 @@ const brotliSettings = {
   lgwin: 12 // default
 };
 
+//function to clear various directories in dist
+export function clearDistFiles(arrayOfFiles) {
+  arrayOfFiles.array.forEach(path => {
+    try {
+      fsExtra.emptyDirSync(`./dist/${path}`);
+    } catch (error) {
+      console.log("failed to clear dist files: ", error);  
+    }
+  });
+}
 
 //function to compress and write files, in subsection of hopper (css vs js)
 export function writeCssOrJs(contentString, fileType, moduleName) {

@@ -1,5 +1,4 @@
 import fs from "fs";
-import { writeCssOrJs, writeModuleResult, writePage } from "./write.mjs";
 import loadModule from "./utils/module-utils.mjs";
 import manageHopper from "./hopper.mjs";
 
@@ -40,15 +39,15 @@ export default async function moduleCompiler(options) {
  
   const hopper = manageHopper.getHopper();
 
-  //if we got a full page request, we call wrapper, passing body into it
-  if(!isFetch) {
-    // await wrapperMod(bodyRes.markup, bodyRes.title);
-    //const { bodyMarkup, title } = args;
-    await loadModule("src/components/wrapper.mjs", { bodyMarkup: bodyRes.markup, title: bodyRes.title });
-  } else {
-    //write the current compiled page to a JSON file
-    writeModuleResult(adjustedPath, JSON.stringify(hopper));
-  }
+  // //if we got a full page request, we call wrapper, passing body into it
+  // if(!isFetch) {
+  //   // await wrapperMod(bodyRes.markup, bodyRes.title);
+  //   //const { bodyMarkup, title } = args;
+  //   await loadModule("src/components/wrapper.mjs", { bodyMarkup: bodyRes.markup, title: bodyRes.title });
+  // } else {
+  //   //write the current compiled page to a JSON file
+  //   writeModuleResult(adjustedPath, JSON.stringify(hopper));
+  // }
 
   return hopper;
 

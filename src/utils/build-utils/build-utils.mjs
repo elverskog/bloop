@@ -52,6 +52,5 @@ export async function build(pagePathsArray) {
 
 //Note - rework moduleCompiler so that it returns an object with markup, css, js
 //have server.js (or whatever) then write files, then return result
-//
 //I guess for build...?
 //need to decide where/when to write 
