@@ -1,13 +1,13 @@
 import fs from "fs";
 import loadModule from "./utils/module-utils.mjs";
 import manageHopper from "./hopper.mjs";
+import { Result } from "postcss";
 
 
 //creates the output for either a full page ("channeling" the result through wrapper)
 //or a single module (which may contain child modules)
 //only runs on server
 export default async function moduleCompiler(options) {
-
 
   let bodyRes;
   const { url, isFetch, isBuild } = options;
@@ -34,10 +34,12 @@ export default async function moduleCompiler(options) {
     return;
   }
 
+  return bodyRes;
+
   //get the body module. exit and log if bodyMod is not valid
   // const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
  
-  const hopper = manageHopper.getHopper();
+  //const hopper = manageHopper.getHopper();
 
   // //if we got a full page request, we call wrapper, passing body into it
   // if(!isFetch) {
@@ -49,7 +51,7 @@ export default async function moduleCompiler(options) {
   //   writeModuleResult(adjustedPath, JSON.stringify(hopper));
   // }
 
-  return hopper;
+  // return hopper;
 
 
   // //write CSS for each module in hopper

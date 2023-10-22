@@ -6,8 +6,6 @@ import hopper from "../hopper.mjs";
 
 export default async function loadModule(path, moduleArgs) {
 
-  console.log("LOAD MODULE PATH: ", path);
-
   //is the import path a string
   //and if moduleArgs was passed, is it an object
   if(typeof path === "string") {
@@ -18,9 +16,6 @@ export default async function loadModule(path, moduleArgs) {
     // //if the module path is already absolute, use it, else add baseDir
     // const modulePath = path.at(0) === "/" ? path :`${baseDir}/${path}`;
     const modulePath = path.at(0) === "/" ? path :`../../${path}`;
-
-
-    console.log("MODULE PATH: ", modulePath);
 
     try {
 
@@ -46,7 +41,7 @@ export default async function loadModule(path, moduleArgs) {
     } catch(err){
 
       console.log("loadModule import path failed: ", err);
-      moduleRes = await loadModule(`${baseDir}/src/pages/fourOhFour.mjs`); 
+      moduleRes = await loadModule("../../src/pages/fourOhFour.mjs"); 
       return;
 
     }

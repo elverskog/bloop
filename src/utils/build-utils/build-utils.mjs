@@ -3,7 +3,6 @@
 
 // import fsExtra from "fs-extra";
 import moduleCompiler from "../../moduleCompiler.mjs";
-import { utilBaseDir } from "../dir-utils/dir-utils.mjs";
 
 
 function validateArgsBuild(args) {
@@ -35,7 +34,7 @@ export async function build(pagePathsArray) {
   // return await moduleCompiler({ url: pagePathsArray[0], isFetch: false, res: null, isBuild: true });
 
   return Promise.all(pagePathsArray.map( async path => {
-    return await moduleCompiler({ url: path, path, isFetch: false, res: null, isBuild: true });
+    return await moduleCompiler({ url: path, isFetch: false, res: null, isBuild: true });
   }));
 
   // //if in build mode, clear the JS and CSS directories in /src

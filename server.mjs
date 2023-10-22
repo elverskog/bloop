@@ -140,13 +140,12 @@ const server = http.createServer(async (req, res) => {
 //run build script if on prod on start
 if(process.env.NODE_ENV === "production") {
   console.log("BUILD");
+  clearDistFiles(["css", "js", "pages", "modules-res"]);
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");
-  //console.log("PAGE PATHS ARRAY: ", pagePathsArray);
   const distFiles = await build(pagePathsArray);
-  //console.log("DIST FILES: ", distFiles);
-  clearDistFiles(["css", "js", "pages", "modules-res"]);
+  console.log("DIST FILES: ", distFiles);
 }
 
 server.listen(PORT, () => {

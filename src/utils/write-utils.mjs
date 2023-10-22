@@ -1,7 +1,7 @@
-import fs from "fs";
-import { fsExtra } from "fs-extra";
+import fs from "fs-extra";
 import brotli from "brotli";
-import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
+import path from "path";
+// import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
 
 //settings for brotli compression - TODO adjust these settings
@@ -13,22 +13,29 @@ const brotliSettings = {
   lgwin: 12 // default
 };
 
+
 //function to clear various directories in dist
-export function clearDistFiles(arrayOfFiles) {
-  arrayOfFiles.array.forEach(path => {
+export function clearDistFiles() {
+
+  const distPath = path.join(process.cwd(), "dist");
+  const subDirs = fs.readdirSync(distPath);
+ 
+  subDirs.forEach(dir => {
     try {
-      fsExtra.emptyDirSync(`./dist/${path}`);
+      fs.emptyDirSync(`${distPath}/${dir}/`);
     } catch (error) {
-      console.log("failed to clear dist files: ", error);  
+      console.log(`failed to clear dist files in ${distPath}/${dir}/: `, error);  
     }
   });
 }
 
+
 //function to compress and write files, in subsection of hopper (css vs js)
 export function writeCssOrJs(contentString, fileType, moduleName) {
 
-  const baseDir = utilBaseDir.getBaseDir();
-  const filePath = `${baseDir}/dist/${fileType}/${moduleName}.${fileType}`;
+  // const baseDir = utilBaseDir.getBaseDir();
+  // const filePath = `${baseDir}/dist/${fileType}/${moduleName}.${fileType}`;
+  const filePath = `./dist/${fileType}/${moduleName}.${fileType}`;
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(filePath)) return;
