@@ -1,6 +1,5 @@
 import fs from "fs";
 import loadModule from "./utils/module-utils.mjs";
-import manageHopper from "./hopper.mjs";
 import { Result } from "postcss";
 
 
@@ -9,36 +8,55 @@ import { Result } from "postcss";
 //only runs on server
 export default async function moduleCompiler(options) {
 
+  let bodyModule;
   let bodyRes;
   const { url, isFetch, isBuild } = options;
   const modulePath = url === "/" ? "/a" : url;
 
   //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = isBuild ? modulePath : `src/pages${modulePath}.mjs`;
+  const adjustedPath = isBuild ? `../${modulePath}` : `../src/pages${modulePath}.mjs`;
 
-
-  if (!fs.existsSync(adjustedPath)) {
-    console.log("moduleCompiler FILE IS NOT FOUND: ", adjustedPath);
-    return;
-  }
-
-  //reset the hopper to blank "css", "markup", "script" nodes
-  //TODO - is this even needed if a new app is started on each request?
-  manageHopper.setHopper();
+  // if (!fs.existsSync(adjustedPath)) {
+  //   console.log("moduleCompiler FILE IS NOT FOUND: ", adjustedPath);
+  //   return;
+  // }
 
   //if we can't find the module/page that matches the path, use a 404 page/module
   try {
-    bodyRes = await loadModule(adjustedPath);
+    // bodyModule = await loadModule(adjustedPath);
+    // const modulePath = path.at(0) === "/" ? path : `../../${path}`;
+    //console.log("ADJUSTED PATH: ", adjustedPath);
+    bodyModule = (await import(adjustedPath)).default; 
   } catch(err) {
     console.log("moduleCompiler.mjs load module error: ", err);
     return;
   }
 
+  try {
+    bodyRes = await bodyModule();
+  } catch(err) {
+    console.log("moduleCompiler.mjs run module error: ", err);
+    return;
+  }
+
+
+  //if we got a full page request, we call wrapper, passing body into it
+  if(!isFetch) {
+    // await wrapperMod(bodyRes.markup, bodyRes.title);
+    //const { bodyMarkup, title } = args;
+    const wrapper = (await import("../src/components/wrapper.mjs")).default;
+    bodyRes = await wrapper({ bodyMarkup: bodyRes.markup, title: bodyRes.title });
+  // } else {
+    //write the current compiled page to a JSON file
+    //writeModuleResult(adjustedPath, JSON.stringify(hopper));
+  }
+
+
   return bodyRes;
 
   //get the body module. exit and log if bodyMod is not valid
-  // const bodyRes = typeof bodyMod === "function" ? await bodyMod() : undefined;
- 
+
+
   //const hopper = manageHopper.getHopper();
 
   // //if we got a full page request, we call wrapper, passing body into it

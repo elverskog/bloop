@@ -2,7 +2,7 @@
 //for each page the HTML, CSS and JS for each will be stored in an analogous location in /dist
 
 // import fsExtra from "fs-extra";
-import moduleCompiler from "../../moduleCompiler.mjs";
+import moduleCompiler from "../../moduleCompiler2.mjs";
 
 
 function validateArgsBuild(args) {
@@ -13,7 +13,7 @@ function validateArgsBuild(args) {
   catch(err) { 
     errors.push(err); 
   }
-  console.log("BUILD ARGS FAIL: ", errors.length);    
+  console.log("BUILD ARGS ERRORS LENGTH: ", errors.length);    
   return (errors.length > 0);
 
 }

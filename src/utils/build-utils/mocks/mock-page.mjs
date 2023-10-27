@@ -1,10 +1,10 @@
-export default async function mockPage() {
+export default async function mockPage(addModule, args) {
 
   const result = {
     name: "mockPage",
     title: "Mock Page",
     css: `
-      .a {
+      .mockpage {
         font-size: 35em;
         text-align: center;
       }
@@ -15,9 +15,12 @@ export default async function mockPage() {
       }
     `,
     markup: `
-      <div id="a" class="a">
-        A
-      </div>    
+      <div id="mock" class="mockpage">
+        Mock page - ${ args.label }
+      </div> 
+      <div id="subPage" class="subPage">
+        ${ await addModule("../../src/utils/build-utils/mocks/mock-page-inner.mjs", { label: "Label for mock page inner" }) }
+      </div> 
     `,
     script: {
       init: function() {

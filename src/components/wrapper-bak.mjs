@@ -6,17 +6,14 @@ import loadModule from "../utils/module-utils.mjs";
 
 export default async function wrapper(moduleRes) {
  
+
   //const thisHopper = hopper.getHopper(); 
 
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 
   //get menu module
-  // const menuRes = await loadModule("src/components/menu.mjs");
-  const menuMod = import (await loadModule("./menu.mjs")).default;
-  const menuRes = menuMod();
-
-  //console.log("MENUMOD: ", menuMod);
+  const menuRes = await loadModule("src/components/menu.mjs");
 
   //we have to add CSS for wrapper and menu as they are not part of body module stack
   let cssTags = `
