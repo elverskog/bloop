@@ -4,17 +4,21 @@ import loadModule from "../utils/module-utils.mjs";
 // import hopper from "../hopper.mjs";
 
 
-export default async function wrapper(moduleRes) {
+export default async function wrapper(addModule, args) {
  
   //const thisHopper = hopper.getHopper(); 
+
+  const { moduleRes } = args;
+  
+  console.log("MODULERES: ", moduleRes);
 
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 
   //get menu module
   // const menuRes = await loadModule("src/components/menu.mjs");
-  const menuMod = import (await loadModule("./menu.mjs")).default;
-  const menuRes = menuMod();
+  // const menuMod = import (await loadModule("./menu.mjs")).default;
+  // const menuRes = menuMod();
 
   //console.log("MENUMOD: ", menuMod);
 
@@ -51,6 +55,8 @@ export default async function wrapper(moduleRes) {
   // }
 
 
+            // ${menuRes.markup}
+
   const result = {
     name: "wrapper",
     css: `
@@ -79,7 +85,7 @@ export default async function wrapper(moduleRes) {
         </head>
         <body id="__body">
           <div id="wrapper">
-            ${menuRes.markup}
+            MENU
             <div id="content">
               ${bodyMarkup}
             </div>

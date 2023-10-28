@@ -3,9 +3,11 @@ import { buildPage } from "./build-page-utils.mjs";
 
 
 tap.test("buildPage, when passed a path to a page, with valid structure, should return an object with nodes for css, markup and script", async t => {
-  console.log("BUILDPAGE", buildPage);
   const path = "src/utils/build-utils/mocks/mock-page.mjs";
   const result = await buildPage({ path, isFetch: false, isBuild: true });
+
+  console.log("RESULT IN TEST: ", result);
+
   t.match(result.mockPage, {
     css: String,
     markup: String,

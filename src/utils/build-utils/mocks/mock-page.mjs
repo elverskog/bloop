@@ -1,4 +1,16 @@
+import { stringify } from "postcss";
+
 export default async function mockPage(addModule, args) {
+
+        // ${ (await addModule("../../src/utils/build-utils/mocks/mock-page-inner.mjs", { label: "Label for mock page inner" })).markup }
+
+
+
+  const submod = await addModule("../../src/utils/build-utils/mocks/mock-page-inner.mjs", { label: "Label for mock page inner" });
+
+  // console.log("/////////////SUBMOD: ", submod);
+
+  // ${ stringify(submod) }
 
   const result = {
     name: "mockPage",
@@ -19,7 +31,6 @@ export default async function mockPage(addModule, args) {
         Mock page - ${ args.label }
       </div> 
       <div id="subPage" class="subPage">
-        ${ await addModule("../../src/utils/build-utils/mocks/mock-page-inner.mjs", { label: "Label for mock page inner" }) }
       </div> 
     `,
     script: {
@@ -30,6 +41,9 @@ export default async function mockPage(addModule, args) {
       } 
     } 
   };
+
+  
+  // console.log("/////////////SUBMOD RESULT: ", result);
 
   return result;
   
