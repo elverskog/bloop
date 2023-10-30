@@ -1,40 +1,28 @@
 //if the command "npm prod" is run, here we run code to build every page found in /pages
 //for each page the HTML, CSS and JS for each will be stored in an analogous location in /dist
 
+import { validateArgs } from "../validation-utils.mjs";
 // import fsExtra from "fs-extra";
-import moduleCompiler from "../../moduleCompiler2.mjs";
-
-
-function validateArgsBuild(args) {
-  
-  const errors = [];
-  try { 
-    args[0].flat(); } 
-  catch(err) { 
-    errors.push(err); 
-  }
-  console.log("BUILD ARGS ERRORS LENGTH: ", errors.length);    
-  return (errors.length > 0);
-
-}
+import { buildPage } from "../build-page-utils.mjs";
 
 
 export async function build(pagePathsArray) {
 
   console.log("PAGEPATHSARRAY: ", pagePathsArray);
 
-  if(validateArgsBuild(arguments)) return;
-
-  // return {
-  //   css: {},
-  //   markup: {},
-  //   style: {}
-  // };
+  try {
+    validateArgs([
+      [pagePathsArray, "array"]
+    ]); 
+  } catch (error) {
+    console.log("CAUGHT ERROR: ", error);
+    return;
+  }
 
   // return await moduleCompiler({ url: pagePathsArray[0], isFetch: false, res: null, isBuild: true });
 
   return Promise.all(pagePathsArray.map( async path => {
-    return await moduleCompiler({ url: path, isFetch: false, res: null, isBuild: true });
+    return await buildPage({ url: path, isFetch: false, res: null, isBuild: true });
   }));
 
   // //if in build mode, clear the JS and CSS directories in /src

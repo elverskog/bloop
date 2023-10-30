@@ -9,17 +9,22 @@ export async function buildPage(options) {
 
   let moduleRes;
   const collectedModules = {};
+  
+  try {
+    validateArgs([
+      [options.path, "string"],
+      [options.isFetch, "boolean"],
+      [options.isBuild, "boolean"]
+    ]); 
+  } catch (error) {
+    return;
+  }
+
   const { path, isFetch, isBuild } = options;
-
-  if (!validateArgs([ 
-    [path, "string"],
-    [isFetch, "boolean"],
-    [isBuild, "boolean"]
-  ])) return;
-
+  
   async function addModule(modulePath, args) {
 
-    console.log("ADD MODULE: ", modulePath, "\n", args);
+    // console.log("ADD MODULE: ", modulePath, "\n", args);
 
     let module;
     let moduleRes;
