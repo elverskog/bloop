@@ -34,22 +34,62 @@ tap.test("validateArgs should receive an error if not passed an array of tuples"
 
 tap.test("validateArgs passed boolean, should return true if type is correct, false if type is wrong (in array of tuples)", async t => {
   const testVar = true;
-  t.match(await validateArgs( [[ testVar, "boolean" ]]), true);
-  t.match(await validateArgs( [[ testVar, "string" ]]), false);
-  t.match(await validateArgs( [[ testVar, "object" ]]), false);
-  t.match(await validateArgs( [[ testVar, "function" ]]), false);
-  t.match(await validateArgs( [[ testVar, "number" ]]), false);
-  t.match(await validateArgs( [[ testVar, "bigint" ]]), false);
+  t.match(await validateArgs( [[ testVar, "boolean" ]]), true, "failed on boolean");
+  try {
+    await validateArgs( [[ testVar, "string" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on string");
+  }
+  try {
+    await validateArgs( [[ testVar, "object" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on object");
+  }
+  try {
+    await validateArgs( [[ testVar, "function" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on function");
+  }
+  try {
+    await validateArgs( [[ testVar, "number" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on number");
+  }
+  try {
+    await validateArgs( [[ testVar, "bigint" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on bigint");
+  }
   t.end();
 });
 
 tap.test("validateArgs passed string, should return true if type is correct, false if type is wrong (in array of tuples)", async t => {
   const testVar = "string am I";
-  t.match(await validateArgs( [[ testVar, "string" ]]), true);
-  t.match(await validateArgs( [[ testVar, "boolean" ]]), false);
-  t.match(await validateArgs( [[ testVar, "object" ]]), false);
-  t.match(await validateArgs( [[ testVar, "function" ]]), false);
-  t.match(await validateArgs( [[ testVar, "number" ]]), false);
-  t.match(await validateArgs( [[ testVar, "bigint" ]]), false);
+  t.match(await validateArgs( [[ testVar, "string" ]]), true, "failed on string");
+  try {
+    await validateArgs( [[ testVar, "boolean" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on boolean");
+  }
+  try {
+    await validateArgs( [[ testVar, "object" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on object");
+  }
+  try {
+    await validateArgs( [[ testVar, "function" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on function");
+  }
+  try {
+    await validateArgs( [[ testVar, "number" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on number");
+  }
+  try {
+    await validateArgs( [[ testVar, "bigint" ]]);
+  } catch (error) {
+    t.match(error instanceof Error, true, "failed on bigint");
+  }
   t.end();
 });

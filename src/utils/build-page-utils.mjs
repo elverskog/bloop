@@ -7,6 +7,8 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
+  console.log("BUILDPAGE - OPTIONS: ", options);
+
   let moduleRes;
   const collectedModules = {};
   

@@ -39,7 +39,6 @@ export function validateArgs(args) {
       console.log("CASE IS DEFAULT");
       break;
     }
-    
     if(res) { 
       return res;
     } else {

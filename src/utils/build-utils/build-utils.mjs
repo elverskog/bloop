@@ -8,7 +8,7 @@ import { buildPage } from "../build-page-utils.mjs";
 
 export async function build(pagePathsArray) {
 
-  console.log("PAGEPATHSARRAY: ", pagePathsArray);
+  console.log("BUILD - PAGEPATHSARRAY: ", pagePathsArray);
 
   try {
     validateArgs([
@@ -22,7 +22,7 @@ export async function build(pagePathsArray) {
   // return await moduleCompiler({ url: pagePathsArray[0], isFetch: false, res: null, isBuild: true });
 
   return Promise.all(pagePathsArray.map( async path => {
-    return await buildPage({ url: path, isFetch: false, res: null, isBuild: true });
+    return await buildPage({ path, isFetch: false, res: null, isBuild: true });
   }));
 
   // //if in build mode, clear the JS and CSS directories in /src
