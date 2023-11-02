@@ -3,8 +3,8 @@
 
 export function validateArgs(args) {
 
-  console.log("ARGS: ", args);
-  console.log("TYPEOF ARGS: ", typeof args);
+  // console.log("ARGS: ", args);
+  // console.log("TYPEOF ARGS: ", typeof args);
 
   function isStandardType(type) {
     return [
@@ -28,15 +28,15 @@ export function validateArgs(args) {
     
     switch (true) {
     case isStandardType(pair[1]):
-      console.log("CASE IS STANDARD");
+      // console.log("CASE IS STANDARD");
       res = typeof pair[0] === pair[1];  
       break;
     case pair[1] === "array": 
-      console.log("CASE IS ARRAY");
+      // console.log("CASE IS ARRAY");
       res = Array.isArray(pair[0]);
       break;
     default:
-      console.log("CASE IS DEFAULT");
+      // console.log("CASE IS DEFAULT");
       break;
     }
     if(res) { 

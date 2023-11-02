@@ -7,10 +7,10 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
-  console.log("BUILDPAGE - OPTIONS: ", options);
+  // console.log("BUILDPAGE - OPTIONS: ", options);
 
   let moduleRes;
-  const collectedModules = {};
+  const collectedModules = [];
   
   try {
     validateArgs([
@@ -44,7 +44,8 @@ export async function buildPage(options) {
     }
 
     if(!collectedModules[ moduleRes ]) {
-      collectedModules[ moduleRes.name ] = moduleRes;
+      // collectedModules[ moduleRes.name ] = moduleRes;
+      collectedModules.push(moduleRes);
     }
 
     return moduleRes;

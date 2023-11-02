@@ -53,7 +53,7 @@ export function getAllFiles(dirPath, result = [], extension = "mjs") {
     const currentFiles = fs.readdirSync(`./${dirPath}`);
     // const currentFiles = fs.readdirSync(`./`);
    
-    console.log("CURRENT FILES: ", currentFiles);
+    // console.log("CURRENT FILES: ", currentFiles);
 
     //loop through the files found
     currentFiles.forEach(function(file) {
