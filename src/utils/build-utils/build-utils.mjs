@@ -59,19 +59,11 @@ export async function build(pagePathsArray) {
     const page = await buildPage({ path, isFetch: false, res: null, isBuild: true });
     // console.log("PAGE: ", page[0].name);
     // console.log("PAGE: ", page);
-    
-    Object.keys(page).forEach(key => {
-      const module = page[key];
-      dedupedRes[module.name] = module;
-    });
-
-    masterRes[page[0].name] = await page;
-
-    console.log("MASTERRES: ", masterRes);
-
-
-    I AM HERE
-
+    // Object.keys(page).forEach(key => {
+    //   const module = page[key];
+    //   dedupedRes[module.name] = module;
+    // });
+    // masterRes[page[0].name] = await page;
   });
 
   // markup = buildMarkup(await masterRes);

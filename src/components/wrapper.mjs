@@ -16,7 +16,7 @@ export default async function wrapper(addModule, args) {
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 
   //get menu module
-  // const menuRes = await loadModule("src/components/menu.mjs");
+  const menuRes = await addModule("src/components/menu.mjs");
   // const menuMod = import (await loadModule("./menu.mjs")).default;
   // const menuRes = menuMod();
 

@@ -9,8 +9,7 @@ export async function buildPage(options) {
 
   // console.log("BUILDPAGE - OPTIONS: ", options);
 
-  let moduleRes;
-  const collectedModules = [];
+  //const collectedModules = [];
   
   try {
     validateArgs([
@@ -22,11 +21,22 @@ export async function buildPage(options) {
     return;
   }
 
+
   const { path, isFetch, isBuild } = options;
-  
+  const pagePath = path === "/" ? "/a" : path;
+  //if for build, just use what was passed in, else need to construct the full path from URL  
+  const adjustedPath = isBuild ? `../../${pagePath}` : `../src/pages${pagePath}.mjs`;
+  let moduleRes;
+  let pageRes = {
+    css: {},
+    markup: "",
+    script: {},
+  };
+
+
   async function addModule(modulePath, args) {
 
-    // console.log("ADD MODULE: ", modulePath, "\n", args);
+    console.log("ADD MODULE: ", modulePath, "\n", args);
 
     let module;
     let moduleRes;
@@ -43,18 +53,28 @@ export async function buildPage(options) {
       console.log("RUN MODULE ERROR: ", error);
     }
 
-    if(!collectedModules[ moduleRes ]) {
-      // collectedModules[ moduleRes.name ] = moduleRes;
-      collectedModules.push(moduleRes);
+    // if(!collectedModules[ moduleRes ]) {
+    //   collectedModules.push(moduleRes);
+    // }
+
+    // console.log("WRAPPER: ", moduleRes);
+    // console.log("TYPEOF MARKUP: ", typeof moduleRes?.wrapper?.markup === "string");
+
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
+      pageRes.css[moduleRes.name] = moduleRes.css;    
+    }
+
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.script === "object") {
+      pageRes.script[moduleRes.name] = moduleRes.script;    
+    }
+
+    if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {
+      pageRes.markup = moduleRes.markup;    
     }
 
     return moduleRes;
+
   }
-
-  const pagePath = path === "/" ? "/a" : path;
-
-  //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = isBuild ? `../../${pagePath}` : `../src/pages${pagePath}.mjs`;
 
   try {
     moduleRes = await addModule(adjustedPath, { label: "Label for mod 1" }); 
@@ -63,13 +83,16 @@ export async function buildPage(options) {
     return;
   }
 
+
+  // get the wrapper for the page
   try {
     await addModule("../../src/components/wrapper.mjs", { moduleRes });
   } catch(err) {
-    console.log("moduleCompiler.mjs add module error: ", err);
+    console.log("moduleCompiler.mjs add wrapper error: ", err);
     return;
   }
 
-  return collectedModules;
+
+  return pageRes;
 
 }
