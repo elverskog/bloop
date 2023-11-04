@@ -23,11 +23,10 @@ export async function buildPage(options) {
 
 
   const { path, isFetch, isBuild } = options;
-  const pagePath = path === "/" ? "/a" : path;
-  //if for build, just use what was passed in, else need to construct the full path from URL  
-  const adjustedPath = isBuild ? `../../${pagePath}` : `../src/pages${pagePath}.mjs`;
   let moduleRes;
+  let wrappedRes;
   let pageRes = {
+    name: "",
     css: {},
     markup: "",
     script: {},
@@ -36,13 +35,18 @@ export async function buildPage(options) {
 
   async function addModule(modulePath, args) {
 
-    console.log("ADD MODULE: ", modulePath, "\n", args);
+    // console.log("ADD MODULE: ", modulePath, "\n", args);
+    console.log("ADD MODULE: ", modulePath);
+
+    const path = modulePath === "/" ? "/a" : modulePath;
+    //if for build, just use what was passed in, else need to construct the full path from URL  
+    const adjustedPath = isBuild ? `../../${path}` : `../src/pages${path}.mjs`;
 
     let module;
     let moduleRes;
 
     try {
-      module = (await import(modulePath)).default;    
+      module = (await import(adjustedPath)).default;    
     } catch (error) {
       console.log("IMPORT MODULE ERROR: ", error);
     }
@@ -60,6 +64,19 @@ export async function buildPage(options) {
     // console.log("WRAPPER: ", moduleRes);
     // console.log("TYPEOF MARKUP: ", typeof moduleRes?.wrapper?.markup === "string");
 
+    // console.log("MODULERES: ", moduleRes, "\n\n");
+
+    return moduleRes;
+
+  }
+
+
+  function processModule(moduleRes) {
+
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
+      pageRes.name = moduleRes.name;    
+    }
+
     if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
       pageRes.css[moduleRes.name] = moduleRes.css;    
     }
@@ -72,12 +89,11 @@ export async function buildPage(options) {
       pageRes.markup = moduleRes.markup;    
     }
 
-    return moduleRes;
-
   }
 
+
   try {
-    moduleRes = await addModule(adjustedPath, { label: "Label for mod 1" }); 
+    moduleRes = await addModule(path, { label: "Label for mod 1" }); 
   } catch(err) {
     console.log("moduleCompiler.mjs add module error: ", err);
     return;
@@ -86,13 +102,19 @@ export async function buildPage(options) {
 
   // get the wrapper for the page
   try {
-    await addModule("../../src/components/wrapper.mjs", { moduleRes });
+    wrappedRes = await addModule("src/components/wrapper.mjs", { moduleRes });
+    //need to add the name to the w
+    //I AM HERE
+    //DO I NEED TO ADD A NAME REALLY JUST FOR THE MARKUP
+    //THE CSS AND JS SHOULD BE UNDER WRAPPER
+    processModule(wrappedRes);
   } catch(err) {
     console.log("moduleCompiler.mjs add wrapper error: ", err);
     return;
   }
 
 
+  console.log("PAGERES: ", pageRes);
   return pageRes;
 
 }

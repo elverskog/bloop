@@ -1,7 +1,7 @@
 // import link from "./link.mjs";
 import loadModule from "../utils/module-utils.mjs";
 
-export default async function menuItem (args) {
+export default async function menuItem (addModule, args) {
 
   // import loadModule from "../utils/module-utils.mjs";
   // const linkRes = await link(label, pathname);
@@ -40,7 +40,7 @@ export default async function menuItem (args) {
     `,
     markup: `
       <menuitem>
-        ${ (await loadModule("src/components/link.mjs", { label, pathname })).markup }
+        ${ (await addModule("src/components/link.mjs", { label, pathname })).markup }
       </menuitem>
     `
   };
