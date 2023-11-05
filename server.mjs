@@ -7,8 +7,8 @@ import { utilBaseDir, getAllFiles } from "./src/utils/dir-utils/dir-utils.mjs";
 import { 
   clearDistFiles, 
   writeCssOrJs, 
+  writeMarkup, 
   writeModuleResult, 
-  writePage
 } from "./src/utils/write-utils.mjs";
 
 
@@ -144,8 +144,13 @@ if(process.env.NODE_ENV === "production") {
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");
+  console.log("PAGEPATHSARRAY: ", pagePathsArray);
   const distFiles = await build(pagePathsArray);
-  console.log("DIST FILES: ", distFiles);
+  // console.log("DIST FILES: ", distFiles);
+  distFiles.forEach(page => {
+    writeMarkup(page);
+  });
+
 }
 
 server.listen(PORT, () => {

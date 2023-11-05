@@ -7,7 +7,7 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
-  // console.log("BUILDPAGE - OPTIONS: ", options);
+  console.log("BUILDPAGE - OPTIONS: ", options);
 
   //const collectedModules = [];
   
@@ -24,8 +24,8 @@ export async function buildPage(options) {
 
   const { path, isFetch, isBuild } = options;
   let moduleRes;
-  let wrappedRes;
-  let pageRes = {
+  const pageRes = {
+    modulePath: path,  //add the pathname into the page output. Need to know where to write dist files
     name: "",
     css: {},
     markup: "",
@@ -36,7 +36,7 @@ export async function buildPage(options) {
   async function addModule(modulePath, args) {
 
     // console.log("ADD MODULE: ", modulePath, "\n", args);
-    console.log("ADD MODULE: ", modulePath);
+    // console.log("ADD MODULE: ", modulePath);
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
@@ -48,7 +48,8 @@ export async function buildPage(options) {
     try {
       module = (await import(adjustedPath)).default;    
     } catch (error) {
-      console.log("IMPORT MODULE ERROR: ", error);
+      // console.log("IMPORT MODULE ERROR: ", error);
+      throw new Error(`IMPORT MODULE: ${error}`);
     }
 
     try {
@@ -66,18 +67,10 @@ export async function buildPage(options) {
 
     // console.log("MODULERES: ", moduleRes, "\n\n");
 
-    return moduleRes;
 
-  }
+    // console.log("PROCESSMODULE: ", moduleRes?.name);
 
-
-  function processModule(moduleRes) {
-
-    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
-      pageRes.name = moduleRes.name;    
-    }
-
-    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string" && typeof pageRes.css[moduleRes.name] !== "string") {
       pageRes.css[moduleRes.name] = moduleRes.css;    
     }
 
@@ -89,32 +82,36 @@ export async function buildPage(options) {
       pageRes.markup = moduleRes.markup;    
     }
 
+    return moduleRes;
+
   }
 
 
   try {
+
     moduleRes = await addModule(path, { label: "Label for mod 1" }); 
+
+    //add the name for page's main module
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
+      pageRes.name = moduleRes.name;    
+    }
+
   } catch(err) {
-    console.log("moduleCompiler.mjs add module error: ", err);
+    console.log("buildPage: add module error: ", err);
     return;
   }
 
 
   // get the wrapper for the page
   try {
-    wrappedRes = await addModule("src/components/wrapper.mjs", { moduleRes });
-    //need to add the name to the w
-    //I AM HERE
-    //DO I NEED TO ADD A NAME REALLY JUST FOR THE MARKUP
-    //THE CSS AND JS SHOULD BE UNDER WRAPPER
-    processModule(wrappedRes);
+    await addModule("src/components/wrapper.mjs", { moduleRes });
   } catch(err) {
-    console.log("moduleCompiler.mjs add wrapper error: ", err);
+    console.log("buildPage: add wrapper error: ", err);
     return;
   }
 
 
-  console.log("PAGERES: ", pageRes);
+  // console.log("PAGERES: ", pageRes);
   return pageRes;
 
 }

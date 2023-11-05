@@ -6,7 +6,7 @@ export default async function mockPage(addModule, args) {
 
 
 
-  const submod = await addModule("../../src/utils/build-utils/mocks/mock-page-inner.mjs", { label: "Label for mock page inner" });
+  const submod = await addModule("src/utils/build-utils/mocks/mock-page-inner.mjs", { label: "Label for mock page inner" });
 
   // console.log("/////////////SUBMOD: ", submod);
 

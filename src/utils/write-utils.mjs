@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import brotli from "brotli";
 import path from "path";
+import { validateArgs } from "./validation-utils.mjs";
 // import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
 
@@ -57,35 +58,42 @@ export function writeCssOrJs(contentString, fileType, moduleName) {
 
 
 //function to compress and write markup files for a full page request
-export function writePage(modulePath, content) {
+export function writeMarkup(page) {
 
-  if(typeof modulePath === "string" && typeof content === "string") {
+  let savePath;
 
-    //change path of module to that of where we should store the page in /dist
-    const pagePath = modulePath.replace("src", "dist").replace("mjs", "html");
-
-    //if in PROD, exit if the file exists (on dev always write the file)
-    if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
-
-    //if the dirs in the path don't exist create them
-    const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
-
-    if(!fs.existsSync(pageDirPath)) {
-      fs.mkdirSync(pageDirPath, { recursive: true });
-    }
-
-    //brotli compress the css-string
-    const buff = Buffer.from(content, "utf-8");
-    const compressed = brotli.compress(buff, brotliSettings);
-    //const compressed = content;
-
-    fs.writeFileSync(pagePath, compressed);
-
-    return true;
-    
-  } else {
-    console.log("compressAndWrite passed invalid page content", modulePath);
+  try {
+    validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
+  } catch (error) {
+    return;
   }
+
+  if(typeof page.modulePath === "string") {
+    //change path of module to that of where we should store the page in /dist
+    savePath = page.modulePath.replace("src", "dist").replace("mjs", "html");
+  } else {
+    throw new Error("writePage: page.modulePath not a string");
+  }
+
+  //if in PROD, exit if the file exists (on dev always write the file)
+  if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
+
+  //if the dirs in the path don't exist create them
+  const saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
+
+  if(!fs.existsSync(saveDirPath)) {
+    fs.mkdirSync(saveDirPath, { recursive: true });
+  }
+
+  //brotli compress the css-string
+  const buff = Buffer.from(page.markup, "utf-8");
+  const compressed = brotli.compress(buff, brotliSettings);
+  //const compressed = content;
+
+  fs.writeFileSync(savePath, compressed);
+
+  return true;
+  
 
 }
 
