@@ -26,12 +26,9 @@ tap.test("buildPage should return undefined if a valid path is not passed", asyn
   t.end();
 });
 
-// tap.test("build, when passed an array of paths with an invalid path, should return an error", async t => {
-//   const pagesPathArray = [
-//     "./bad-path/bad-page.mjs"
-//   ];
-//   t.match(await build(pagesPathArray), [ undefined ]);
-//   t.end();
-// });
+tap.test("buildPage, when passed an invalid path, should return an error", async t => {
+  t.match(await buildPage("./bad-path/bad-page.mjs"), undefined);
+  t.end();
+});
 
 
