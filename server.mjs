@@ -3,13 +3,16 @@ import fs from "fs";
 import moduleCompiler from "./src/moduleCompiler.mjs";
 // import { build } from "./src/utils/build-utils.mjs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
-import { utilBaseDir, getAllFiles } from "./src/utils/dir-utils/dir-utils.mjs";
 import { 
-  clearDistFiles, 
+  clearFiles, 
+  utilBaseDir,
+  getAllFiles 
+} from "./src/utils/dir-utils/dir-utils.mjs";
+import { 
   writeCssOrJs, 
   writeMarkup, 
   writeModuleResult, 
-} from "./src/utils/write-utils.mjs";
+} from "./src/utils/write-utils/write-utils.mjs";
 
 
 //for node set a base directory as full path
@@ -140,7 +143,12 @@ const server = http.createServer(async (req, res) => {
 //run build script if on prod on start
 if(process.env.NODE_ENV === "production") {
   console.log("BUILD");
-  clearDistFiles(["css", "js", "pages", "modules-res"]);
+  clearFiles([
+    "src/dist/css",
+    "src/dist/js",
+    "psrc/dist/ages",
+    "msrc/dist/odules-res"
+  ]);
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");

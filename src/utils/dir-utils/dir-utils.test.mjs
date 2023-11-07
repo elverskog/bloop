@@ -2,52 +2,72 @@ import fs from "fs";
 import tap from "tap";
 import path from "path";
 import {fileURLToPath} from "url";
-import { utilBaseDir, getAllPages } from "./dir-utils.mjs";
+import { clearFiles, utilBaseDir, getAllFiles } from "./dir-utils.mjs";
 
 const thisFilename = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(thisFilename);
 
-tap.test("getAllPages should return an array of all files with .mjs extension", t => {
+
+//clearFiles tests //////////////////////////////////////////////////////////////////
+
+// tap.test("clearFiles if passed an array of valid paths should remove all files inside each", async t => {
+ 
+//   //if the dummy dir doesn't exist, create it
+//   if(!fs.existsSync("mocks/clear-files/fake")) {
+//     fs.mkdirSync("mocks/clear-files/fake", { recursive: false });
+//   }
+
+//   t.match(1, 1);
+//   t.end();
+// });
+
+
+//getAllFiles tests //////////////////////////////////////////////////////////////////
+
+tap.test("getAllFiles should return an array of all files with .mjs extension", t => {
   const expectedFiles = [
-    "/home/ee/code/bloop/src/utils/dir-utils/mocks/dir-util-mock.mjs",
-    "/home/ee/code/bloop/src/utils/dir-utils/mocks/inner-dir/dir-util-mock-inner.mjs"
+    "src/utils/dir-utils/mocks/dir-util-mock.mjs",
+    "src/utils/dir-utils/mocks/inner-dir/dir-util-mock-inner.mjs"
   ];
-  const actualFiles = getAllPages(`${ currentDir }/mocks`);
+  const actualFiles = getAllFiles("src/utils/dir-utils/mocks");
   t.match(actualFiles, expectedFiles);
   t.end();
 });
 
-tap.test("getAllPages should throw an error if path is not valid", t => {
-  const invalidPath = "/this/path/does/not/exist";
-  t.throws(() => getAllPages(invalidPath), {
-    message: `Error while reading directory ${invalidPath}: ENOENT: no such file or directory, scandir '${invalidPath}'`
+tap.test("getAllFiles should throw an error if path is not valid", t => {
+  const invalidPath = "src/utils/dir-utils/this/path/does/not/exist";
+  t.throws(() => getAllFiles(invalidPath), {
+    message: `ENOENT: no such file or directory, scandir './${invalidPath}'`
   });
   t.end();
 });
 
-tap.test("getAllPages should return an empty array if directory contains no files with the specified extension", t => {
-  const actualFiles = getAllPages(`${ currentDir }/mocks/empty`);
+tap.test("getAllFiles should return an empty array if directory contains no files with the specified extension", t => {
+  const actualFiles = getAllFiles("src/utils/dir-utils/mocks/empty");
   t.match(actualFiles, []);
   t.end();
 });
 
-tap.test("getAllPages should throw an error if passed a file instead of a directory", t => {
-  const filePath = `${ currentDir }/mocks/file1.mjs`;
-  t.throws(() => getAllPages(filePath), {
+tap.test("getAllFiles should throw an error if passed a file instead of a directory", t => {
+  const filePath = "src/utils/dir-utils/mocks/file1.mjs";
+  t.throws(() => getAllFiles(filePath), {
     // message: `Error while reading directory ${filePath}: ENOTDIR: not a directory, scandir '${filePath}'`
-    message: `Error while reading directory ${filePath}: ENOENT: no such file or directory, scandir '${filePath}'`
+    message: `ENOENT: no such file or directory, scandir './${filePath}'`
   });
   t.end();
 });
 
-tap.test("getAllPages should not take too long to execute with a large directory", t => {
+tap.test("getAllFiles should not take too long to execute with a large directory", t => {
   const start = performance.now();
-  getAllPages(`${ currentDir }/mocks`);
+  getAllFiles(`src/utils/dir-utils/mocks`);
   const end = performance.now();
   const timeTaken = end - start;
   t.ok(timeTaken < 50, "Function should take less than 50ms to execute");
   t.end();
 });
+
+
+//utilBaseDir tests //////////////////////////////////////////////////////////////////
 
 tap.test("utilBaseDir setBaseDir should return false when not passed a string", t => {
   t.match(utilBaseDir.setBaseDir(null), false);

@@ -8,6 +8,12 @@ import {
 
 
 
+tap.test("clearFiles if passed an array of valid paths should remove all files inside each", async t => {
+  t.match(statement, expected);
+  t.end();
+});
+
+
 
 
 

@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import brotli from "brotli";
 import path from "path";
-import { validateArgs } from "./validation-utils.mjs";
+import { validateArgs } from "../validation-utils.mjs";
 // import { utilBaseDir } from "./utils/dir-utils/dir-utils.mjs";
 
 
@@ -13,22 +13,6 @@ const brotliSettings = {
   quality: 10, // 0 - 11,
   lgwin: 12 // default
 };
-
-
-//function to clear various directories in dist
-export function clearDistFiles() {
-
-  const distPath = path.join(process.cwd(), "dist");
-  const subDirs = fs.readdirSync(distPath);
- 
-  subDirs.forEach(dir => {
-    try {
-      fs.emptyDirSync(`${distPath}/${dir}/`);
-    } catch (error) {
-      console.log(`failed to clear dist files in ${distPath}/${dir}/: `, error);  
-    }
-  });
-}
 
 
 //function to compress and write files, in subsection of hopper (css vs js)

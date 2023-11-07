@@ -1,8 +1,30 @@
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
 
+
+
+
+//function to clear various directories in dist
+export function clearFiles(paths) {
+
+  // const distPath = path.join(process.cwd(), "dist");
+  // const subDirs = fs.readdirSync(distPath);
+ 
+  paths.forEach(path => {
+    try {
+      // fs.emptyDirSync(`${distPath}/${dir}/`);
+      fs.emptyDirSync(path);
+    } catch (error) {
+      throw new Error(`clearDistFiles failed: ${error}`);  
+    }
+  });
+}
+
+
+
 //a simple util module (a singleton? oh no!) to set and pass the base file path around
+//TODO is this code still needed?
 let baseDir; 
 
 export const utilBaseDir = {
@@ -70,7 +92,8 @@ export function getAllFiles(dirPath, result = [], extension = "mjs") {
     });
 
   } catch (err) {
-    throw new Error(`Error while reading directory ${dirPath}: ${err.message}`);
+    console.log(err.message);
+    throw new Error(err.message);
   }
   
   return result;
