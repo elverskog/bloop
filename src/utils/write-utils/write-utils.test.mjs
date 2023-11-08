@@ -1,16 +1,29 @@
 import tap from "tap";
+import fs from "fs-extra";
 import { 
-  clearFiles, 
   writeCssOrJs, 
   writeMarkup, 
   writeModuleResult, 
-} from "./src/utils/write-utils.mjs";
+} from "./write-utils.mjs";
 
 
 
-tap.test("clearFiles if passed an array of valid paths should remove all files inside each", async t => {
-  t.match(statement, expected);
+tap.test("writeMarkup should write a file in src/dist/markup", t => {
+  
+  const page = {
+    modulePath: "src/markup/test",
+    markup: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
+
+  t.match(writeMarkup(page), true, "writeMarkup returned true");
+  t.match(fs.existsSync("src/dist/markup"), false, "clearFiles clears \"fake\" failed to clear the file");
+
+
+
+
   t.end();
+
 });
 
 

@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs-extra";
 import tap from "tap";
 import path from "path";
 import {fileURLToPath} from "url";
@@ -10,16 +10,31 @@ const currentDir = path.dirname(thisFilename);
 
 //clearFiles tests //////////////////////////////////////////////////////////////////
 
-// tap.test("clearFiles if passed an array of valid paths should remove all files inside each", async t => {
- 
-//   //if the dummy dir doesn't exist, create it
-//   if(!fs.existsSync("mocks/clear-files/fake")) {
-//     fs.mkdirSync("mocks/clear-files/fake", { recursive: false });
-//   }
+tap.test("clearFiles if passed an array of valid paths should remove all files inside each", async t => {
 
-//   t.match(1, 1);
-//   t.end();
-// });
+  //if the dummy-dir doesn't exist, create it
+  if(!fs.existsSync("src/utils/dir-utils/mocks/clear-files/dummy-dir")) {
+    fs.mkdirSync("src/utils/dir-utils/mocks/clear-files/dummy-dir", { recursive: false });
+  }
+
+  //if the dummy-file doesn't exist, create it
+  if(!fs.existsSync("src/utils/dir-utils/mocks/clear-files/dummy-dir/dummy-file.txt")) {
+    fs.writeFileSync("src/utils/dir-utils/mocks/clear-files/dummy-dir/dummy-file.txt", "dummy file content");
+  }
+
+  //when passed a legit array of paths
+  t.match(clearFiles(["src/utils/dir-utils/mocks/clear-files/dummy-dir"]), true, "clearFiles returns true");
+  t.match(fs.existsSync("src/utils/dir-utils/mocks/clear-files/dummy-dir/dummy-file.txt"), false, "clearFiles clears \"fake\" failed to clear the file");
+
+  //when passed a bad array of paths
+  t.match(clearFiles(["src/utils/dir-utils/mocks/clear-files/wrong-dir"]), true, "clearFiles returns false");
+
+  t.end();
+
+
+});
+
+
 
 
 //getAllFiles tests //////////////////////////////////////////////////////////////////

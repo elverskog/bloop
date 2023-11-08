@@ -34,8 +34,12 @@ export function writeCssOrJs(contentString, fileType, moduleName) {
 
     fs.writeFileSync(filePath, compressed);
 
+    return true;
+
   } else {
+
     console.log("compressAndWrite passed invalid values", arguments);
+
   }
 
 }
@@ -62,22 +66,25 @@ export function writeMarkup(page) {
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
-  //if the dirs in the path don't exist create them
   const saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
+  //if the dirs in the path don't exist create them
   if(!fs.existsSync(saveDirPath)) {
     fs.mkdirSync(saveDirPath, { recursive: true });
   }
 
   //brotli compress the css-string
   const buff = Buffer.from(page.markup, "utf-8");
+  console.log("BUFF: ", typeof buff);
   const compressed = brotli.compress(buff, brotliSettings);
-  //const compressed = content;
+  //const compressed = page.markup;
 
-  fs.writeFileSync(savePath, compressed);
-
-  return true;
-  
+  try {
+    fs.writeFileSync(savePath, compressed);
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
 
 }
 
