@@ -144,10 +144,10 @@ const server = http.createServer(async (req, res) => {
 if(process.env.NODE_ENV === "production") {
   console.log("BUILD");
   clearFiles([
-    "src/dist/css",
-    "src/dist/js",
-    "psrc/dist/ages",
-    "msrc/dist/odules-res"
+    "dist/css",
+    "dist/js",
+    "dist/markup",
+    "dist/modules-res"
   ]);
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);

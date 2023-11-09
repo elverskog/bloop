@@ -42,7 +42,7 @@ export function validateArgs(args) {
     if(res) { 
       return res;
     } else {
-      throw new Error(`validateArgs - "${ pair[0] }" isn't ${ pair[1] }`);
+      throw new Error(`validateArgs - ${ pair[0] } isn't ${ pair[1] }`);
     }
 
   };

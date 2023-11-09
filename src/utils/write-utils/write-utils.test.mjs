@@ -5,13 +5,15 @@ import {
   writeMarkup, 
   writeModuleResult, 
 } from "./write-utils.mjs";
-
+import { clearFiles } from "../dir-utils/dir-utils.mjs";
 
 // TODO: currently these write tests write to the real dist
 // not sure how to best handle relative path issues; singleton etc.
 
-tap.test("writeMarkup should write a file in src/dist/markup", t => {
-  
+tap.test("writeMarkup tests", t => {
+ 
+  clearFiles(["dist/markup",]);
+
   const page = {
     modulePath: "src/markup/test.mjs",
     markup: `<!DOCTYPE html>
@@ -21,13 +23,44 @@ tap.test("writeMarkup should write a file in src/dist/markup", t => {
   t.match(writeMarkup(page), true, "writeMarkup returned true");
   t.match(fs.existsSync("dist/markup/test.html"), true, "writeMarkup wrote test.mjs");
 
+  clearFiles(["dist/markup",]);
+
   const pageMissingModulePath = {
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
 
-  t.match(writeMarkup(pageMissingModulePath), false, "writeMarkup returned failed because modulePath is missing");
+  t.throws(() => writeMarkup(pageMissingModulePath), {
+    message: "Error: validateArgs - undefined isn't string"
+  }, "pageMissingModulePath");
+
   t.match(fs.existsSync("src/dist/markup/test.mjs"), false, "writeMarkup failed to write test.mjs because modulePath is missing");
+
+  clearFiles(["dist/markup",]);
+
+  const pageMissingMarkup = {
+    modulePath: "src/markup/test.mjs"
+  };
+
+  t.throws(() => writeMarkup(pageMissingMarkup), {
+    message: "Error: validateArgs - undefined isn't string"
+  },"pageMissingMarkup");
+
+  t.match(fs.existsSync("src/dist/markup/test.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
+
+  clearFiles(["dist/markup",]);
+
+  const pageBadPath = {
+    modulePath: "blah/markup/test.mjs",
+    markup: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
+
+  t.throws(() => writeMarkup(pageBadPath), {
+    message: "writePage: page.modulePath not a string or is otherwise invalid"
+  });
+
+  t.match(fs.existsSync("dist/markup/test.html"), false, "writeMarkup failed to write test.mjs as modulePath is invalid");
 
   t.end();
 

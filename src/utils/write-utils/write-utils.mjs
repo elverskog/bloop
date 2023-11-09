@@ -53,14 +53,18 @@ export function writeMarkup(page) {
   try {
     validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
   } catch (error) {
-    return false;
+    throw new Error(error);
   }
 
-  if(typeof page.modulePath === "string") {
+  console.log("MODULEPATH: ", page.modulePath );
+  console.log("INDEX OF SRC/ ", page.modulePath.indexOf("src/") > -1);
+
+
+  if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
     //change path of module to that of where we should store the page in /dist
     savePath = page.modulePath.replace("src", "dist").replace("mjs", "html");
   } else {
-    throw new Error("writePage: page.modulePath not a string");
+    throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
   }
 
   //if in PROD, exit if the file exists (on dev always write the file)
@@ -68,7 +72,7 @@ export function writeMarkup(page) {
 
   const saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
-  console.log("SAVE DIR PATH: ", saveDirPath);
+  // console.log("SAVE DIR PATH: ", saveDirPath);
   
   //if the dirs in the path don't exist create them
   if(!fs.existsSync(saveDirPath)) {
