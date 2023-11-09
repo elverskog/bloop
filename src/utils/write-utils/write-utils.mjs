@@ -53,7 +53,7 @@ export function writeMarkup(page) {
   try {
     validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
   } catch (error) {
-    return;
+    return false;
   }
 
   if(typeof page.modulePath === "string") {
@@ -68,6 +68,8 @@ export function writeMarkup(page) {
 
   const saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
+  console.log("SAVE DIR PATH: ", saveDirPath);
+  
   //if the dirs in the path don't exist create them
   if(!fs.existsSync(saveDirPath)) {
     fs.mkdirSync(saveDirPath, { recursive: true });

@@ -7,20 +7,27 @@ import {
 } from "./write-utils.mjs";
 
 
+// TODO: currently these write tests write to the real dist
+// not sure how to best handle relative path issues; singleton etc.
 
 tap.test("writeMarkup should write a file in src/dist/markup", t => {
   
   const page = {
-    modulePath: "src/markup/test",
+    modulePath: "src/markup/test.mjs",
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
 
   t.match(writeMarkup(page), true, "writeMarkup returned true");
-  t.match(fs.existsSync("src/dist/markup"), false, "clearFiles clears \"fake\" failed to clear the file");
+  t.match(fs.existsSync("dist/markup/test.html"), true, "writeMarkup wrote test.mjs");
 
+  const pageMissingModulePath = {
+    markup: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
 
-
+  t.match(writeMarkup(pageMissingModulePath), false, "writeMarkup returned failed because modulePath is missing");
+  t.match(fs.existsSync("src/dist/markup/test.mjs"), false, "writeMarkup failed to write test.mjs because modulePath is missing");
 
   t.end();
 
