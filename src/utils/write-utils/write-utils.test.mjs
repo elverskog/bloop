@@ -1,7 +1,7 @@
 import tap from "tap";
 import fs from "fs-extra";
 import { 
-  writeCssOrJs, 
+  writeDistFile, 
   writeMarkup, 
   writeModuleResult, 
 } from "./write-utils.mjs";
@@ -12,18 +12,18 @@ import { clearFiles } from "../dir-utils/dir-utils.mjs";
 
 tap.test("writeMarkup tests", t => {
  
-  clearFiles(["dist/markup",]);
+  clearFiles(["dist/pages-test",]);
 
   const page = {
-    modulePath: "src/markup/test.mjs",
+    modulePath: "src/pages-test/test.mjs",
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
 
   t.match(writeMarkup(page), true, "writeMarkup returned true");
-  t.match(fs.existsSync("dist/markup/test.html"), true, "writeMarkup wrote test.mjs");
+  t.match(fs.existsSync("dist/pages-test/test.html"), true, "writeMarkup wrote test.mjs");
 
-  clearFiles(["dist/markup",]);
+  clearFiles(["dist/pages-test",]);
 
   const pageMissingModulePath = {
     markup: `<!DOCTYPE html>
@@ -34,24 +34,24 @@ tap.test("writeMarkup tests", t => {
     message: "Error: validateArgs - undefined isn't string"
   }, "pageMissingModulePath");
 
-  t.match(fs.existsSync("src/dist/markup/test.mjs"), false, "writeMarkup failed to write test.mjs because modulePath is missing");
+  t.match(fs.existsSync("src/dist/pages-test/test.mjs"), false, "writeMarkup failed to write test.mjs because modulePath is missing");
 
-  clearFiles(["dist/markup",]);
+  clearFiles(["dist/pages-test",]);
 
   const pageMissingMarkup = {
-    modulePath: "src/markup/test.mjs"
+    modulePath: "src/pages-test/test.mjs"
   };
 
   t.throws(() => writeMarkup(pageMissingMarkup), {
     message: "Error: validateArgs - undefined isn't string"
   },"pageMissingMarkup");
 
-  t.match(fs.existsSync("src/dist/markup/test.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
+  t.match(fs.existsSync("src/dist/pages-test/test.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
 
-  clearFiles(["dist/markup",]);
+  clearFiles(["dist/pages-test",]);
 
   const pageBadPath = {
-    modulePath: "blah/markup/test.mjs",
+    modulePath: "blah/pages-test/test.mjs",
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
@@ -60,7 +60,64 @@ tap.test("writeMarkup tests", t => {
     message: "writePage: page.modulePath not a string or is otherwise invalid"
   });
 
-  t.match(fs.existsSync("dist/markup/test.html"), false, "writeMarkup failed to write test.mjs as modulePath is invalid");
+  t.match(fs.existsSync("dist/pages-test/test.html"), false, "writeMarkup failed to write test.mjs as modulePath is invalid");
+
+  t.end();
+
+});
+
+
+tap.test("write CSS tests", t => {
+ 
+  clearFiles(["dist/css-test"]);
+
+  const page = {
+    modulePath: "src/css-test/test.mjs",
+    css: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
+
+  t.match(writeDistFile(page, "css"), true, "writeDistFile returned true");
+  t.match(fs.existsSync("dist/css-test/test.css"), true, "writeDistFile wrote test.mjs");
+
+  clearFiles(["dist/css-test"]);
+
+  const pageMissingModulePath = {
+    css: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
+
+  t.throws(() => writeDistFile(pageMissingModulePath, "css"), {
+    message: "Error: validateArgs - undefined isn't string"
+  }, "pageMissingModulePath");
+
+  t.match(fs.existsSync("src/dist/css-test/test.css"), false, "writeDistFile failed to write test.mjs because modulePath is missing");
+
+  clearFiles(["dist/css-test"]);
+
+  const pageMissingCss = {
+    modulePath: "src/css-test/test.mjs"
+  };
+
+  t.throws(() => writeDistFile(pageMissingCss, "css"), {
+    message: "Error: validateArgs - undefined isn't string"
+  },"pageMissingCss");
+
+  t.match(fs.existsSync("src/dist/css-test/test.mjs"), false, "writeDistFile failed to write test.mjs because css is missing");
+
+  clearFiles(["dist/css-test"]);
+
+  const pageBadPath = {
+    modulePath: "blah/css-test/test.mjs",
+    css: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
+
+  t.throws(() => writeDistFile(pageBadPath, "css"), {
+    message: "writePage: page.modulePath not a string or is otherwise invalid"
+  });
+
+  t.match(fs.existsSync("dist/css-test/test.html"), false, "writeDistFile failed to write test.mjs as modulePath is invalid");
 
   t.end();
 
@@ -68,36 +125,5 @@ tap.test("writeMarkup tests", t => {
 
 
 
-
-
-
-// tap.test("buildPage, when passed a path to a page, with valid structure, should return an object with nodes for name, css, markup and script", async t => {
-//   const path = "src/utils/build-utils/mocks/mock-page.mjs";
-//   const result = await buildPage({ path, isFetch: false, isBuild: true });
-
-//   // console.log("RESULT IN TEST: ", result);
-
-//   t.match(result, {
-//     modulePath: String,
-//     name: String,
-//     css: Object,
-//     markup: String,
-//     script: Object
-//   }, "build result object should have css, markup, style");
-//   t.end();
-// });
-
-// tap.test("buildPage should return undefined if a valid path is not passed", async t => {
-//   t.match(await buildPage(), undefined);
-//   t.match(await buildPage(null), undefined);
-//   t.match(await buildPage("This is a string"), undefined);
-//   t.match(await buildPage({ here: "there"}), undefined);
-//   t.end();
-// });
-
-// tap.test("buildPage, when passed an invalid path, should return an error", async t => {
-//   t.match(await buildPage("./bad-path/bad-page.mjs"), undefined);
-//   t.end();
-// });
 
 

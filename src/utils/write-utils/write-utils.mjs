@@ -16,7 +16,8 @@ const brotliSettings = {
 
 
 //function to compress and write files, in subsection of hopper (css vs js)
-export function writeCssOrJs(contentString, fileType, moduleName) {
+// export function writeCssOrJs(contentString, fileType, moduleName) {
+export function writeCssOrJs(page, fileType) {
 
   // const baseDir = utilBaseDir.getBaseDir();
   // const filePath = `${baseDir}/dist/${fileType}/${moduleName}.${fileType}`;
@@ -43,6 +44,57 @@ export function writeCssOrJs(contentString, fileType, moduleName) {
   }
 
 }
+
+
+//function to compress and write markup files for a full page request
+export function writeDistFile(page, type) {
+
+  let savePath;
+  let saveDirPath;
+  let buff;
+  let compressed;
+
+  try {
+    validateArgs([[page.modulePath, "string"], [page[type], "string"], [type, "string"]]); 
+  } catch (error) {
+    throw new Error(error);
+  }
+
+  console.log("MODULEPATH: ", page.modulePath );
+  console.log("INDEX OF SRC/ ", page.modulePath.indexOf("src/") > -1);
+
+  if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
+    //change path of module to that of where we should store the page in /dist
+    savePath = page.modulePath.replace("src", "dist").replace("mjs", type);
+  } else {
+    throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
+  }
+
+  //if in PROD, exit if the file exists (on dev always write the file)
+  if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
+
+  //if the dirs in the path don't exist create them
+  saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
+  if(!fs.existsSync(saveDirPath)) {
+    fs.mkdirSync(saveDirPath, { recursive: true });
+  }
+
+  //brotli compress the string
+  buff = Buffer.from(page[type], "utf-8");
+  console.log("BUFF: ", typeof buff);
+  compressed = brotli.compress(buff, brotliSettings);
+  //const compressed = page.markup;
+
+  try {
+    fs.writeFileSync(savePath, compressed);
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+
+}
+
+
 
 
 //function to compress and write markup files for a full page request
@@ -79,7 +131,7 @@ export function writeMarkup(page) {
     fs.mkdirSync(saveDirPath, { recursive: true });
   }
 
-  //brotli compress the css-string
+  //brotli compress the string
   const buff = Buffer.from(page.markup, "utf-8");
   console.log("BUFF: ", typeof buff);
   const compressed = brotli.compress(buff, brotliSettings);
