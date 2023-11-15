@@ -46,6 +46,7 @@ export function writeCssOrJs(page, fileType) {
 }
 
 
+
 //function to compress and write markup files for a full page request
 export function writeDistFile(page, type) {
 
@@ -53,9 +54,10 @@ export function writeDistFile(page, type) {
   let saveDirPath;
   let buff;
   let compressed;
+  const contentType = type === "markup" ? "string" : "object";
 
   try {
-    validateArgs([[page.modulePath, "string"], [page[type], "string"], [type, "string"]]); 
+    validateArgs([[page.modulePath, "string"], [page[type], contentType], [type, "string"]]); 
   } catch (error) {
     throw new Error(error);
   }
@@ -79,18 +81,39 @@ export function writeDistFile(page, type) {
     fs.mkdirSync(saveDirPath, { recursive: true });
   }
 
-  //brotli compress the string
-  buff = Buffer.from(page[type], "utf-8");
-  console.log("BUFF: ", typeof buff);
-  compressed = brotli.compress(buff, brotliSettings);
-  //const compressed = page.markup;
+  //iterate over the object and write each top level node to a file
+  Object.keys(page[type]).forEach(key => {
 
-  try {
-    fs.writeFileSync(savePath, compressed);
-    return true;
-  } catch (error) {
-    throw new Error(error);
-  }
+    const val = page[type][key];
+
+    if(typeof val === "string") {
+   
+      console.log("VAL: ", val);
+      //brotli compress the string
+      buff = Buffer.from(val, "utf-8");
+
+      console.log("BUFF: ", buff);
+      
+      try {
+        compressed = brotli.compress(buff, brotliSettings);
+        console.log("COMPRESSED 1: ", compressed);
+      } catch (error) {
+        throw new Error(`FFFFFFFFFFFFFF ${error}`);
+      }
+      //const compressed = page.markup;
+
+      try {
+        console.log("COMPRESSED: ", compressed);
+        fs.writeFileSync(savePath, compressed);
+      } catch (error) {
+        throw new Error(`GGGGGGGGGGGGGGGGG ${error}`);
+      }
+
+    }  
+
+  });
+
+  return true;
 
 }
 
