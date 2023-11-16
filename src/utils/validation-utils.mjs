@@ -6,6 +6,18 @@ export function validateArgs(args) {
   // console.log("ARGS: ", args);
   // console.log("TYPEOF ARGS: ", typeof args);
 
+  function exists(pair) {
+    const result = (
+      pair
+      && typeof pair === "object"
+      && pair.length === 2
+      && pair[0]
+      && pair[1]
+      && typeof pair[1] === "string"
+    );
+    return result;
+  }
+
   function isStandardType(type) {
     return [
       "boolean",
@@ -27,18 +39,22 @@ export function validateArgs(args) {
   const isCorrectType = pair => {
     
     switch (true) {
-    case isStandardType(pair[1]):
-      // console.log("CASE IS STANDARD");
-      res = typeof pair[0] === pair[1];  
-      break;
-    case pair[1] === "array": 
-      // console.log("CASE IS ARRAY");
-      res = Array.isArray(pair[0]);
-      break;
-    default:
-      // console.log("CASE IS DEFAULT");
-      break;
+      case exists:
+        res = true;
+        break;
+      case isStandardType(pair[1]):
+        // console.log("CASE IS STANDARD");
+        res = typeof pair[0] === pair[1];  
+        break;
+      case pair[1] === "array": 
+        // console.log("CASE IS ARRAY");
+        res = Array.isArray(pair[0]);
+        break;
+      default:
+        // console.log("CASE IS DEFAULT");
+        break;
     }
+
     if(res) { 
       return res;
     } else {

@@ -46,24 +46,52 @@ export function writeCssOrJs(page, fileType) {
 }
 
 
+//brotli compress the recieved string/content and write to the received path
+//NOTE: side effects occur here
+function write(content, path) {
+
+  let buff;
+  let compressed;
+
+  try {
+    validateArgs([[content, "string"], [path, "string"]]); 
+  } catch (error) {
+    throw new Error(error);
+  }
+
+  buff = Buffer.from(content, "utf-8");
+  
+  try {
+    compressed = brotli.compress(buff, brotliSettings);
+  } catch (error) {
+    throw new Error(`COMPRESS FAILED: ${error}`);
+  }
+
+  try {
+    fs.writeFileSync(path, compressed);
+  } catch (error) {
+    throw new Error(`WRITE FAILED: ${error}`);
+  }
+
+  return true;
+
+}
+
 
 //function to compress and write markup files for a full page request
 export function writeDistFile(page, type) {
 
   let savePath;
   let saveDirPath;
-  let buff;
-  let compressed;
-  const contentType = type === "markup" ? "string" : "object";
+
+  console.log("PAGE: ", page);
+  console.log("TYPE: ", type);
 
   try {
-    validateArgs([[page.modulePath, "string"], [page[type], contentType], [type, "string"]]); 
+    validateArgs([[page.modulePath, "string"], [type, "string"]]); 
   } catch (error) {
     throw new Error(error);
   }
-
-  console.log("MODULEPATH: ", page.modulePath );
-  console.log("INDEX OF SRC/ ", page.modulePath.indexOf("src/") > -1);
 
   if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
     //change path of module to that of where we should store the page in /dist
@@ -72,10 +100,10 @@ export function writeDistFile(page, type) {
     throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
   }
 
-  //if in PROD, exit if the file exists (on dev always write the file)
+  //if in PROD, exit if the file exists. on dev always write the file
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
-  //if the dirs in the path don't exist create them
+  //if the dirs in the path don't exist create them (cut the filename off the end)
   saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
   if(!fs.existsSync(saveDirPath)) {
     fs.mkdirSync(saveDirPath, { recursive: true });
@@ -83,34 +111,8 @@ export function writeDistFile(page, type) {
 
   //iterate over the object and write each top level node to a file
   Object.keys(page[type]).forEach(key => {
-
     const val = page[type][key];
-
-    if(typeof val === "string") {
-   
-      console.log("VAL: ", val);
-      //brotli compress the string
-      buff = Buffer.from(val, "utf-8");
-
-      console.log("BUFF: ", buff);
-      
-      try {
-        compressed = brotli.compress(buff, brotliSettings);
-        console.log("COMPRESSED 1: ", compressed);
-      } catch (error) {
-        throw new Error(`FFFFFFFFFFFFFF ${error}`);
-      }
-      //const compressed = page.markup;
-
-      try {
-        console.log("COMPRESSED: ", compressed);
-        fs.writeFileSync(savePath, compressed);
-      } catch (error) {
-        throw new Error(`GGGGGGGGGGGGGGGGG ${error}`);
-      }
-
-    }  
-
+    write(val, savePath);
   });
 
   return true;
