@@ -15,37 +15,6 @@ const brotliSettings = {
 };
 
 
-//function to compress and write files, in subsection of hopper (css vs js)
-// export function writeCssOrJs(contentString, fileType, moduleName) {
-export function writeCssOrJs(page, fileType) {
-
-  // const baseDir = utilBaseDir.getBaseDir();
-  // const filePath = `${baseDir}/dist/${fileType}/${moduleName}.${fileType}`;
-  const filePath = `./dist/${fileType}/${moduleName}.${fileType}`;
-
-  //if in PROD, exit if the file exists (on dev always write the file)
-  if(process.env.NODE_ENV === "production" && fs.existsSync(filePath)) return;
-
-  if(typeof contentString === "string" && typeof fileType === "string" && typeof moduleName === "string") {
-
-    //brotli compress the css-string
-    const buff = Buffer.from(contentString, "utf-8");
-    const compressed = brotli.compress(buff, brotliSettings);
-    //const compressed = contentString;
-
-    fs.writeFileSync(filePath, compressed);
-
-    return true;
-
-  } else {
-
-    console.log("compressAndWrite passed invalid values", arguments);
-
-  }
-
-}
-
-
 //brotli compress the recieved string/content and write to the received path
 //NOTE: side effects occur here
 function write(content, path) {
@@ -79,16 +48,13 @@ function write(content, path) {
 
 
 //function to compress and write markup files for a full page request
-export function writeDistFile(page, type) {
+export function writeCssOrJs(page, type) {
 
   let savePath;
   let saveDirPath;
 
-  console.log("PAGE: ", page);
-  console.log("TYPE: ", type);
-
   try {
-    validateArgs([[page.modulePath, "string"], [type, "string"]]); 
+    validateArgs([[page.modulePath, "string"], [page[type], "object"], [type, "string"]]); 
   } catch (error) {
     throw new Error(error);
   }
@@ -120,8 +86,6 @@ export function writeDistFile(page, type) {
 }
 
 
-
-
 //function to compress and write markup files for a full page request
 export function writeMarkup(page) {
 
@@ -132,10 +96,6 @@ export function writeMarkup(page) {
   } catch (error) {
     throw new Error(error);
   }
-
-  console.log("MODULEPATH: ", page.modulePath );
-  console.log("INDEX OF SRC/ ", page.modulePath.indexOf("src/") > -1);
-
 
   if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
     //change path of module to that of where we should store the page in /dist
@@ -156,18 +116,9 @@ export function writeMarkup(page) {
     fs.mkdirSync(saveDirPath, { recursive: true });
   }
 
-  //brotli compress the string
-  const buff = Buffer.from(page.markup, "utf-8");
-  console.log("BUFF: ", typeof buff);
-  const compressed = brotli.compress(buff, brotliSettings);
-  //const compressed = page.markup;
+  write(page.markup, savePath);
 
-  try {
-    fs.writeFileSync(savePath, compressed);
-    return true;
-  } catch (error) {
-    throw new Error(error);
-  }
+  return true;
 
 }
 

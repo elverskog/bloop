@@ -10,7 +10,6 @@ import {
 } from "./src/utils/dir-utils/dir-utils.mjs";
 import { 
   writeCssOrJs, 
-  writeDistFile, 
   writeMarkup, 
   writeModuleResult, 
 } from "./src/utils/write-utils/write-utils.mjs";
@@ -158,7 +157,8 @@ if(process.env.NODE_ENV === "production") {
   console.log("DIST FILES: ", distFiles);
   distFiles.forEach(page => {
     writeMarkup(page);
-    writeDistFile(page, "css");
+    writeCssOrJs(page, "css");
+    writeCssOrJs(page, "script");
   });
 
 }

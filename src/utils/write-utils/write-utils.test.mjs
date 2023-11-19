@@ -1,7 +1,7 @@
 import tap from "tap";
 import fs from "fs-extra";
 import { 
-  writeDistFile, 
+  writeCssOrJs, 
   writeMarkup, 
   writeModuleResult, 
 } from "./write-utils.mjs";
@@ -81,8 +81,8 @@ tap.test("write CSS tests", t => {
     ` }
   };
 
-  t.match(writeDistFile(page, "css"), true, "writeDistFile returned true");
-  t.match(fs.existsSync("dist/css-test/test.css"), true, "writeDistFile wrote test.mjs");
+  t.match(writeCssOrJs(page, "css"), true, "writeCssOrJs returned true");
+  t.match(fs.existsSync("dist/css-test/test.css"), true, "writeCssOrJs wrote test.mjs");
 
 
   clearFiles(["dist/css-test"]);
@@ -91,11 +91,11 @@ tap.test("write CSS tests", t => {
     css: { thing: ".thing { color: red; }" }
   };
 
-  t.throws(() => writeDistFile(pageMissingModulePath, "css"), {
+  t.throws(() => writeCssOrJs(pageMissingModulePath, "css"), {
     message: "Error: validateArgs - undefined isn't string"
   }, "pageMissingModulePath");
 
-  t.match(fs.existsSync("src/dist/css-test/test.css"), false, "writeDistFile failed to write test.mjs because modulePath is missing");
+  t.match(fs.existsSync("src/dist/css-test/test.css"), false, "writeCssOrJs failed to write test.mjs because modulePath is missing");
 
 
   clearFiles(["dist/css-test"]);
@@ -104,14 +104,15 @@ tap.test("write CSS tests", t => {
     modulePath: "src/css-test/test.mjs"
   };
 
-  t.throws(() => writeDistFile(pageMissingCss, "css"), {
+  t.throws(() => writeCssOrJs(pageMissingCss, "css"), {
     message: "Error: validateArgs - undefined isn't object"
   },"pageMissingCss");
 
-  t.match(fs.existsSync("src/dist/css-test/test.mjs"), false, "writeDistFile failed to write test.mjs because css is missing");
+  t.match(fs.existsSync("src/dist/css-test/test.mjs"), false, "writeCssOrJs failed to write test.mjs because css is missing");
 
 
   clearFiles(["dist/css-test"]);
+
 
   const pageBadPath = {
     modulePath: "blah/css-test/test.mjs",
@@ -123,18 +124,89 @@ tap.test("write CSS tests", t => {
     ` }
   };
 
-  t.throws(() => writeDistFile(pageBadPath, "css"), {
+  t.throws(() => writeCssOrJs(pageBadPath, "css"), {
     message: "writePage: page.modulePath not a string or is otherwise invalid"
   });
 
-  t.match(fs.existsSync("dist/css-test/test.html"), false, "writeDistFile failed to write test.mjs as modulePath is invalid");
+  t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
 
   clearFiles(["dist/css-test"]);
+
 
   t.end();
 
 });
 
+
+tap.test("write JS tests", t => {
+ 
+  clearFiles(["dist/js-test"]);
+
+  const page = {
+    modulePath: "src/js-test/test.mjs",
+    js: { 
+      args: { someVal: "someVal" },
+      thing: function (args) {
+        console.log("something", args.someVal);
+      }
+    }
+  };
+
+  t.match(writeCssOrJs(page, "js"), true, "writeCssOrJs returned true");
+  t.match(fs.existsSync("dist/js-test/test.js"), true, "writeCssOrJs wrote test.mjs");
+
+
+  clearFiles(["dist/js-test"]);
+
+  const pageMissingModulePath = {
+    js: { thing: ".thing { color: red; }" }
+  };
+
+  t.throws(() => writeCssOrJs(pageMissingModulePath, "js"), {
+    message: "Error: validateArgs - undefined isn't string"
+  }, "pageMissingModulePath");
+
+  t.match(fs.existsSync("src/dist/js-test/test.js"), false, "writeCssOrJs failed to write test.mjs because modulePath is missing");
+
+
+  clearFiles(["dist/js-test"]);
+
+  const pageMissingJs = {
+    modulePath: "src/js-test/test.mjs"
+  };
+
+  t.throws(() => writeCssOrJs(pageMissingJs, "js"), {
+    message: "Error: validateArgs - undefined isn't object"
+  },"pageMissingJs");
+
+  t.match(fs.existsSync("src/dist/js-test/test.mjs"), false, "writeCssOrJs failed to write test.mjs because js is missing");
+
+
+  clearFiles(["dist/js-test"]);
+
+
+  const pageBadPath = {
+    modulePath: "blah/js-test/test.mjs",
+    js: { 
+      args: { someVal: "someVal" },
+      thing: function (args) {
+        console.log("something", args.someVal);
+      }
+    }
+  };
+
+  t.throws(() => writeCssOrJs(pageBadPath, "js"), {
+    message: "writePage: page.modulePath not a string or is otherwise invalid"
+  });
+
+  t.match(fs.existsSync("dist/js-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
+
+  clearFiles(["dist/js-test"]);
+
+
+  t.end();
+
+});
 
 
 
