@@ -19,13 +19,26 @@ const brotliSettings = {
 //NOTE: side effects occur here
 function write(content, path) {
 
-  let buff;
-  let compressed;
+  console.log("CONTENT: ", content);
+  console.log("PATH: ", path);
 
   try {
     validateArgs([[content, "string"], [path, "string"]]); 
   } catch (error) {
     throw new Error(error);
+  }
+
+  let buff;
+  let compressed;
+  let dirPath;
+
+  //if in PROD, exit if the file exists. on dev always write the file
+  if(process.env.NODE_ENV === "production" && fs.existsSync(path)) return;
+
+  //if the dirs in the path doesn't exist create them (cut the filename off the end)
+  dirPath = path.split("/").slice(0, -1).join("/").toString();
+  if(!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
   }
 
   buff = Buffer.from(content, "utf-8");
@@ -47,11 +60,48 @@ function write(content, path) {
 }
 
 
+
+//function to compress and write css files for a full page request
+export function writeCss(page) {
+
+  // console.log("PAGE: ", page);
+
+  let path;
+
+  try {
+    validateArgs([[page.modulePath, "string"], [page.css, "object"]]); 
+  } catch (error) {
+    throw new Error(error);
+  }
+
+  //iterate over the object and write each top level node to a file
+  page.css.forEach(cssObj => {
+
+    console.log("MODULE PATH: ", cssObj.modulePath);
+
+    if(cssObj.modulePath.indexOf("src/") > -1 && cssObj.modulePath.indexOf(".mjs") > -1) {
+      path = cssObj.modulePath.replace("src", "dist").replace("mjs", "css");
+    } else {
+      throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
+    }
+
+    write(cssObj.val, path);
+
+  });
+
+  return true;
+
+}
+
+
+
+
 //function to compress and write markup files for a full page request
 export function writeCssOrJs(page, type) {
 
   let savePath;
   let saveDirPath;
+  let contentType = page[type] === "script" ? "object" : "string";
 
   try {
     validateArgs([[page.modulePath, "string"], [page[type], "object"], [type, "string"]]); 
@@ -59,9 +109,15 @@ export function writeCssOrJs(page, type) {
     throw new Error(error);
   }
 
+  //create path where we should store the page in, based on module name and type
   if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
-    //change path of module to that of where we should store the page in /dist
-    savePath = page.modulePath.replace("src", "dist").replace("mjs", type);
+    if (type === "css") { 
+      savePath = page.modulePath.replace("src", "dist").replace("mjs", "css");
+    } else if (type === "script") {
+      savePath = page.modulePath.replace("src", "dist").replace("mjs", "js");
+    } else {
+      throw new Error("writePage: type is invalid type");
+    }
   } else {
     throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
   }

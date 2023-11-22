@@ -7,7 +7,7 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
-  console.log("BUILDPAGE - OPTIONS: ", options);
+  // console.log("BUILDPAGE - OPTIONS: ", options);
 
   //const collectedModules = [];
   
@@ -27,7 +27,7 @@ export async function buildPage(options) {
   const pageRes = {
     modulePath: path,  //add the pathname into the page output. Need to know where to write dist files
     name: "",
-    css: {},
+    css: [],
     markup: "",
     script: {},
   };
@@ -71,7 +71,11 @@ export async function buildPage(options) {
     // console.log("PROCESSMODULE: ", moduleRes?.name);
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string" && typeof pageRes.css[moduleRes.name] !== "string") {
-      pageRes.css[moduleRes.name] = moduleRes.css;    
+      pageRes.css.push({
+        name: moduleRes.name,
+        modulePath,
+        val: moduleRes.css    
+      });
     }
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.script === "object") {
@@ -92,7 +96,7 @@ export async function buildPage(options) {
     moduleRes = await addModule(path, { label: "Label for mod 1" }); 
 
     //add the name for page's main module
-    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
+    if(typeof moduleRes?.name === "string") {
       pageRes.name = moduleRes.name;    
     }
 
