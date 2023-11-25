@@ -19,8 +19,8 @@ const brotliSettings = {
 //NOTE: side effects occur here
 function write(content, path) {
 
-  console.log("CONTENT: ", content);
-  console.log("PATH: ", path);
+  // console.log("CONTENT: ", content);
+  // console.log("PATH: ", path);
 
   try {
     validateArgs([[content, "string"], [path, "string"]]); 
@@ -37,6 +37,7 @@ function write(content, path) {
 
   //if the dirs in the path doesn't exist create them (cut the filename off the end)
   dirPath = path.split("/").slice(0, -1).join("/").toString();
+
   if(!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
@@ -64,23 +65,27 @@ function write(content, path) {
 //function to compress and write css files for a full page request
 export function writeCss(page) {
 
-  // console.log("PAGE: ", page);
+  console.log("PAGE: ", page);
 
   let path;
 
   try {
-    validateArgs([[page.modulePath, "string"], [page.css, "object"]]); 
+    validateArgs([[page.css, "array"]]); 
   } catch (error) {
     throw new Error(error);
   }
 
+  function filterObjs(cssObj) {
+    return (typeof cssObj.modulePath === "string" && typeof cssObj.val === "string"); 
+  }
+
   //iterate over the object and write each top level node to a file
-  page.css.forEach(cssObj => {
+  page.css.filter(filterObjs).forEach(cssObj => {
 
     console.log("MODULE PATH: ", cssObj.modulePath);
 
     if(cssObj.modulePath.indexOf("src/") > -1 && cssObj.modulePath.indexOf(".mjs") > -1) {
-      path = cssObj.modulePath.replace("src", "dist").replace("mjs", "css");
+      path = cssObj.modulePath.replace("src", "dist").replace("components", "css").replace("mjs", "css");
     } else {
       throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
     }
