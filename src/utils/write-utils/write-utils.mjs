@@ -65,9 +65,8 @@ function write(content, path) {
 //function to compress and write css files for a full page request
 export function writeCss(page) {
 
-  console.log("PAGE: ", page);
-
   let path;
+  let index = 0;
 
   try {
     validateArgs([[page.css, "array"]]); 
@@ -76,75 +75,96 @@ export function writeCss(page) {
   }
 
   function filterObjs(cssObj) {
-    return (typeof cssObj.modulePath === "string" && typeof cssObj.val === "string"); 
+    return (cssObj && typeof cssObj.modulePath === "string" && typeof cssObj.val === "string"); 
   }
 
-  //iterate over the object and write each top level node to a file
-  page.css.filter(filterObjs).forEach(cssObj => {
-
-    console.log("MODULE PATH: ", cssObj.modulePath);
+  function writeEach() {
+   
+    const cssObj = page.css[index];
 
     if(cssObj.modulePath.indexOf("src/") > -1 && cssObj.modulePath.indexOf(".mjs") > -1) {
       path = cssObj.modulePath.replace("src", "dist").replace("components", "css").replace("mjs", "css");
     } else {
-      throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
+      throw new Error("writePage - page.modulePath is missing src or mjs");
     }
 
     write(cssObj.val, path);
+    index++;
+   
+    if(page.css[index]) {
 
-  });
+      if (filterObjs(page.css[index])) {
+        writeEach();
+      } else {
+        throw new Error("writePage in write - modulePath or val is not a string");
+      }
+
+    }
+
+  }
+
+  if (filterObjs(page.css[index])) {
+    writeEach();
+  } else {
+    throw new Error("writePage outer - modulePath or val is not a string");
+  }
 
   return true;
 
 }
 
 
+//function to compress and write js files for a full page request
+export function writeJs(page) {
 
-
-//function to compress and write markup files for a full page request
-export function writeCssOrJs(page, type) {
-
-  let savePath;
-  let saveDirPath;
-  let contentType = page[type] === "script" ? "object" : "string";
+  let path;
+  let index = 0;
 
   try {
-    validateArgs([[page.modulePath, "string"], [page[type], "object"], [type, "string"]]); 
+    validateArgs([[page.js, "array"]]); 
   } catch (error) {
     throw new Error(error);
   }
 
-  //create path where we should store the page in, based on module name and type
-  if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
-    if (type === "css") { 
-      savePath = page.modulePath.replace("src", "dist").replace("mjs", "css");
-    } else if (type === "script") {
-      savePath = page.modulePath.replace("src", "dist").replace("mjs", "js");
+  function filterObjs(jsObj) {
+    return (jsObj && typeof jsObj.modulePath === "string" && typeof jsObj.val === "string"); 
+  }
+
+  function writeEach() {
+   
+    const jsObj = page.js[index];
+
+    if(jsObj.modulePath.indexOf("src/") > -1 && jsObj.modulePath.indexOf(".mjs") > -1) {
+      path = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("mjs", "js");
     } else {
-      throw new Error("writePage: type is invalid type");
+      throw new Error("writePage - page.modulePath is missing src or mjs");
     }
+
+    write(jsObj.val, path);
+    index++;
+   
+    if(page.js[index]) {
+
+      if (filterObjs(page.js[index])) {
+        writeEach();
+      } else {
+        throw new Error("writePage in write - modulePath or val is not a string");
+      }
+
+    }
+
+  }
+
+  if (filterObjs(page.js[index])) {
+    writeEach();
   } else {
-    throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
+    throw new Error("writePage outer - modulePath or val is not a string");
   }
-
-  //if in PROD, exit if the file exists. on dev always write the file
-  if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
-
-  //if the dirs in the path don't exist create them (cut the filename off the end)
-  saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
-  if(!fs.existsSync(saveDirPath)) {
-    fs.mkdirSync(saveDirPath, { recursive: true });
-  }
-
-  //iterate over the object and write each top level node to a file
-  Object.keys(page[type]).forEach(key => {
-    const val = page[type][key];
-    write(val, savePath);
-  });
 
   return true;
 
 }
+
 
 
 //function to compress and write markup files for a full page request
