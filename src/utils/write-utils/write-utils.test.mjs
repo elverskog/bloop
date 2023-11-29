@@ -154,7 +154,7 @@ tap.test("write CSS tests", t => {
 
 //WRITE JS TESTS/////////////////////////////////////////////////////////////////////
 
-tap.test("write CSS tests", t => {
+tap.test("write JS tests", t => {
  
   clearFiles(["dist/js-test"]);
 

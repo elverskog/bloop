@@ -117,6 +117,8 @@ export function writeCss(page) {
 //function to compress and write js files for a full page request
 export function writeJs(page) {
 
+  // console.log("PAGE: ", page);
+
   let path;
   let index = 0;
 
@@ -134,11 +136,16 @@ export function writeJs(page) {
    
     const jsObj = page.js[index];
 
+    console.log("JSOBJ: ", jsObj);
+    
     if(jsObj.modulePath.indexOf("src/") > -1 && jsObj.modulePath.indexOf(".mjs") > -1) {
       path = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("mjs", "js");
     } else {
       throw new Error("writePage - page.modulePath is missing src or mjs");
     }
+
+    //I AM HERE
+    //LIKELY NEED TO STRINGIFY EACH FUNCTION
 
     write(jsObj.val, path);
     index++;
@@ -154,6 +161,9 @@ export function writeJs(page) {
     }
 
   }
+
+
+  console.log("INDEX: ", page.js[index]);
 
   if (filterObjs(page.js[index])) {
     writeEach();

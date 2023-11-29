@@ -19,8 +19,8 @@ export default async function test1() {
         LV1
       </div>    
     `,
-    script: {
-      init: function(args) {
+    js: {
+      init: function() {
       
         if(typeof window === "object") {
           console.log("INIT LINK");
@@ -28,7 +28,7 @@ export default async function test1() {
 
       }
     }
-  }
+  };
 
   return result;
   

@@ -19,7 +19,7 @@ export default async function test2() {
         LV2
       </div>    
     `,
-    script: {
+    js: {
       init: function() {
         if(typeof window === "object") {
           console.log("INIT TEST 2");

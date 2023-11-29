@@ -38,7 +38,7 @@ export default async function link (args) {
         text-decoration: none;
       }`,
     markup: `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`,
-    script: {
+    js: {
       init: function(args) {
       
         if(typeof window === "object") {
@@ -80,7 +80,7 @@ export default async function link (args) {
 
 
 
-// script: (args) => {
+// js: (args) => {
 //   if(typeof window === "object") {
 
 //     const { pathname } = args;

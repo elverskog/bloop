@@ -19,7 +19,7 @@ export default async function a() {
         A
       </div>    
     `,
-    script: {
+    js: {
       init: function() {
         if(typeof window === "object") {
           console.log("INIT A");

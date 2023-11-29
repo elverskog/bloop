@@ -29,14 +29,14 @@ export async function buildPage(options) {
     name: "",
     css: [],
     markup: "",
-    script: {},
+    js: [],
   };
 
 
   async function addModule(modulePath, args) {
 
     // console.log("ADD MODULE: ", modulePath, "\n", args);
-    // console.log("ADD MODULE: ", modulePath);
+    // console.log("ADD MODULE: ", modulePath)
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
@@ -70,7 +70,7 @@ export async function buildPage(options) {
 
     // console.log("PROCESSMODULE: ", moduleRes?.name);
 
-    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string" && typeof pageRes.css[moduleRes.name] !== "string") {
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
       pageRes.css.push({
         name: moduleRes.name,
         modulePath,
@@ -78,8 +78,14 @@ export async function buildPage(options) {
       });
     }
 
-    if(typeof moduleRes?.name === "string" && typeof moduleRes.script === "object") {
-      pageRes.script[moduleRes.name] = moduleRes.script;    
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.js === "object") {
+      // pageRes.script[moduleRes.name] = moduleRes.script;    
+      pageRes.js.push({
+        name: moduleRes.name,
+        modulePath,
+        val: moduleRes.js    
+      });
+
     }
 
     if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {

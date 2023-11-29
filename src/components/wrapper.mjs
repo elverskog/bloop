@@ -97,7 +97,7 @@ export default async function wrapper(addModule, args) {
         ${scriptTags}
       </html> 
     `,
-    script: {
+    js: {
       init: function() {
         //for forward and back buttons
         window.addEventListener("popstate", () => {

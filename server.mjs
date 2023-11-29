@@ -11,6 +11,7 @@ import {
 import { 
   writeCss, 
   writeMarkup, 
+  writeJs, 
   writeModuleResult, 
 } from "./src/utils/write-utils/write-utils.mjs";
 
@@ -158,7 +159,7 @@ if(process.env.NODE_ENV === "production") {
   distFiles.forEach(page => {
     writeMarkup(page);
     writeCss(page, "css");
-    // writeCssOrJs(page, "script");
+    writeJs(page, "js");
   });
 
 }

@@ -19,14 +19,14 @@ export default async function b() {
         B
       </div>    
     `,
-    script: {
+    js: {
       init: function() {
         if(typeof window === "object") {
           console.log("INIT B");
         }
       } 
     } 
-  }
+  };
 
   return result;
 
