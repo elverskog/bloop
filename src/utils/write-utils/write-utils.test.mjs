@@ -189,9 +189,10 @@ tap.test("write JS tests", t => {
   //   message: "Error: writePage outer - modulePath or val is not a string"
   // }, "pageMissingModulePath");
 
-  t.throws(() => writeJs(pageMissingModulePath), Error, `pageMissingModulePath ${ Error }`);
+  // t.throws(() => writeJs(pageMissingModulePath), Error, `pageMissingModulePath ${ Error }`);
 
 
+  t.match(writeJs(pageMissingModulePath), true, "writeJsOrJs returned true");
   t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs should fail to write test.mjs because modulePath is missing");
 
 
@@ -203,7 +204,7 @@ tap.test("write JS tests", t => {
     }]
   };
 
-  t.throws(() => writeJs(pageMissingVal), Error, `pageMissingVal ${ Error }`);
+  t.match(writeJs(pageMissingVal), true, "writeJsOrJs returned true");
 
   t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js is missing");
 

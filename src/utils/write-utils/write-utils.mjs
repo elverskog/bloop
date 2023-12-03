@@ -132,10 +132,8 @@ export function writeJs(page) {
     return (jsObj && typeof jsObj.modulePath === "string" && typeof jsObj.val === "string"); 
   }
 
-  function writeEach() {
+  function writeEach(jsObj) {
    
-    const jsObj = page.js[index];
-
     console.log("JSOBJ: ", jsObj);
     
     if(jsObj.modulePath.indexOf("src/") > -1 && jsObj.modulePath.indexOf(".mjs") > -1) {
@@ -148,27 +146,26 @@ export function writeJs(page) {
     //LIKELY NEED TO STRINGIFY EACH FUNCTION
 
     write(jsObj.val, path);
-    index++;
    
-    if(page.js[index]) {
+    index++;
+  
+    //if we have ANOTHER "js object" at the current index, try and write it
+    //else just exit (doing anything can cause errors in tests)
 
-      if (filterObjs(page.js[index])) {
-        writeEach();
-      } else {
-        throw new Error("writePage in write - modulePath or val is not a string");
-      }
-
+    if (filterObjs(page.js[index])) {
+      writeEach(page.js[index]);
     }
 
+  
   }
 
 
-  console.log("INDEX: ", page.js[index]);
+  console.log("PAGE AT INDEX: ", page.js[index]);
 
+  //if we have an "js object" at the current index, try and write it
+  //else just exit (doing anything can cause errors in tests)
   if (filterObjs(page.js[index])) {
-    writeEach();
-  } else {
-    throw new Error("writePage outer - modulePath or val is not a string");
+    writeEach(page.js[index]);
   }
 
   return true;

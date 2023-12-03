@@ -13,7 +13,7 @@ tap.test("buildPage, when passed a path to a page, with valid structure, should 
     name: String,
     css: Object,
     markup: String,
-    script: Object
+    js: Object
   }, "build result object should have css, markup, style");
   t.end();
 });
