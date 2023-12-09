@@ -51,7 +51,9 @@ function write(content, path) {
   }
 
   try {
-    fs.writeFileSync(path, compressed);
+    // fs.writeFileSync(path, compressed);
+    // console.log("PATH: ", path);
+    fs.writeFileSync(path, content);
   } catch (error) {
     throw new Error(`WRITE FAILED: ${error}`);
   }
@@ -117,9 +119,8 @@ export function writeCss(page) {
 //function to compress and write js files for a full page request
 export function writeJs(page) {
 
-  // console.log("PAGE: ", page);
+  // console.log("PAGE JS: ", page.js);
 
-  let path;
   let index = 0;
 
   try {
@@ -129,23 +130,43 @@ export function writeJs(page) {
   }
 
   function filterObjs(jsObj) {
-    return (jsObj && typeof jsObj.modulePath === "string" && typeof jsObj.val === "string"); 
+    return (jsObj && typeof jsObj.modulePath === "string" && typeof jsObj.val === "object"); 
+  }
+
+  //this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
+  function convertFuncsToStrings(obj) {
+    
+    let result = "";
+    let comma;
+    let i = 1;
+
+    for(const [key, val] of Object.entries(obj)) {
+      comma = Object.entries.length === i ? "" : ","; 
+      result += `${ key }: ${ val.toString() }${ comma }\n`;
+      i++;
+    }
+    
+    return `{\n\t${result}\n}`;
+  
   }
 
   function writeEach(jsObj) {
-   
-    console.log("JSOBJ: ", jsObj);
-    
+
+    let path;
+    let val;
+
+    // console.log("jsObj: ", jsObj);
+
     if(jsObj.modulePath.indexOf("src/") > -1 && jsObj.modulePath.indexOf(".mjs") > -1) {
       path = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("mjs", "js");
+      // val = jsObj.val.toString();
+      val = convertFuncsToStrings(jsObj.val);
+      // val = jsObj.val;
+      console.log("VAL: ", val);
+      write(val, path);
     } else {
       throw new Error("writePage - page.modulePath is missing src or mjs");
     }
-
-    //I AM HERE
-    //LIKELY NEED TO STRINGIFY EACH FUNCTION
-
-    write(jsObj.val, path);
    
     index++;
   
@@ -155,12 +176,8 @@ export function writeJs(page) {
     if (filterObjs(page.js[index])) {
       writeEach(page.js[index]);
     }
-
   
   }
-
-
-  console.log("PAGE AT INDEX: ", page.js[index]);
 
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)

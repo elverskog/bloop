@@ -12,9 +12,7 @@ export function clearFiles(paths) {
   // const subDirs = fs.readdirSync(distPath);
  
   paths.forEach(path => {
-    console.log("PATH: ", path);
     try {
-      // fs.emptyDirSync(`${distPath}/${dir}/`);
       fs.emptyDirSync(path);
     } catch (error) {
       throw new Error(`clearFiles failed: ${error}`);  
