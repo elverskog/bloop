@@ -119,7 +119,7 @@ export function writeCss(page) {
 //function to compress and write js files for a full page request
 export function writeJs(page) {
 
-  // console.log("PAGE JS: ", page.js);
+  console.log("PAGE JS: ", page.js);
 
   let index = 0;
 
@@ -162,7 +162,7 @@ export function writeJs(page) {
       // val = jsObj.val.toString();
       val = convertFuncsToStrings(jsObj.val);
       // val = jsObj.val;
-      console.log("VAL: ", val);
+      // console.log("VAL: ", val);
       write(val, path);
     } else {
       throw new Error("writePage - page.modulePath is missing src or mjs");
