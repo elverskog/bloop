@@ -63,6 +63,52 @@ function write(content, path) {
 }
 
 
+function write2(obj) {
+
+  // console.log("CONTENT: ", content);
+  // console.log("PATH: ", path);
+
+  try {
+    validateArgs([[obj, "object"], [obj.val, "string"], [obj.name, "string"]]); 
+  } catch (error) {
+    throw new Error(error);
+  }
+
+  let buff;
+  let compressed;
+  let dirPath;
+  const path = `dist/css/${ obj.name }.css`;
+
+  //if in PROD, exit if the file exists. on dev always write the file
+  if(process.env.NODE_ENV === "production" && fs.existsSync(path)) return;
+
+  //if the dirs in the path doesn't exist create them (cut the filename off the end)
+  dirPath = path.split("/").slice(0, -1).join("/").toString();
+
+  if(!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+
+  buff = Buffer.from(obj.val, "utf-8");
+  
+  try {
+    compressed = brotli.compress(buff, brotliSettings);
+  } catch (error) {
+    throw new Error(`COMPRESS FAILED: ${error}`);
+  }
+
+  try {
+    // fs.writeFileSync(path, compressed);
+    // console.log("PATH: ", path);
+    fs.writeFileSync(path, obj.val);
+  } catch (error) {
+    throw new Error(`WRITE FAILED: ${error}`);
+  }
+
+  return true;
+
+}
+
 
 //function to compress and write css files for a full page request
 export function writeCss(page) {
@@ -90,7 +136,7 @@ export function writeCss(page) {
       throw new Error("writePage - page.modulePath is missing src or mjs");
     }
 
-    write(cssObj.val, path);
+    write2(cssObj);
     index++;
    
     if(page.css[index]) {
@@ -119,7 +165,7 @@ export function writeCss(page) {
 //function to compress and write js files for a full page request
 export function writeJs(page) {
 
-  console.log("PAGE JS: ", page.js);
+  // console.log("PAGE JS: ", page.js);
 
   let index = 0;
 
