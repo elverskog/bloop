@@ -63,13 +63,13 @@ function write(content, path) {
 }
 
 
-function write2(obj) {
+function write2(val, savePath) {
 
-  // console.log("CONTENT: ", content);
-  // console.log("PATH: ", path);
+  // console.log("VAL: ", val);
+  // console.log("SAVEPATH: ", savePath);
 
   try {
-    validateArgs([[obj, "object"], [obj.val, "string"], [obj.name, "string"]]); 
+    validateArgs([ [ val, "string" ], [ savePath, "string" ] ]); 
   } catch (error) {
     throw new Error(error);
   }
@@ -77,19 +77,18 @@ function write2(obj) {
   let buff;
   let compressed;
   let dirPath;
-  const path = `dist/css/${ obj.name }.css`;
 
   //if in PROD, exit if the file exists. on dev always write the file
   if(process.env.NODE_ENV === "production" && fs.existsSync(path)) return;
 
   //if the dirs in the path doesn't exist create them (cut the filename off the end)
-  dirPath = path.split("/").slice(0, -1).join("/").toString();
+  dirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
   if(!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 
-  buff = Buffer.from(obj.val, "utf-8");
+  buff = Buffer.from(val, "utf-8");
   
   try {
     compressed = brotli.compress(buff, brotliSettings);
@@ -98,9 +97,9 @@ function write2(obj) {
   }
 
   try {
-    // fs.writeFileSync(path, compressed);
+    // fs.writeFileSync(savePath, compressed);
     // console.log("PATH: ", path);
-    fs.writeFileSync(path, obj.val);
+    fs.writeFileSync(savePath, val);
   } catch (error) {
     throw new Error(`WRITE FAILED: ${error}`);
   }
@@ -129,16 +128,19 @@ export function writeCss(page) {
   function writeEach() {
    
     const cssObj = page.css[index];
-
+    const val = cssObj.val;
+    const savePath = `dist/css/${ cssObj.name }.css`;
+    
     if(cssObj.modulePath.indexOf("src/") > -1 && cssObj.modulePath.indexOf(".mjs") > -1) {
       path = cssObj.modulePath.replace("src", "dist").replace("components", "css").replace("mjs", "css");
     } else {
       throw new Error("writePage - page.modulePath is missing src or mjs");
     }
 
-    write2(cssObj);
+    write2(val, savePath);
     index++;
-   
+  
+    //recurse on current function
     if(page.css[index]) {
 
       if (filterObjs(page.css[index])) {
@@ -198,22 +200,22 @@ export function writeJs(page) {
 
   function writeEach(jsObj) {
 
-    let path;
-    let val;
+    const savePath = `dist/js/${ jsObj.name }.js`;
 
     // console.log("jsObj: ", jsObj);
-
-    if(jsObj.modulePath.indexOf("src/") > -1 && jsObj.modulePath.indexOf(".mjs") > -1) {
-      path = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("mjs", "js");
-      // val = jsObj.val.toString();
-      val = convertFuncsToStrings(jsObj.val);
-      // val = jsObj.val;
-      // console.log("VAL: ", val);
-      write(val, path);
-    } else {
-      throw new Error("writePage - page.modulePath is missing src or mjs");
-    }
+    //   path = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("mjs", "js");
+    //   // val = jsObj.val.toString();
+    //   val = convertFuncsToStrings(jsObj.val);
+    //   // val = jsObj.val;
+    //   // console.log("VAL: ", val);
+    //   write(val, path);
+    // } else {
+    //   throw new Error("writePage - page.modulePath is missing src or mjs");
+    // }
    
+    const val = convertFuncsToStrings(jsObj.val);
+    write2(val, savePath);
+    
     index++;
   
     //if we have ANOTHER "js object" at the current index, try and write it
@@ -240,21 +242,14 @@ export function writeJs(page) {
 //function to compress and write markup files for a full page request
 export function writeMarkup(page) {
 
-  let savePath;
-
   try {
     validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
   } catch (error) {
     throw new Error(error);
   }
 
-  if(typeof page.modulePath === "string" && page.modulePath.indexOf("src/") > -1 && page.modulePath.indexOf(".mjs") > -1) {
-    //change path of module to that of where we should store the page in /dist
-    savePath = page.modulePath.replace("src", "dist").replace("mjs", "html");
-  } else {
-    throw new Error("writePage: page.modulePath not a string or is otherwise invalid");
-  }
-
+  const savePath = `dist/markup/${ page.name }.html`;
+  
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
@@ -267,7 +262,7 @@ export function writeMarkup(page) {
     fs.mkdirSync(saveDirPath, { recursive: true });
   }
 
-  write(page.markup, savePath);
+  write2(page.markup, savePath);
 
   return true;
 

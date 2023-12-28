@@ -20,7 +20,7 @@ export default async function wrapper(addModule, args) {
   // const menuMod = import (await loadModule("./menu.mjs")).default;
   // const menuRes = menuMod();
 
-  //console.log("MENUMOD: ", menuMod);
+  // console.log("MENUMOD: ", menuRes);
 
   //we have to add CSS for wrapper and menu as they are not part of body module stack
   let cssTags = `
@@ -55,7 +55,6 @@ export default async function wrapper(addModule, args) {
   // }
 
 
-            // ${menuRes.markup}
 
   const result = {
     name: "wrapper",
@@ -86,6 +85,7 @@ export default async function wrapper(addModule, args) {
         <body id="__body">
           <div id="wrapper">
             MENU
+            ${menuRes.markup}
             <div id="content">
               ${bodyMarkup}
             </div>

@@ -1,7 +1,14 @@
-export default async function link (args) {
+export default async function link (addModule, args) {
+
+  console.log("ARGS: ", args);
 
   let { label, pathname } = args;
   // let html = `<a class="link" id="${ pathname }" href="${ pathname }">${ label }</a>`;
+
+  console.log("LABEL: ", label);
+  console.log("PATHNAME: ", pathname);
+
+
 
   if(typeof window === "object") {
 
