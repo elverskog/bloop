@@ -45,7 +45,9 @@ export default async function moduleCompiler(options) {
     // await wrapperMod(bodyRes.markup, bodyRes.title);
     //const { bodyMarkup, title } = args;
     const wrapper = (await import("../src/components/wrapper.mjs")).default;
-    bodyRes = await wrapper({ bodyMarkup: bodyRes.markup, title: bodyRes.title });
+    //bodyRes = await wrapper({ bodyMarkup: bodyRes.markup, title: bodyRes.title });
+    bodyRes = await wrapper(addModule, bodyRes);
+    // bodyRes = await wrapper({ ddd: "ddd"});
   // } else {
     //write the current compiled page to a JSON file
     //writeModuleResult(adjustedPath, JSON.stringify(hopper));

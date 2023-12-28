@@ -83,7 +83,7 @@ const server = http.createServer(async (req, res) => {
 
     //add brotli header if file is JS or CSS
     if(reqExtension === "css" || reqExtension === "js") {
-      headerOptions["Content-Encoding"] = "br";
+      // headerOptions["Content-Encoding"] = "br";
     }
 
     headerOptions["Content-Type"] = contentType;
@@ -92,12 +92,12 @@ const server = http.createServer(async (req, res) => {
   } else {
 
     //add compression and type flags for current file types served
-    headerOptions["Content-Encoding"] = "br";
+    //headerOptions["Content-Encoding"] = "br";
     headerOptions["Content-Type"] = isFetch ? "json" : "html";
 
     //path to rendered files changes based on if request is for a page or a module
-    const path = isFetch ? `${baseDir}/dist/modules-res${url}.json` : `${baseDir}/dist/pages/${url}.html`;
-    const fallbackPath = isFetch ? `${baseDir}/dist/modules-res/fourOhFour.json` : `${baseDir}/dist/pages/fourOhFour.html`;
+    const path = isFetch ? `${baseDir}/dist/modules-res${url}.json` : `${baseDir}/dist/markup/${url}.html`;
+    const fallbackPath = isFetch ? `${baseDir}/dist/modules-res/fourOhFour.json` : `${baseDir}/dist/markup/fourOhFour.html`;
 
     //if there is a file found for the pathname, return it
     //else compile the module(s) and write the related files

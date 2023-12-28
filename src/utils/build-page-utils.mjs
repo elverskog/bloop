@@ -92,7 +92,7 @@ export async function buildPage(options) {
       pageRes.markup = moduleRes.markup;    
     }
 
-    return moduleRes;
+    return pageRes;
 
   }
 
@@ -100,6 +100,8 @@ export async function buildPage(options) {
   try {
 
     moduleRes = await addModule(path, { label: "Label for mod 1" }); 
+
+    console.log("MODULERES: ", moduleRes);
 
     //add the name for page's main module
     if(typeof moduleRes?.name === "string") {
@@ -114,7 +116,7 @@ export async function buildPage(options) {
 
   // get the wrapper for the page
   try {
-    await addModule("src/components/wrapper.mjs", { moduleRes });
+    await addModule("src/components/wrapper.mjs", { addModule, moduleRes });
   } catch(err) {
     console.log("buildPage: add wrapper error: ", err);
     return;

@@ -8,6 +8,8 @@ export default async function wrapper(addModule, args) {
  
   //const thisHopper = hopper.getHopper(); 
 
+  console.log("WRAPPER ARGS: ", args);
+
   const { moduleRes } = args;
   
   // console.log("MODULERES: ", moduleRes);
@@ -31,6 +33,10 @@ export default async function wrapper(addModule, args) {
 
   //we have to add scripts for wrapper as it are not part of body module stack
   let scriptTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
+
+  //I AM HERE
+  //NEED TO SEE HOW TP
+
   //create a css/link tag for each module used in the page, server-side
   // if(Object.keys(cssPaths).length) {
   //   Object.keys(cssPaths).forEach( key => {
@@ -84,7 +90,6 @@ export default async function wrapper(addModule, args) {
         </head>
         <body id="__body">
           <div id="wrapper">
-            MENU
             ${menuRes.markup}
             <div id="content">
               ${bodyMarkup}
