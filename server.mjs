@@ -157,7 +157,6 @@ if(process.env.NODE_ENV === "production") {
   const distFiles = await build(pagePathsArray);
   // console.log("DIST FILES: ", distFiles);
   distFiles.forEach(page => {
-    // console.log("CSS: ", page.css);
     writeMarkup(page);
     writeCss(page);
     writeJs(page);

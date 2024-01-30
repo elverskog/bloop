@@ -8,7 +8,7 @@ export default async function wrapper(addModule, args) {
  
   //const thisHopper = hopper.getHopper(); 
 
-  console.log("WRAPPER ARGS: ", args);
+  // console.log("WRAPPER ARGS: ", args);
 
   const { moduleRes } = args;
   

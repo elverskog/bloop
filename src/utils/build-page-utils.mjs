@@ -101,7 +101,7 @@ export async function buildPage(options) {
 
     moduleRes = await addModule(path, { label: "Label for mod 1" }); 
 
-    console.log("MODULERES: ", moduleRes);
+    // console.log("MODULERES: ", moduleRes);
 
     //add the name for page's main module
     if(typeof moduleRes?.name === "string") {

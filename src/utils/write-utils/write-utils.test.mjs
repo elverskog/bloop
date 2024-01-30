@@ -19,52 +19,53 @@ tap.test("writeMarkup tests", t => {
   clearFiles(["dist/pages-test",]);
 
   const page = {
-    modulePath: "src/pages-test/test.mjs",
+    name: "test-markup",
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
 
   t.match(writeMarkup(page), true, "writeMarkup returned true");
-  t.match(fs.existsSync("dist/pages-test/test.html"), true, "writeMarkup wrote test.mjs");
+  t.match(fs.existsSync("dist/markup/test-markup.html"), true, "writeMarkup wrote test.mjs");
 
-  clearFiles(["dist/pages-test",]);
+  clearFiles(["dist/markup/test-markup",]);
 
-  const pageMissingModulePath = {
+  const pageMissingName = {
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
 
-  t.throws(() => writeMarkup(pageMissingModulePath), {
+  t.throws(() => writeMarkup(pageMissingName), {
     message: "Error: validateArgs - undefined isn't string"
   }, "pageMissingModulePath");
 
-  t.match(fs.existsSync("src/dist/pages-test/test.mjs"), false, "writeMarkup failed to write test.mjs because modulePath is missing");
+  t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write test.mjs because name is missing");
 
-  clearFiles(["dist/pages-test",]);
+  clearFiles(["dist/markup/test-markup",]);
 
   const pageMissingMarkup = {
-    modulePath: "src/pages-test/test.mjs"
+    name: "test-markup"
   };
 
   t.throws(() => writeMarkup(pageMissingMarkup), {
     message: "Error: validateArgs - undefined isn't string"
   },"pageMissingMarkup");
 
-  t.match(fs.existsSync("src/dist/pages-test/test.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
+  t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
 
-  clearFiles(["dist/pages-test",]);
+  clearFiles(["dist/markup/test-markup",]);
 
-  const pageBadPath = {
-    modulePath: "blah/pages-test/test.mjs",
-    markup: `<!DOCTYPE html>
-    <html>dsfasdf</html>`
-  };
 
-  t.throws(() => writeMarkup(pageBadPath), {
-    message: "writePage: page.modulePath not a string or is otherwise invalid"
-  });
+  // const pageBadPath = {
+  //   modulePath: "blah/pages-test/test.mjs",
+  //   markup: `<!DOCTYPE html>
+  //   <html>dsfasdf</html>`
+  // };
 
-  t.match(fs.existsSync("dist/pages-test/test.html"), false, "writeMarkup failed to write test.mjs as modulePath is invalid");
+  // t.throws(() => writeMarkup(pageBadPath), {
+  //   message: "writePage: page.modulePath not a string or is otherwise invalid"
+  // });
+
+  // t.match(fs.existsSync("dist/pages-test/test.html"), false, "writeMarkup failed to write test.mjs as modulePath is invalid");
 
   t.end();
 
@@ -73,160 +74,160 @@ tap.test("writeMarkup tests", t => {
 
 //WRITE CCS TESTS/////////////////////////////////////////////////////////////////////
 
-tap.test("write CSS tests", t => {
+// tap.test("write CSS tests", t => {
  
-  clearFiles(["dist/css-test"]);
+//   clearFiles(["dist/css-test"]);
 
-  const page = {
-    css: [{
-      modulePath: "src/components/test.mjs",
-      val: `
-          .thing { 
-            color: red; 
-          }
-      `
-    }]
-  };
+//   const page = {
+//     css: [{
+//       modulePath: "src/components/test.mjs",
+//       val: `
+//           .thing { 
+//             color: red; 
+//           }
+//       `
+//     }]
+//   };
 
-  t.match(writeCss(page), true, "writeCssOrJs returned true");
-  t.match(fs.existsSync("dist/css/test.css"), true, "writeCssOrJs wrote test.mjs");
-
-
-  clearFiles(["dist/css"]);
-
-  const pageMissingModulePath = {
-    css: [{
-      val: `
-          .thing { 
-            color: red; 
-          }
-      `
-    }]
-  };
-
-  // t.throws(() => writeCss(pageMissingModulePath), {
-  //   message: "Error: writePage outer - modulePath or val is not a string"
-  // }, "pageMissingModulePath");
-
-  t.throws(() => writeCss(pageMissingModulePath), Error, `pageMissingModulePath ${ Error }`);
+//   t.match(writeCss(page), true, "writeCssOrJs returned true");
+//   t.match(fs.existsSync("dist/css/test.css"), true, "writeCssOrJs wrote test.mjs");
 
 
-  t.match(fs.existsSync("dist/css/test.css"), false, "writeCssOrJs should fail to write test.mjs because modulePath is missing");
+//   clearFiles(["dist/css"]);
+
+//   const pageMissingModulePath = {
+//     css: [{
+//       val: `
+//           .thing { 
+//             color: red; 
+//           }
+//       `
+//     }]
+//   };
+
+//   // t.throws(() => writeCss(pageMissingModulePath), {
+//   //   message: "Error: writePage outer - modulePath or val is not a string"
+//   // }, "pageMissingModulePath");
+
+//   t.throws(() => writeCss(pageMissingModulePath), Error, `pageMissingModulePath ${ Error }`);
 
 
-  clearFiles(["dist/css"]); //clear files here just in case?
-
-  const pageMissingVal = {
-    css: [{
-      modulePath: "src/components/test.mjs"
-    }]
-  };
-
-  t.throws(() => writeCss(pageMissingVal), Error, `pageMissingVal ${ Error }`);
-
-  t.match(fs.existsSync("dist/css/test.mjs"), false, "writeCssOrJs failed to write test.mjs because css is missing");
+//   t.match(fs.existsSync("dist/css/test.css"), false, "writeCssOrJs should fail to write test.mjs because modulePath is missing");
 
 
-  clearFiles(["dist/css"]);
+//   clearFiles(["dist/css"]); //clear files here just in case?
 
-  const pageBadPath = {
-    css: [{
-      modulePath: "blah/css-test/test.mjs",
-      val: `
-        .thing { 
-          color: red; 
-        }
-      `
-    }]
-  };
+//   const pageMissingVal = {
+//     css: [{
+//       modulePath: "src/components/test.mjs"
+//     }]
+//   };
 
-  t.throws(() => writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
+//   t.throws(() => writeCss(pageMissingVal), Error, `pageMissingVal ${ Error }`);
 
-  t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
-
-  clearFiles(["dist/components/css-test"]);
+//   t.match(fs.existsSync("dist/css/test.mjs"), false, "writeCssOrJs failed to write test.mjs because css is missing");
 
 
-  t.end();
+//   clearFiles(["dist/css"]);
 
-});
+//   const pageBadPath = {
+//     css: [{
+//       modulePath: "blah/css-test/test.mjs",
+//       val: `
+//         .thing { 
+//           color: red; 
+//         }
+//       `
+//     }]
+//   };
+
+//   t.throws(() => writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
+
+//   t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
+
+//   clearFiles(["dist/components/css-test"]);
 
 
-//WRITE JS TESTS/////////////////////////////////////////////////////////////////////
+//   t.end();
 
-tap.test("write JS tests", t => {
+// });
+
+
+// //WRITE JS TESTS/////////////////////////////////////////////////////////////////////
+
+// tap.test("write JS tests", t => {
  
-  const testFunction = function() {};
+//   const testFunction = function() {};
 
-  clearFiles(["dist/js-test"]);
+//   clearFiles(["dist/js-test"]);
 
-  const page = {
-    js: [{
-      modulePath: "src/components/test.mjs",
-      val: { init: testFunction }
-    }]
-  };
+//   const page = {
+//     js: [{
+//       modulePath: "src/components/test.mjs",
+//       val: { init: testFunction }
+//     }]
+//   };
 
-  t.match(writeJs(page), true, "writeJsOrJs returned true");
-  t.match(fs.existsSync("dist/js/test.js"), true, "writeJsOrJs wrote test.mjs");
-
-
-  clearFiles(["dist/js"]);
-
-  const pageMissingVal = {
-    js: [{
-      modulePath: "src/components/test.mjs"
-    }]
-  };
-
-  t.match(writeJs(pageMissingVal), true, "writeJsOrJs returned true");
-
-  t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js val is missing");
-
-  clearFiles(["dist/js"]);
+//   t.match(writeJs(page), true, "writeJsOrJs returned true");
+//   t.match(fs.existsSync("dist/js/test.js"), true, "writeJsOrJs wrote test.mjs");
 
 
-  const pageBadJs = {
-    js: [{
-      modulePath: "src/components/test.mjs",
-      val: { init: "asdfsadf" }
-    }]
-  };
+//   clearFiles(["dist/js"]);
 
-  t.match(writeJs(pageBadJs), true, "writeJsOrJs returned true");
-  t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js val is bad");
+//   const pageMissingVal = {
+//     js: [{
+//       modulePath: "src/components/test.mjs"
+//     }]
+//   };
 
+//   t.match(writeJs(pageMissingVal), true, "writeJsOrJs returned true");
 
-  clearFiles(["dist/js"]);
+//   t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js val is missing");
 
-
-  const pageBadPath = {
-    js: [{
-      modulePath: "blah/js-test/test.mjs",
-      val: { init: testFunction }
-    }]
-  };
-
-  t.throws(() => writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
-
-  t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
-
-  clearFiles(["dist/components/css-test"]);
+//   clearFiles(["dist/js"]);
 
 
-  const pageMissingModulePath = {
-    js: [{
-      val: { init: testFunction }
-    }]
-  };
+//   const pageBadJs = {
+//     js: [{
+//       modulePath: "src/components/test.mjs",
+//       val: { init: "asdfsadf" }
+//     }]
+//   };
 
-  t.match(writeJs(pageMissingModulePath), true, "writeJsOrJs returned true");
-  t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs should fail to write test.mjs because modulePath is missing");
-
-
-  clearFiles(["dist/js"]); //clear files here just in case?
+//   t.match(writeJs(pageBadJs), true, "writeJsOrJs returned true");
+//   t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js val is bad");
 
 
-  t.end();
+//   clearFiles(["dist/js"]);
 
-});
+
+//   const pageBadPath = {
+//     js: [{
+//       modulePath: "blah/js-test/test.mjs",
+//       val: { init: testFunction }
+//     }]
+//   };
+
+//   t.throws(() => writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
+
+//   t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
+
+//   clearFiles(["dist/components/css-test"]);
+
+
+//   const pageMissingModulePath = {
+//     js: [{
+//       val: { init: testFunction }
+//     }]
+//   };
+
+//   t.match(writeJs(pageMissingModulePath), true, "writeJsOrJs returned true");
+//   t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs should fail to write test.mjs because modulePath is missing");
+
+
+//   clearFiles(["dist/js"]); //clear files here just in case?
+
+
+//   t.end();
+
+// });

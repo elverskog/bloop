@@ -243,12 +243,14 @@ export function writeJs(page) {
 export function writeMarkup(page) {
 
   try {
-    validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
+    validateArgs([[page.name, "string"], [page.markup, "string"]]); 
   } catch (error) {
     throw new Error(error);
   }
 
-  const savePath = `dist/markup/${ page.name }.html`;
+  const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "markup/").replace(".mjs", ".html");
+
+  console.log("savePath", savePath);
   
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
