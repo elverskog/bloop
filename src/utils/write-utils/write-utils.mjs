@@ -84,8 +84,10 @@ function write2(val, savePath) {
   //if the dirs in the path doesn't exist create them (cut the filename off the end)
   dirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
+  console.log("GRRR: ", dirPath);
+
   if(!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+    // fs.mkdirSync(dirPath, { recursive: true });
   }
 
   buff = Buffer.from(val, "utf-8");
@@ -243,7 +245,7 @@ export function writeJs(page) {
 export function writeMarkup(page) {
 
   try {
-    validateArgs([[page.name, "string"], [page.markup, "string"]]); 
+    validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
   } catch (error) {
     throw new Error(error);
   }
@@ -257,11 +259,11 @@ export function writeMarkup(page) {
 
   const saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
-  // console.log("SAVE DIR PATH: ", saveDirPath);
+  console.log("SAVE DIR PATH: ", saveDirPath);
   
   //if the dirs in the path don't exist create them
   if(!fs.existsSync(saveDirPath)) {
-    fs.mkdirSync(saveDirPath, { recursive: true });
+    // fs.mkdirSync(saveDirPath, { recursive: true });
   }
 
   write2(page.markup, savePath);

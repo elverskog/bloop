@@ -1,10 +1,10 @@
 import tap from "tap";
 import fs from "fs-extra";
 import { 
-  writeCss, 
-  writeJs, 
-  writeMarkup, 
-  writeModuleResult, 
+  writeMarkup 
+  // writeCss, 
+  // writeJs, 
+  // writeModuleResult, 
 } from "./write-utils.mjs";
 import { clearFiles } from "../dir-utils/dir-utils.mjs";
 
@@ -19,7 +19,7 @@ tap.test("writeMarkup tests", t => {
   clearFiles(["dist/pages-test",]);
 
   const page = {
-    name: "test-markup",
+    modulePath: "src/markup/test-markup.mjs",
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
@@ -27,23 +27,23 @@ tap.test("writeMarkup tests", t => {
   t.match(writeMarkup(page), true, "writeMarkup returned true");
   t.match(fs.existsSync("dist/markup/test-markup.html"), true, "writeMarkup wrote test.mjs");
 
-  clearFiles(["dist/markup/test-markup",]);
+  clearFiles(["dist/markup",]);
 
-  const pageMissingName = {
+  const pageMissingModulePath = {
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
 
-  t.throws(() => writeMarkup(pageMissingName), {
+  t.throws(() => writeMarkup(pageMissingModulePath), {
     message: "Error: validateArgs - undefined isn't string"
   }, "pageMissingModulePath");
 
   t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write test.mjs because name is missing");
 
-  clearFiles(["dist/markup/test-markup",]);
+  clearFiles(["dist/markup",]);
 
   const pageMissingMarkup = {
-    name: "test-markup"
+    modulePath: "src/markup/test-markup.mjs",
   };
 
   t.throws(() => writeMarkup(pageMissingMarkup), {
@@ -52,20 +52,18 @@ tap.test("writeMarkup tests", t => {
 
   t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
 
-  clearFiles(["dist/markup/test-markup",]);
+  clearFiles(["dist/markup",]);
 
 
-  // const pageBadPath = {
-  //   modulePath: "blah/pages-test/test.mjs",
-  //   markup: `<!DOCTYPE html>
-  //   <html>dsfasdf</html>`
-  // };
+  const pageBadModulePath = {
+    modulePath: null,
+    markup: `<!DOCTYPE html>
+    <html>dsfasdf</html>`
+  };
 
-  // t.throws(() => writeMarkup(pageBadPath), {
-  //   message: "writePage: page.modulePath not a string or is otherwise invalid"
-  // });
-
-  // t.match(fs.existsSync("dist/pages-test/test.html"), false, "writeMarkup failed to write test.mjs as modulePath is invalid");
+  t.throws(() => writeMarkup(pageBadModulePath), {
+    message: "Error: validateArgs - null isn't string"
+  });
 
   t.end();
 
