@@ -15,51 +15,9 @@ const brotliSettings = {
 };
 
 
-//brotli compress the recieved string/content and write to the received path
-//NOTE: side effects occur here
-function write(content, path) {
-
-  // console.log("CONTENT: ", content);
-  // console.log("PATH: ", path);
-
-  try {
-    validateArgs([[content, "string"], [path, "string"]]); 
-  } catch (error) {
-    throw new Error(error);
-  }
-
-  let buff;
-  let compressed;
-  let dirPath;
-
-  //if in PROD, exit if the file exists. on dev always write the file
-  if(process.env.NODE_ENV === "production" && fs.existsSync(path)) return;
-
-  //if the dirs in the path doesn't exist create them (cut the filename off the end)
-  dirPath = path.split("/").slice(0, -1).join("/").toString();
-
-  if(!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-
-  buff = Buffer.from(content, "utf-8");
-  
-  try {
-    compressed = brotli.compress(buff, brotliSettings);
-  } catch (error) {
-    throw new Error(`COMPRESS FAILED: ${error}`);
-  }
-
-  try {
-    // fs.writeFileSync(path, compressed);
-    // console.log("PATH: ", path);
-    fs.writeFileSync(path, content);
-  } catch (error) {
-    throw new Error(`WRITE FAILED: ${error}`);
-  }
-
-  return true;
-
+function validateObj(obj, valType) {
+  console.log("VALIDATE OBJ: ", obj);
+  return (obj && typeof obj.modulePath === "string" && typeof obj.val === valType); 
 }
 
 
@@ -83,8 +41,6 @@ function write2(val, savePath) {
 
   //if the dirs in the path doesn't exist create them (cut the filename off the end)
   dirPath = savePath.split("/").slice(0, -1).join("/").toString();
-
-  console.log("GRRR: ", dirPath);
 
   if(!fs.existsSync(dirPath)) {
     // fs.mkdirSync(dirPath, { recursive: true });
@@ -114,7 +70,6 @@ function write2(val, savePath) {
 //function to compress and write css files for a full page request
 export function writeCss(page) {
 
-  let path;
   let index = 0;
 
   try {
@@ -123,29 +78,19 @@ export function writeCss(page) {
     throw new Error(error);
   }
 
-  function filterObjs(cssObj) {
-    return (cssObj && typeof cssObj.modulePath === "string" && typeof cssObj.val === "string"); 
-  }
-
   function writeEach() {
-   
+  
     const cssObj = page.css[index];
     const val = cssObj.val;
-    const savePath = `dist/css/${ cssObj.name }.css`;
-    
-    if(cssObj.modulePath.indexOf("src/") > -1 && cssObj.modulePath.indexOf(".mjs") > -1) {
-      path = cssObj.modulePath.replace("src", "dist").replace("components", "css").replace("mjs", "css");
-    } else {
-      throw new Error("writePage - page.modulePath is missing src or mjs");
-    }
+    const savePath = cssObj.modulePath.replace("src", "dist").replace("components", "css").replace("mjs", "css");
 
     write2(val, savePath);
     index++;
   
-    //recurse on current function
+    //recurse on current function (writeEach)
     if(page.css[index]) {
 
-      if (filterObjs(page.css[index])) {
+      if (validateObj(page.css[index], "string")) {
         writeEach();
       } else {
         throw new Error("writePage in write - modulePath or val is not a string");
@@ -155,7 +100,8 @@ export function writeCss(page) {
 
   }
 
-  if (filterObjs(page.css[index])) {
+
+  if (validateObj(page.css[index], "string")) {
     writeEach();
   } else {
     throw new Error("writePage outer - modulePath or val is not a string");
@@ -179,10 +125,6 @@ export function writeJs(page) {
     throw new Error(error);
   }
 
-  function filterObjs(jsObj) {
-    return (jsObj && typeof jsObj.modulePath === "string" && typeof jsObj.val === "object"); 
-  }
-
   //this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
   function convertFuncsToStrings(obj) {
     
@@ -202,37 +144,40 @@ export function writeJs(page) {
 
   function writeEach(jsObj) {
 
-    const savePath = `dist/js/${ jsObj.name }.js`;
-
-    // console.log("jsObj: ", jsObj);
-    //   path = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("mjs", "js");
-    //   // val = jsObj.val.toString();
-    //   val = convertFuncsToStrings(jsObj.val);
-    //   // val = jsObj.val;
-    //   // console.log("VAL: ", val);
-    //   write(val, path);
-    // } else {
-    //   throw new Error("writePage - page.modulePath is missing src or mjs");
-    // }
-   
+    const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
     const val = convertFuncsToStrings(jsObj.val);
-    write2(val, savePath);
+
+    console.log("--------typeof val; ", typeof val); 
+
+
+    if (typeof val === "string" && typeof savePath === "string") {
+      write2(val, savePath);
+    } else {
+      throw new Error("writeJS failed because val or savePath invalid");
+    }
     
     index++;
   
     //if we have ANOTHER "js object" at the current index, try and write it
     //else just exit (doing anything can cause errors in tests)
-
-    if (filterObjs(page.js[index])) {
-      writeEach(page.js[index]);
-    }
+    // if (validateObj(page.js[index], "object")) {
+    //   writeEach(page.js[index]);
+    // }
   
   }
 
+  // console.log("ONSDFASDF", page.js[index]);
+  // console.log("TYPEOF MODULEPATH", typeof page.js[index].modulePath);
+  // console.log("TYPEOF VAL", typeof page.js[index].val);
+
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
-  if (filterObjs(page.js[index])) {
+  if (validateObj(page.js[index], "object")) {
+
+  // if(page.js && typeof page.js.modulePath === "string" && typeof page.js.val === "object") { 
     writeEach(page.js[index]);
+  } else {
+    throw new Error("writeJS failed page.js does not exist at first index");
   }
 
   return true;
@@ -252,23 +197,12 @@ export function writeMarkup(page) {
 
   const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "markup/").replace(".mjs", ".html");
 
-  console.log("savePath", savePath);
-  
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
-  const saveDirPath = savePath.split("/").slice(0, -1).join("/").toString();
+  return write2(page.markup, savePath);
 
-  console.log("SAVE DIR PATH: ", saveDirPath);
-  
-  //if the dirs in the path don't exist create them
-  if(!fs.existsSync(saveDirPath)) {
-    // fs.mkdirSync(saveDirPath, { recursive: true });
-  }
-
-  write2(page.markup, savePath);
-
-  return true;
+  // return true;
 
 }
 
