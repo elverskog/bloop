@@ -16,15 +16,14 @@ const brotliSettings = {
 
 
 function validateObj(obj, valType) {
-  console.log("VALIDATE OBJ: ", obj);
   return (obj && typeof obj.modulePath === "string" && typeof obj.val === valType); 
 }
 
 
 function write2(val, savePath) {
 
-  // console.log("VAL: ", val);
   // console.log("SAVEPATH: ", savePath);
+  // console.log("VAL: ", val);
 
   try {
     validateArgs([ [ val, "string" ], [ savePath, "string" ] ]); 
@@ -43,7 +42,7 @@ function write2(val, savePath) {
   dirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
   if(!fs.existsSync(dirPath)) {
-    // fs.mkdirSync(dirPath, { recursive: true });
+    fs.mkdirSync(dirPath, { recursive: true });
   }
 
   buff = Buffer.from(val, "utf-8");
@@ -112,7 +111,7 @@ export function writeCss(page) {
 }
 
 
-//function to compress and write js files for a full page request
+//function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
   // console.log("PAGE JS: ", page.js);
@@ -147,9 +146,6 @@ export function writeJs(page) {
     const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
     const val = convertFuncsToStrings(jsObj.val);
 
-    console.log("--------typeof val; ", typeof val); 
-
-
     if (typeof val === "string" && typeof savePath === "string") {
       write2(val, savePath);
     } else {
@@ -158,23 +154,11 @@ export function writeJs(page) {
     
     index++;
   
-    //if we have ANOTHER "js object" at the current index, try and write it
-    //else just exit (doing anything can cause errors in tests)
-    // if (validateObj(page.js[index], "object")) {
-    //   writeEach(page.js[index]);
-    // }
-  
   }
-
-  // console.log("ONSDFASDF", page.js[index]);
-  // console.log("TYPEOF MODULEPATH", typeof page.js[index].modulePath);
-  // console.log("TYPEOF VAL", typeof page.js[index].val);
 
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[index], "object")) {
-
-  // if(page.js && typeof page.js.modulePath === "string" && typeof page.js.val === "object") { 
     writeEach(page.js[index]);
   } else {
     throw new Error("writeJS failed page.js does not exist at first index");
@@ -186,7 +170,7 @@ export function writeJs(page) {
 
 
 
-//function to compress and write markup files for a full page request
+//function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page) {
 
   try {
@@ -207,33 +191,69 @@ export function writeMarkup(page) {
 }
 
 
-//function to compress and write module results ({css, markup,script})
-export function writeModuleResult(modulePath, content) {
+function cleanObjects(arrayOfObjects, key) {
+  return arrayOfObjects.map( obj => {
+    const cleanedObj = { ...obj };
+    delete cleanedObj[ key ];
+    return cleanedObj;
+  });
+}
 
-  if(typeof modulePath === "string" && typeof content === "string") {
 
-    //change path of module to that of where we should store the page in /dist
-    const pagePath = modulePath.replace("src", "dist").replace("pages", "modules-res").replace("mjs", "json");
+//function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
+export function writeModule(page) {
 
-    //if in PROD, exit if the file exists (on dev always write the file)
-    if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
-
-    //if the dirs in the path don't exist create them
-    const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
-
-    if(!fs.existsSync(pageDirPath)) {
-      fs.mkdirSync(pageDirPath, { recursive: true });
-    }
-
-    //brotli compress the string
-    const buff = Buffer.from(content, "utf-8");
-    const compressed = brotli.compress(buff, brotliSettings);
-    //const compressed = content;
-
-    fs.writeFileSync(pagePath, compressed);
-
-  } else {
-    console.log("compressAndWrite passed invalid module output", modulePath);
+  try {
+    validateArgs([
+      [page.modulePath, "string"],
+      [page.css, "array"],
+      [page.markup, "string"],
+      [page.js, "array"]
+    ]); 
+  } catch (error) {
+    throw new Error(error);
   }
 
+  const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "modules/").replace(".mjs", ".json");
+
+  //if in PROD, exit if the file exists (on dev always write the file)
+  if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
+
+  console.log("Page: ", page);
+  const pagePathsRemoved = cleanObjects(page, "modulePath");
+  console.log("Page: ", pagePathsRemoved);
+
+  return write2(JSON.stringify(pagePathsRemoved), savePath);
+
 }
+
+// //function to compress and write module results ({css, markup,script})
+// export function writeModuleResult(modulePath, content) {
+
+//   if(typeof modulePath === "string" && typeof content === "string") {
+
+//     //change path of module to that of where we should store the page in /dist
+//     const pagePath = modulePath.replace("src", "dist").replace("pages", "modules-res").replace("mjs", "json");
+
+//     //if in PROD, exit if the file exists (on dev always write the file)
+//     if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
+
+//     //if the dirs in the path don't exist create them
+//     const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
+
+//     if(!fs.existsSync(pageDirPath)) {
+//       fs.mkdirSync(pageDirPath, { recursive: true });
+//     }
+
+//     //brotli compress the string
+//     const buff = Buffer.from(content, "utf-8");
+//     const compressed = brotli.compress(buff, brotliSettings);
+//     //const compressed = content;
+
+//     fs.writeFileSync(pagePath, compressed);
+
+//   } else {
+//     console.log("compressAndWrite passed invalid module output", modulePath);
+//   }
+
+// }

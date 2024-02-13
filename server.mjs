@@ -12,7 +12,7 @@ import {
   writeCss, 
   writeMarkup, 
   writeJs, 
-  writeModuleResult, 
+  writeModule, 
 } from "./src/utils/write-utils/write-utils.mjs";
 
 
@@ -148,7 +148,7 @@ if(process.env.NODE_ENV === "production") {
     "dist/css",
     "dist/js",
     "dist/markup",
-    "dist/modules-res"
+    "dist/modules"
   ]);
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
@@ -160,6 +160,7 @@ if(process.env.NODE_ENV === "production") {
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
+    writeModule(page);
   });
 }
 
