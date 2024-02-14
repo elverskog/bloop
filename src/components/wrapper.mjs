@@ -4,6 +4,7 @@ import loadModule from "../utils/module-utils.mjs";
 // import hopper from "../hopper.mjs";
 
 
+
 export default async function wrapper(addModule, args) {
  
   //const thisHopper = hopper.getHopper(); 
@@ -12,7 +13,7 @@ export default async function wrapper(addModule, args) {
 
   const { moduleRes } = args;
   
-  // console.log("MODULERES: ", moduleRes);
+  console.log("MODULERES: ", moduleRes);
 
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
@@ -38,14 +39,17 @@ export default async function wrapper(addModule, args) {
   //NEED TO SEE HOW TP
 
   //create a css/link tag for each module used in the page, server-side
-  // if(Object.keys(cssPaths).length) {
-  //   Object.keys(cssPaths).forEach( key => {
-  //     // cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`
-  //     cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="${cssPaths[key]}" />\n`
-  //   })
-  // }
+  if(moduleRes.css.length) {
+    moduleRes.css.forEach( obj => {
+      const cssPath = obj.modulePath.replace("src/", "dist/")
+        .replace("components/", "css/")
+        .replace("pages/", "css/")
+        .replace(".mjs", ".css");
+      cssTags += `<link id="${obj.name}Styles" rel="stylesheet" type="text/css" href="${cssPath}" />\n`;
+    });
+  }
 
-
+  console.log("CSSTAGS", cssTags);
 
   // if(thisHopper && Object.keys(thisHopper.css).length) {
   //   Object.keys(thisHopper.css).forEach( key => {

@@ -160,7 +160,7 @@ if(process.env.NODE_ENV === "production") {
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
-    writeModule(page);
+    // writeModule(page);
   });
 }
 

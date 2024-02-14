@@ -7,7 +7,7 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
-  // console.log("BUILDPAGE - OPTIONS: ", options);
+  console.log("BUILDPAGE - OPTIONS: ", options);
 
   //const collectedModules = [];
   
@@ -85,12 +85,17 @@ export async function buildPage(options) {
         modulePath,
         val: moduleRes.js    
       });
-
     }
 
-    if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {
-      pageRes.markup = moduleRes.markup;    
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.markup === "string") {
+      // pageRes.script[moduleRes.name] = moduleRes.script;    
+      pageRes.markup = moduleRes.markup;
     }
+
+
+    // if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {
+    //   pageRes.markup = moduleRes.markup;    
+    // }
 
     return pageRes;
 
@@ -99,7 +104,7 @@ export async function buildPage(options) {
 
   try {
 
-    moduleRes = await addModule(path, { label: "Label for mod 1" }); 
+    moduleRes = await addModule(path, { addModule, label: "Label for mod 1" }); 
 
     // console.log("MODULERES: ", moduleRes);
 
