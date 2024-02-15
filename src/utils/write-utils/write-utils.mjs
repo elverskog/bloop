@@ -22,8 +22,10 @@ function validateObj(obj, valType) {
 
 function write2(val, savePath) {
 
-  // console.log("SAVEPATH: ", savePath);
-  // console.log("VAL: ", val);
+  if(savePath.indexOf("a.css") > -1) {
+    console.log("SAVEPATH: ", savePath);
+    console.log("VAL: ", val);
+  }
 
   try {
     validateArgs([ [ val, "string" ], [ savePath, "string" ] ]); 
@@ -69,6 +71,10 @@ function write2(val, savePath) {
 //function to compress and write css files for a full page request
 export function writeCss(page) {
 
+  if(page.modulePath && page.modulePath.indexOf("a.mjs") > -1) {
+    console.log("WRITECSS PAGE: ", page);
+  }  
+
   let index = 0;
 
   try {
@@ -81,7 +87,11 @@ export function writeCss(page) {
   
     const cssObj = page.css[index];
     const val = cssObj.val;
-    const savePath = cssObj.modulePath.replace("src", "dist").replace("components", "css").replace("mjs", "css");
+    const savePath = cssObj.modulePath
+      .replace("src", "dist")
+      .replace("pages", "css")
+      .replace("components", "css")
+      .replace("mjs", "css");
 
     write2(val, savePath);
     index++;

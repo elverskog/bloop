@@ -7,7 +7,7 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
-  console.log("BUILDPAGE - OPTIONS: ", options);
+  // console.log("BUILDPAGE - OPTIONS: ", options);
 
   //const collectedModules = [];
   
@@ -36,7 +36,7 @@ export async function buildPage(options) {
   async function addModule(modulePath, args) {
 
     // console.log("ADD MODULE: ", modulePath, "\n", args);
-    // console.log("ADD MODULE: ", modulePath)
+    // console.log("ADD MODULE: ", modulePath);
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
@@ -96,6 +96,12 @@ export async function buildPage(options) {
     // if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {
     //   pageRes.markup = moduleRes.markup;    
     // }
+
+    // if(modulePath.indexOf("a.mjs") > -1) {
+    //   console.log("ADD MODULE: ", modulePath);
+    //   console.log("PAGERES: ", pageRes);
+    // }
+    
 
     return pageRes;
 

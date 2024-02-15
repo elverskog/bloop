@@ -13,7 +13,7 @@ export default async function wrapper(addModule, args) {
 
   const { moduleRes } = args;
   
-  console.log("MODULERES: ", moduleRes);
+  // console.log("MODULERES: ", moduleRes);
 
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
@@ -49,7 +49,7 @@ export default async function wrapper(addModule, args) {
     });
   }
 
-  console.log("CSSTAGS", cssTags);
+  // console.log("CSSTAGS", cssTags);
 
   // if(thisHopper && Object.keys(thisHopper.css).length) {
   //   Object.keys(thisHopper.css).forEach( key => {
