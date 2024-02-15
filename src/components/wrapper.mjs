@@ -120,9 +120,15 @@ export default async function wrapper(addModule, args) {
           }
         });
       },
-      parseAndOutputStream: parseAndOutputStream.toString(),
-      insertStyleSheets: insertStyleSheets.toString(),
-      insertScripts: insertScripts.toString(),
+      // parseAndOutputStream: parseAndOutputStream.toString(),
+      // insertStyleSheets: insertStyleSheets.toString(),
+      // insertScripts: insertScripts.toString(),
+
+      parseAndOutputStream,
+      insertStyleSheets,
+      insertScripts,
+
+
       //function to just get the module for the body
       //TODO we can make this more agnostic per what DOM element it updates
       getBody: async function(pathname) {

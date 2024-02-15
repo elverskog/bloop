@@ -22,7 +22,7 @@ function validateObj(obj, valType) {
 
 function write2(val, savePath) {
 
-  if(savePath.indexOf("a.css") > -1) {
+  if(savePath.indexOf("wrapper.js") > -1) {
     console.log("SAVEPATH: ", savePath);
     console.log("VAL: ", val);
   }
@@ -71,10 +71,6 @@ function write2(val, savePath) {
 //function to compress and write css files for a full page request
 export function writeCss(page) {
 
-  if(page.modulePath && page.modulePath.indexOf("a.mjs") > -1) {
-    console.log("WRITECSS PAGE: ", page);
-  }  
-
   let index = 0;
 
   try {
@@ -109,7 +105,6 @@ export function writeCss(page) {
 
   }
 
-
   if (validateObj(page.css[index], "string")) {
     writeEach();
   } else {
@@ -123,8 +118,6 @@ export function writeCss(page) {
 
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
-
-  // console.log("PAGE JS: ", page.js);
 
   let index = 0;
 
@@ -156,6 +149,7 @@ export function writeJs(page) {
     const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
     const val = convertFuncsToStrings(jsObj.val);
 
+
     if (typeof val === "string" && typeof savePath === "string") {
       write2(val, savePath);
     } else {
@@ -163,7 +157,13 @@ export function writeJs(page) {
     }
     
     index++;
-  
+
+    if (validateObj(page.js[index], "object")) {
+      writeEach(page.js[index]);
+    } else {
+      console.log("JS OBJ: ", page.js[ index.js ]);
+    }
+ 
   }
 
   //if we have an "js object" at the current index, try and write it
@@ -171,7 +171,7 @@ export function writeJs(page) {
   if (validateObj(page.js[index], "object")) {
     writeEach(page.js[index]);
   } else {
-    throw new Error("writeJS failed page.js does not exist at first index");
+    throw new Error("writeJS failed: js object not valid at first index");
   }
 
   return true;

@@ -62,11 +62,9 @@ export async function buildPage(options) {
     //   collectedModules.push(moduleRes);
     // }
 
-    // console.log("WRAPPER: ", moduleRes);
-    // console.log("TYPEOF MARKUP: ", typeof moduleRes?.wrapper?.markup === "string");
-
-    // console.log("MODULERES: ", moduleRes, "\n\n");
-
+    if (moduleRes.name === "wrapper") {
+      console.log("MODULERES: ", moduleRes, "\n\n");
+    }
 
     // console.log("PROCESSMODULE: ", moduleRes?.name);
 
