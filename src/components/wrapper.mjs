@@ -38,7 +38,7 @@ export default async function wrapper(addModule, args) {
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {
     moduleRes.css.forEach( obj => {
-      if(typeof obj.val === "string") {
+      if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string") {
         const cssPath = obj.modulePath.replace("src/", "dist/")
           .replace("components/", "css/")
           .replace("pages/", "css/")
@@ -51,7 +51,7 @@ export default async function wrapper(addModule, args) {
   //create a js/script tag for each module used in the page, server-side
   if(moduleRes.js.length) {
     moduleRes.css.forEach( obj => {
-      if(typeof obj.val === "object") {
+      if(typeof obj.val === "object" && typeof obj.name === "string" && typeof obj.modulePath === "string") {
         const path = obj.modulePath.replace("src/", "dist/")
           .replace("components/", "js/")
           .replace("pages/", "js/")
