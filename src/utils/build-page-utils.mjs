@@ -63,7 +63,7 @@ export async function buildPage(options) {
     // }
 
     if (moduleRes.name === "wrapper") {
-      console.log("MODULERES: ", moduleRes, "\n\n");
+      // console.log("MODULERES: ", moduleRes, "\n\n");
     }
 
     // console.log("PROCESSMODULE: ", moduleRes?.name);

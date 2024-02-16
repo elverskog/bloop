@@ -23,8 +23,8 @@ function validateObj(obj, valType) {
 function write2(val, savePath) {
 
   if(savePath.indexOf("wrapper.js") > -1) {
-    console.log("SAVEPATH: ", savePath);
-    console.log("VAL: ", val);
+    // console.log("SAVEPATH: ", savePath);
+    // console.log("VAL: ", val);
   }
 
   try {
@@ -134,8 +134,11 @@ export function writeJs(page) {
     let comma;
     let i = 1;
 
+    // console.log("OBJ: ", obj);
+    // console.log("OBJ ENTRIES LENGTH: ", Object.keys(obj).length);
+    
     for(const [key, val] of Object.entries(obj)) {
-      comma = Object.entries.length === i ? "" : ","; 
+      comma = Object.entries(obj).length === i ? "" : ","; 
       result += `${ key }: ${ val.toString() }${ comma }\n`;
       i++;
     }
@@ -146,14 +149,18 @@ export function writeJs(page) {
 
   function writeEach(jsObj) {
 
+    // console.log("JS OBJ: ", jsObj);
+    
     const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
-    const val = convertFuncsToStrings(jsObj.val);
+    const scriptsAsString = convertFuncsToStrings(jsObj.val);
+    let scriptResAll;
 
 
-    if (typeof val === "string" && typeof savePath === "string") {
-      write2(val, savePath);
+    if (typeof scriptsAsString === "string" && typeof savePath === "string") {
+      scriptResAll = `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
+      write2(scriptResAll, savePath);
     } else {
-      throw new Error("writeJS failed because val or savePath invalid");
+      throw new Error("writeJS failed because scriptResAll or savePath invalid");
     }
     
     index++;
@@ -166,6 +173,7 @@ export function writeJs(page) {
  
   }
 
+  
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[index], "object")) {

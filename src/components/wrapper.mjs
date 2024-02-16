@@ -13,7 +13,7 @@ export default async function wrapper(addModule, args) {
 
   const { moduleRes } = args;
   
-  // console.log("MODULERES: ", moduleRes);
+  console.log("MODULERES: ", moduleRes);
 
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
@@ -34,9 +34,6 @@ export default async function wrapper(addModule, args) {
 
   //we have to add scripts for wrapper as it are not part of body module stack
   let scriptTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
-
-  //I AM HERE
-  //NEED TO SEE HOW TP
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {
