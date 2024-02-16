@@ -33,18 +33,34 @@ export default async function wrapper(addModule, args) {
 
 
   //we have to add scripts for wrapper as it are not part of body module stack
-  let scriptTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
+  let jsTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {
     moduleRes.css.forEach( obj => {
-      const cssPath = obj.modulePath.replace("src/", "dist/")
-        .replace("components/", "css/")
-        .replace("pages/", "css/")
-        .replace(".mjs", ".css");
-      cssTags += `<link id="${obj.name}Styles" rel="stylesheet" type="text/css" href="${cssPath}" />\n`;
+      if(typeof obj.val === "string") {
+        const cssPath = obj.modulePath.replace("src/", "dist/")
+          .replace("components/", "css/")
+          .replace("pages/", "css/")
+          .replace(".mjs", ".css");
+        cssTags += `<link id="${obj.name}Styles" rel="stylesheet" type="text/css" href="${cssPath}" />\n`;
+      }
     });
   }
+
+  //create a js/script tag for each module used in the page, server-side
+  if(moduleRes.js.length) {
+    moduleRes.css.forEach( obj => {
+      if(typeof obj.val === "object") {
+        const path = obj.modulePath.replace("src/", "dist/")
+          .replace("components/", "js/")
+          .replace("pages/", "js/")
+          .replace(".mjs", ".js");
+        jsTags += `<script id="${obj.name}Styles" rel="stylesheet" type="text/javascript" src="${path}"></script>\n`;
+      }
+    });
+  }
+
 
   // console.log("CSSTAGS", cssTags);
 
@@ -100,7 +116,7 @@ export default async function wrapper(addModule, args) {
         <script type="text/javascript">
           window.p_p = {};
         </script>
-        ${scriptTags}
+        ${jsTags}
       </html> 
     `,
     js: {
