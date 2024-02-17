@@ -23,22 +23,20 @@ export default async function wrapper(addModule, args) {
   // const menuMod = import (await loadModule("./menu.mjs")).default;
   // const menuRes = menuMod();
 
-  // console.log("MENUMOD: ", menuRes);
 
-  //we have to add CSS for wrapper and menu as they are not part of body module stack
+  //add CSS for wrapper and menu as they are not part of body module stack
   let cssTags = `
     <link id="wrapperStyles" rel="stylesheet" type="text/css" href="/dist/css/wrapper.css" />\n
     <link id="menuStyles" rel="stylesheet" type="text/css" href="/dist/css/menu.css" />\n
   `;
-
-
-  //we have to add scripts for wrapper as it are not part of body module stack
-  let jsTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
+  //keep track of what scripts have been added (e.g. link may appear many times on a page)
+  const addedCssNames = [ "wrapper", "menu" ];
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {
     moduleRes.css.forEach( obj => {
-      if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string") {
+      if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedCssNames.includes(obj.name)) {
+        addedCssNames.push(obj.name);
         const cssPath = obj.modulePath.replace("src/", "dist/")
           .replace("components/", "css/")
           .replace("pages/", "css/")
@@ -48,10 +46,16 @@ export default async function wrapper(addModule, args) {
     });
   }
 
+  //add scripts for wrapper as it are not part of body module stack
+  let jsTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
+  //keep track of what scripts have been added (e.g. link may appear many times on a page)
+  const addedJsNames = [ "wrapper" ];
+
   //create a js/script tag for each module used in the page, server-side
   if(moduleRes.js.length) {
-    moduleRes.css.forEach( obj => {
-      if(typeof obj.val === "object" && typeof obj.name === "string" && typeof obj.modulePath === "string") {
+    moduleRes.js.forEach( obj => {
+      if(typeof obj.val === "object" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
+        addedJsNames.push(obj.name);
         const path = obj.modulePath.replace("src/", "dist/")
           .replace("components/", "js/")
           .replace("pages/", "js/")
