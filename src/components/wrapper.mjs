@@ -13,7 +13,7 @@ export default async function wrapper(addModule, args) {
 
   const { moduleRes } = args;
   
-  console.log("MODULERES: ", moduleRes);
+  // console.log("MODULERES: ", moduleRes);
 
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";

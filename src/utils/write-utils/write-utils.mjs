@@ -22,9 +22,9 @@ function validateObj(obj, valType) {
 
 function write2(val, savePath) {
 
-  if(savePath.indexOf("wrapper.js") > -1) {
-    // console.log("SAVEPATH: ", savePath);
-    // console.log("VAL: ", val);
+  if(savePath.indexOf("link.js") > -1) {
+    console.log("SAVEPATH: ", savePath);
+    console.log("VAL: ", val);
   }
 
   try {
@@ -137,33 +137,73 @@ function convertFuncsToStrings(jsObjVal) {
 }
 
 
-function writeEachJs(pageJs, index) {
+function writeEachJs(page, index) {
 
-  const jsObj = pageJs[index];
-  // console.log("JS OBJ: ", jsObj);
+  try {
+    validateArgs([[page, "object"], [index, "number"]]); 
+  } catch (error) {
+    throw new Error(error);
+  }
+
+  const jsObj = page.js[index];
   
   const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
-  const scriptsAsString = convertFuncsToStrings(jsObj.val);
-  let scriptResAll;
+  let scriptsAsString = convertFuncsToStrings(jsObj.val);
+  let scriptWithWindow = "";
+  const inits = getInits(page);
 
-
-  if (typeof scriptsAsString === "string" && typeof savePath === "string") {
-    scriptResAll = `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
-    write2(scriptResAll, savePath);
+  if (typeof scriptsAsString === "string" && typeof jsObj.name === "string") {
+    scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
   } else {
-    throw new Error("writeJS failed because scriptResAll or savePath invalid");
+    throw new Error("1. writeJS failed because scriptAsString or savePath invalid");
+  }
+
+  if(inits) {
+    scriptWithWindow += inits;
+  }
+
+  // scriptWithWindow += "ddddddddd";
+  
+  if (typeof scriptsAsString === "string" && typeof savePath === "string") {
+    write2(scriptWithWindow, savePath);
+  } else {
+    throw new Error("2. writeJS failed because scriptResAll or savePath invalid");
   }
   
   index++;
 
-  if (validateObj(pageJs[index], "object")) {
-    writeEachJs(pageJs, index);
+  if (validateObj(page.js[index], "array")) {
+    writeEachJs(page, index);
   } else {
-    console.log("JS OBJ: ", pageJs[ index.js ]);
+    console.log("JS OBJ ERROR: ", page.js[index]);
   }
 
 }
 
+
+//function to create a specific js file to fire init functions for modules that have them
+export function getInits(page) {
+
+
+  let inits = "";
+
+  page.js.forEach( jsObj => {
+
+  console.log("PAGE: ", page);
+
+    if(typeof jsObj === "object" && jsObj.init === "function") {
+      try {
+        const initArgs = typeof jsObj.initArgs === "object" ? JSON.stringify(jsObj.initArgs) : "";
+        inits += `\n p_p.${jsObj.name}.init(${initArgs});`; 
+      } catch (error) {
+        console.log("conversion of init function failed", error);
+      }
+    }
+  });
+
+  return inits;
+
+}
 
 
 //function to compress and write js files for a full page request///////////////////////////
@@ -178,8 +218,7 @@ export function writeJs(page) {
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[0], "object")) {
-    // writeEachJs(page.js[index]);
-    writeEachJs(page.js, 0);
+    writeEachJs(page, 0);
   } else {
     throw new Error("writeJS failed: js object not valid at first index");
   }
@@ -189,66 +228,6 @@ export function writeJs(page) {
 }
 
 
-// //function to create a specific js file to fire init functions for modules that have them
-// export function writeJsInits(page) {
-
-//   try {
-//     validateArgs([[page.js, "array"]]); 
-//   } catch (error) {
-//     throw new Error(error);
-//   }
-
-
-//   //if it has been added, still add any init functions (for event listeners for repeated modules etc)
-//   if(typeof moduleResult.script === "object") {
-
-//     //don't add script if it's module (by key/name) doesn't exist in this.hopper already
-//     if(typeof this.hopper.script[moduleName] === "undefined") {
-
-//       //loop through scripts and add a stringified function in the script object, for the given key
-//       let scripts = "";
-            
-//       for(const [key, val] of Object.entries(moduleResult.script)) {
-//         scripts += `${key}: ${val.toString()},\n`;
-//       }
-
-//       //assign the result to a var (for now) so we can access it
-//       //for now the variable (when loaded in browser) adds that var to window
-//       scriptResAll = `window.p_p.${moduleName} = {\n${scripts}\n}`;
-
-//     }
-
-//     //even if (main) script for the module was already added,
-//     //add call to init function if a function named init exists (add initArgs if also declared in moduleResult) 
-//     if(typeof moduleResult.script.init ==="function") {
-//       const initArgs = typeof moduleResult.initArgs === "object" ? JSON.stringify(moduleResult.initArgs) : "";
-//       scriptResAll += `\n p_p.${moduleName}.init(${initArgs});` 
-//     }
-
-//     //minify (remove breaks etc) the JS before we write it to file, if in prod  
-//     if(typeof scriptResAll === "string" && process.env.NODE_ENV === "production") {
-//       const minifiedScriptResAll = UglifyJS.minify(scriptResAll);
-//       if(typeof minifiedScriptResAll.code === "string") {
-//         scriptResAll = minifiedScriptResAll.code;
-//       } else {
-//         console.log("JS minified error", moduleName, "\n", minifiedScriptResAll.error);
-//         console.log("JS minified error", moduleName, "\n", scriptResAll);
-//       }
-//     }
-
-//     //add script to this.hopper
-//     if(typeof scriptResAll === "string") {
-//       //if the node/key exists, add to it, else create it  
-//       if(typeof this.hopper.script[moduleName] === "string") {
-//         this.hopper.script[moduleName] += scriptResAll;
-//       } else {
-//         this.hopper.script[moduleName] = scriptResAll;
-//       }
-//     }
-
-
-
-// }
 
 
 //function to compress and write markup files for a full page request /////////////////////////////////////////

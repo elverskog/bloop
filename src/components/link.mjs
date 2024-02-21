@@ -67,6 +67,9 @@ export default async function link (addModule, args) {
 
         }
 
+      },
+      test: function() {
+        console.log("SDFSDFSDF");
       }
     },
     // args: { pathname }
