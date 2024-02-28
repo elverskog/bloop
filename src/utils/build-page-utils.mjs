@@ -62,11 +62,17 @@ export async function buildPage(options) {
     //   collectedModules.push(moduleRes);
     // }
 
-    if (moduleRes.name === "wrapper") {
+    // if (moduleRes.name === "wrapper") {
       // console.log("MODULERES: ", moduleRes, "\n\n");
-    }
+    // }
 
     // console.log("PROCESSMODULE: ", moduleRes?.name);
+
+
+    //add a name for the page if it doesn't exist
+    if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
+      pageRes.name = moduleRes.name;    
+    }
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
       pageRes.css.push({
@@ -85,11 +91,20 @@ export async function buildPage(options) {
       });
     }
 
+    if(typeof moduleRes?.name === "string" && typeof moduleRes.initArgs === "object") {
+      // pageRes.script[moduleRes.name] = moduleRes.script;    
+      pageRes.initArgs.push({
+        name: moduleRes.name,
+        modulePath,
+        initArgs: moduleRes.initArgs    
+      });
+    }
+
+
     if(typeof moduleRes?.name === "string" && typeof moduleRes.markup === "string") {
       // pageRes.script[moduleRes.name] = moduleRes.script;    
       pageRes.markup = moduleRes.markup;
     }
-
 
     // if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {
     //   pageRes.markup = moduleRes.markup;    
@@ -99,7 +114,11 @@ export async function buildPage(options) {
     //   console.log("ADD MODULE: ", modulePath);
     //   console.log("PAGERES: ", pageRes);
     // }
-    
+
+    // if (moduleRes?.name === "wrapper") {
+    //   console.log("MODULERES: ", moduleRes);
+    //   console.log("PAGERES: ", pageRes);
+    // }
 
     return pageRes;
 
@@ -108,7 +127,7 @@ export async function buildPage(options) {
 
   try {
 
-    moduleRes = await addModule(path, { addModule, label: "Label for mod 1" }); 
+    moduleRes = await addModule(path, { addModule }); 
 
     // console.log("MODULERES: ", moduleRes);
 
@@ -131,6 +150,11 @@ export async function buildPage(options) {
     return;
   }
 
+  console.log("PAGERES NAME: ", pageRes.name);
+  
+  // if (pageRes?.name === "a") {
+  //   console.log("PAGERES: ", pageRes);
+  // }
 
   // console.log("PAGERES: ", pageRes);
   return pageRes;

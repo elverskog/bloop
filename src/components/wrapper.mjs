@@ -1,14 +1,10 @@
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
 import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
 import loadModule from "../utils/module-utils.mjs";
-// import hopper from "../hopper.mjs";
-
 
 
 export default async function wrapper(addModule, args) {
  
-  //const thisHopper = hopper.getHopper(); 
-
   // console.log("WRAPPER ARGS: ", args);
 
   const { moduleRes } = args;
@@ -20,9 +16,6 @@ export default async function wrapper(addModule, args) {
 
   //get menu module
   const menuRes = await addModule("src/components/menu.mjs");
-  // const menuMod = import (await loadModule("./menu.mjs")).default;
-  // const menuRes = menuMod();
-
 
   //add CSS for wrapper and menu as they are not part of body module stack
   let cssTags = `
@@ -64,24 +57,6 @@ export default async function wrapper(addModule, args) {
       }
     });
   }
-
-
-  // console.log("CSSTAGS", cssTags);
-
-  // if(thisHopper && Object.keys(thisHopper.css).length) {
-  //   Object.keys(thisHopper.css).forEach( key => {
-  //     cssTags += `<link id="${key}Styles" rel="stylesheet" type="text/css" href="/dist/css/${key}.css" />\n`;
-  //   });
-  // }
-
-  // //create a script tag for each module used in the page, server-side
-  // if(thisHopper && Object.keys(thisHopper.script).length) {
-  //   Object.keys(thisHopper.script).forEach( key => {
-  //     scriptTags += `<script id="${key}Script" src="/dist/js/${key}.js" type="text/javascript"></script>\n`;
-  //   });
-  // }
-
-
 
   const result = {
     name: "wrapper",
@@ -137,14 +112,9 @@ export default async function wrapper(addModule, args) {
           }
         });
       },
-      // parseAndOutputStream: parseAndOutputStream.toString(),
-      // insertStyleSheets: insertStyleSheets.toString(),
-      // insertScripts: insertScripts.toString(),
-
       parseAndOutputStream,
       insertStyleSheets,
       insertScripts,
-
 
       //function to just get the module for the body
       //TODO we can make this more agnostic per what DOM element it updates

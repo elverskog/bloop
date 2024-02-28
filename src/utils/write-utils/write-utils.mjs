@@ -22,11 +22,6 @@ function validateObj(obj, valType) {
 
 function write2(val, savePath) {
 
-  if(savePath.indexOf("link.js") > -1) {
-    console.log("SAVEPATH: ", savePath);
-    console.log("VAL: ", val);
-  }
-
   try {
     validateArgs([ [ val, "string" ], [ savePath, "string" ] ]); 
   } catch (error) {
@@ -139,6 +134,10 @@ function convertFuncsToStrings(jsObjVal) {
 
 function writeEachJs(page, index) {
 
+  // if(page?.name === "wrapper") {
+    // console.log("WRITEEACHJS: ", page.js[index]);
+  // }
+
   try {
     validateArgs([[page, "object"], [index, "number"]]); 
   } catch (error) {
@@ -150,7 +149,10 @@ function writeEachJs(page, index) {
   const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
   let scriptsAsString = convertFuncsToStrings(jsObj.val);
   let scriptWithWindow = "";
+
   const inits = getInits(page);
+
+  console.log("INITS: ", inits);
 
   if (typeof scriptsAsString === "string" && typeof jsObj.name === "string") {
     scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
@@ -162,8 +164,6 @@ function writeEachJs(page, index) {
     scriptWithWindow += inits;
   }
 
-  // scriptWithWindow += "ddddddddd";
-  
   if (typeof scriptsAsString === "string" && typeof savePath === "string") {
     write2(scriptWithWindow, savePath);
   } else {
@@ -172,11 +172,20 @@ function writeEachJs(page, index) {
   
   index++;
 
-  if (validateObj(page.js[index], "array")) {
+  if (validateObj(page.js[index], "object")) {
     writeEachJs(page, index);
   } else {
-    console.log("JS OBJ ERROR: ", page.js[index]);
+    //console.log("JS OBJ ERROR: ", page.js[index]);
   }
+
+  //I AM HERE
+  //ISSUE IS THAT INITARGS ARE NOT PART OF JS NODE CURRENTLY
+  //EITHER THEY SHOULD BE OR
+  //MAYBE THEY CAN BE ALIGNED BY OTHER MEANS?
+    //NAME WON'T WORK, AS THE NAMES REPEAT (LIKE LINK)
+  //MAYBE THE INITARGS CAN BE CONNECTED TO THE CORRECT JS CHUNK
+  //FURTHER UP THE CHAIN?
+
 
 }
 
@@ -184,22 +193,34 @@ function writeEachJs(page, index) {
 //function to create a specific js file to fire init functions for modules that have them
 export function getInits(page) {
 
+  console.log("JSVAL: ", jsVal, name);
+  
+  let inits;
 
-  let inits = "";
-
-  page.js.forEach( jsObj => {
-
-  console.log("PAGE: ", page);
-
-    if(typeof jsObj === "object" && jsObj.init === "function") {
-      try {
-        const initArgs = typeof jsObj.initArgs === "object" ? JSON.stringify(jsObj.initArgs) : "";
-        inits += `\n p_p.${jsObj.name}.init(${initArgs});`; 
-      } catch (error) {
-        console.log("conversion of init function failed", error);
-      }
+  if(typeof jsVal.init === "function" && typeof name === "string") {
+    try {
+      const initArgs = typeof jsVal.initArgs === "object" ? JSON.stringify(jsVal.initArgs) : "";
+      inits = `\n p_p.${name}.init(${initArgs});`; 
+    } catch (error) {
+      console.log("creation/conversion of init function failed", error);
     }
-  });
+  }
+
+
+  // jsVal.forEach( val => {
+
+  //   console.log("VAL: ", val);
+
+  //   // if(typeof jsObj === "object" && jsObj.init === "function") {
+  //   //   try {
+  //   //     const initArgs = typeof jsObj.initArgs === "object" ? JSON.stringify(jsObj.initArgs) : "";
+  //   //     inits += `\n p_p.${jsObj.name}.init(${initArgs});`; 
+  //   //   } catch (error) {
+  //   //     console.log("conversion of init function failed", error);
+  //   //   }
+  //   // }
+    
+  // });
 
   return inits;
 

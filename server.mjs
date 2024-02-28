@@ -155,8 +155,10 @@ if(process.env.NODE_ENV === "production") {
   const pagePathsArray = getAllFiles("src/pages");
   // console.log("PAGEPATHSARRAY: ", pagePathsArray);
   const distFiles = await build(pagePathsArray);
-  // console.log("DIST FILES: ", distFiles);
   distFiles.forEach(page => {
+
+    // console.log("DIST FILES PAGE: ", page);
+
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
