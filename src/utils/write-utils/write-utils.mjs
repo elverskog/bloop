@@ -146,13 +146,13 @@ function writeEachJs(page, index) {
 
   const jsObj = page.js[index];
   
+  // console.log("JSOBJ: ", jsObj);
+  
   const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
   let scriptsAsString = convertFuncsToStrings(jsObj.val);
   let scriptWithWindow = "";
 
-  const inits = getInits(page);
-
-  console.log("INITS: ", inits);
+  const inits = getInits(jsObj);
 
   if (typeof scriptsAsString === "string" && typeof jsObj.name === "string") {
     scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
@@ -161,6 +161,7 @@ function writeEachJs(page, index) {
   }
 
   if(inits) {
+    console.log("INITS: ", jsObj.initArgs);
     scriptWithWindow += inits;
   }
 
@@ -191,15 +192,17 @@ function writeEachJs(page, index) {
 
 
 //function to create a specific js file to fire init functions for modules that have them
-export function getInits(page) {
+export function getInits(jsObj) {
 
-  console.log("JSVAL: ", jsVal, name);
+  // console.log("JSOBJ: ", jsObj);
   
   let inits;
+  const name = jsObj.name;
+  const val = jsObj.val;
+  const initArgs = typeof jsObj.initArgs === "object" ? jsObj.initArgs : "";
 
-  if(typeof jsVal.init === "function" && typeof name === "string") {
+  if(typeof val?.init === "function" && typeof name === "string") {
     try {
-      const initArgs = typeof jsVal.initArgs === "object" ? JSON.stringify(jsVal.initArgs) : "";
       inits = `\n p_p.${name}.init(${initArgs});`; 
     } catch (error) {
       console.log("creation/conversion of init function failed", error);

@@ -20,13 +20,16 @@ export default async function a() {
       </div>    
     `,
     js: {
-      init: function() {
+      init: function(args) {
         if(typeof window === "object") {
-          console.log("INIT A");
+          console.log(`INIT A arg: ${ args.x }`);
         }
       } 
-    } 
-  }
+    },
+    initArgs: {
+      x: "xxxxxxx" 
+    }
+  };
 
   return result;
   

@@ -30,6 +30,7 @@ export async function buildPage(options) {
     css: [],
     markup: "",
     js: [],
+    initArgs: []
   };
 
 
@@ -83,22 +84,29 @@ export async function buildPage(options) {
     }
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.js === "object") {
-      // pageRes.script[moduleRes.name] = moduleRes.script;    
-      pageRes.js.push({
+      
+      const jsObj = {
         name: moduleRes.name,
         modulePath,
         val: moduleRes.js    
-      });
+      };
+
+      if(typeof moduleRes.initArgs === "object") {
+        jsObj.initArgs = moduleRes.initArgs;
+      }
+
+      pageRes.js.push(jsObj);
+
     }
 
-    if(typeof moduleRes?.name === "string" && typeof moduleRes.initArgs === "object") {
-      // pageRes.script[moduleRes.name] = moduleRes.script;    
-      pageRes.initArgs.push({
-        name: moduleRes.name,
-        modulePath,
-        initArgs: moduleRes.initArgs    
-      });
-    }
+    // if(typeof moduleRes?.name === "string" && typeof moduleRes.initArgs === "object") {
+    //   // pageRes.script[moduleRes.name] = moduleRes.script;    
+    //   pageRes.initArgs.push({
+    //     name: moduleRes.name,
+    //     modulePath,
+    //     initArgs: moduleRes.initArgs    
+    //   });
+    // }
 
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.markup === "string") {
