@@ -29,8 +29,8 @@ export async function buildPage(options) {
     name: "",
     css: [],
     markup: "",
-    js: [],
-    initArgs: []
+    js: {},
+    inits: []
   };
 
 
@@ -67,8 +67,9 @@ export async function buildPage(options) {
       // console.log("MODULERES: ", moduleRes, "\n\n");
     // }
 
-    // console.log("PROCESSMODULE: ", moduleRes?.name);
-
+    if (moduleRes.name === "a") {
+      console.log("MODULERES", moduleRes);
+    }
 
     //add a name for the page if it doesn't exist
     if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
@@ -85,17 +86,22 @@ export async function buildPage(options) {
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.js === "object") {
       
-      const jsObj = {
-        name: moduleRes.name,
+      // const jsObj = {
+      //   // name: moduleRes.name,
+      //   modulePath,
+      //   val: moduleRes.js    
+      // };
+
+      if(typeof moduleRes.js.init === "function" && typeof moduleRes.name === "string") {
+        const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
+        pageRes.inits.push(`\n p_p.${moduleRes.name}.init(${initArgs});`); 
+      }
+
+      pageRes.js[ moduleRes.name ] = {
         modulePath,
         val: moduleRes.js    
       };
 
-      if(typeof moduleRes.initArgs === "object") {
-        jsObj.initArgs = moduleRes.initArgs;
-      }
-
-      pageRes.js.push(jsObj);
 
     }
 
@@ -158,8 +164,6 @@ export async function buildPage(options) {
     return;
   }
 
-  console.log("PAGERES NAME: ", pageRes.name);
-  
   // if (pageRes?.name === "a") {
   //   console.log("PAGERES: ", pageRes);
   // }

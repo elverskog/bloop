@@ -157,11 +157,13 @@ if(process.env.NODE_ENV === "production") {
   const distFiles = await build(pagePathsArray);
   distFiles.forEach(page => {
 
-    // console.log("DIST FILES PAGE: ", page);
+    if (page.name === "a") {
+      console.log("DIST FILES PAGE: ", page);
+    }
 
-    writeMarkup(page);
-    writeCss(page);
-    writeJs(page);
+    // writeMarkup(page);
+    // writeCss(page);
+    // writeJs(page);
     // writeModule(page);
   });
 }

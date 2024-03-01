@@ -132,6 +132,45 @@ function convertFuncsToStrings(jsObjVal) {
 }
 
 
+//function to create a specific js file to fire init functions for modules that have them
+export function getInits(jsObj) {
+
+  // console.log("JSOBJ: ", jsObj);
+  
+  let inits;
+  const name = jsObj.name;
+  const val = jsObj.val;
+  const initArgs = typeof jsObj.initArgs === "object" ? jsObj.initArgs : "";
+
+  if(typeof val?.init === "function" && typeof name === "string") {
+    try {
+      inits = `\n p_p.${name}.init(${initArgs});`; 
+    } catch (error) {
+      console.log("creation/conversion of init function failed", error);
+    }
+  }
+
+
+  // jsVal.forEach( val => {
+
+  //   console.log("VAL: ", val);
+
+  //   // if(typeof jsObj === "object" && jsObj.init === "function") {
+  //   //   try {
+  //   //     const initArgs = typeof jsObj.initArgs === "object" ? JSON.stringify(jsObj.initArgs) : "";
+  //   //     inits += `\n p_p.${jsObj.name}.init(${initArgs});`; 
+  //   //   } catch (error) {
+  //   //     console.log("conversion of init function failed", error);
+  //   //   }
+  //   // }
+    
+  // });
+
+  return inits;
+
+}
+
+
 function writeEachJs(page, index) {
 
   // if(page?.name === "wrapper") {
@@ -178,54 +217,6 @@ function writeEachJs(page, index) {
   } else {
     //console.log("JS OBJ ERROR: ", page.js[index]);
   }
-
-  //I AM HERE
-  //ISSUE IS THAT INITARGS ARE NOT PART OF JS NODE CURRENTLY
-  //EITHER THEY SHOULD BE OR
-  //MAYBE THEY CAN BE ALIGNED BY OTHER MEANS?
-    //NAME WON'T WORK, AS THE NAMES REPEAT (LIKE LINK)
-  //MAYBE THE INITARGS CAN BE CONNECTED TO THE CORRECT JS CHUNK
-  //FURTHER UP THE CHAIN?
-
-
-}
-
-
-//function to create a specific js file to fire init functions for modules that have them
-export function getInits(jsObj) {
-
-  // console.log("JSOBJ: ", jsObj);
-  
-  let inits;
-  const name = jsObj.name;
-  const val = jsObj.val;
-  const initArgs = typeof jsObj.initArgs === "object" ? jsObj.initArgs : "";
-
-  if(typeof val?.init === "function" && typeof name === "string") {
-    try {
-      inits = `\n p_p.${name}.init(${initArgs});`; 
-    } catch (error) {
-      console.log("creation/conversion of init function failed", error);
-    }
-  }
-
-
-  // jsVal.forEach( val => {
-
-  //   console.log("VAL: ", val);
-
-  //   // if(typeof jsObj === "object" && jsObj.init === "function") {
-  //   //   try {
-  //   //     const initArgs = typeof jsObj.initArgs === "object" ? JSON.stringify(jsObj.initArgs) : "";
-  //   //     inits += `\n p_p.${jsObj.name}.init(${initArgs});`; 
-  //   //   } catch (error) {
-  //   //     console.log("conversion of init function failed", error);
-  //   //   }
-  //   // }
-    
-  // });
-
-  return inits;
 
 }
 
