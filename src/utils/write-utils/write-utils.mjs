@@ -132,50 +132,7 @@ function convertFuncsToStrings(jsObjVal) {
 }
 
 
-//function to create a specific js file to fire init functions for modules that have them
-export function getInits(jsObj) {
-
-  // console.log("JSOBJ: ", jsObj);
-  
-  let inits;
-  const name = jsObj.name;
-  const val = jsObj.val;
-  const initArgs = typeof jsObj.initArgs === "object" ? jsObj.initArgs : "";
-
-  if(typeof val?.init === "function" && typeof name === "string") {
-    try {
-      inits = `\n p_p.${name}.init(${initArgs});`; 
-    } catch (error) {
-      console.log("creation/conversion of init function failed", error);
-    }
-  }
-
-
-  // jsVal.forEach( val => {
-
-  //   console.log("VAL: ", val);
-
-  //   // if(typeof jsObj === "object" && jsObj.init === "function") {
-  //   //   try {
-  //   //     const initArgs = typeof jsObj.initArgs === "object" ? JSON.stringify(jsObj.initArgs) : "";
-  //   //     inits += `\n p_p.${jsObj.name}.init(${initArgs});`; 
-  //   //   } catch (error) {
-  //   //     console.log("conversion of init function failed", error);
-  //   //   }
-  //   // }
-    
-  // });
-
-  return inits;
-
-}
-
-
 function writeEachJs(page, index) {
-
-  // if(page?.name === "wrapper") {
-    // console.log("WRITEEACHJS: ", page.js[index]);
-  // }
 
   try {
     validateArgs([[page, "object"], [index, "number"]]); 
@@ -183,26 +140,27 @@ function writeEachJs(page, index) {
     throw new Error(error);
   }
 
-  const jsObj = page.js[index];
-  
+  // const jsObj = Object.entries(page.js)[index];
+  const jsEntry = Object.entries(page.js)[index];
+  // console.log("JSENTRY: ", jsEntry);
+  const name = jsEntry[0];
+  const jsObj = jsEntry[1];
   // console.log("JSOBJ: ", jsObj);
-  
+  const jsVal = jsObj.val;
   const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
-  let scriptsAsString = convertFuncsToStrings(jsObj.val);
+  const inits = page.inits ? page.inits : "";
+  let scriptsAsString = convertFuncsToStrings(jsVal);
   let scriptWithWindow = "";
 
-  const inits = getInits(jsObj);
-
-  if (typeof scriptsAsString === "string" && typeof jsObj.name === "string") {
+  if (typeof scriptsAsString === "string" && typeof name === "string") {
     scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
   } else {
     throw new Error("1. writeJS failed because scriptAsString or savePath invalid");
   }
 
-  if(inits) {
-    console.log("INITS: ", jsObj.initArgs);
-    scriptWithWindow += inits;
-  }
+  //if we are the first element, as it is the main js for the page,
+  //check for inits in page and add them to the end of said js file
+  scriptWithWindow += inits;
 
   if (typeof scriptsAsString === "string" && typeof savePath === "string") {
     write2(scriptWithWindow, savePath);
@@ -212,7 +170,7 @@ function writeEachJs(page, index) {
   
   index++;
 
-  if (validateObj(page.js[index], "object")) {
+  if (validateObj(Object.entries(page.js)[index][0][1], "object")) {
     writeEachJs(page, index);
   } else {
     //console.log("JS OBJ ERROR: ", page.js[index]);
@@ -224,15 +182,17 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
+  // console.log("PAGE JS: ", Object.entries(page.js)[0][1]);
+
   try {
-    validateArgs([[page.js, "array"]]); 
+    validateArgs([[page.js, "object"]]); 
   } catch (error) {
     throw new Error(error);
   }
   
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
-  if (validateObj(page.js[0], "object")) {
+  if (validateObj(Object.entries(page.js)[0][1], "object")) {
     writeEachJs(page, 0);
   } else {
     throw new Error("writeJS failed: js object not valid at first index");
@@ -283,7 +243,7 @@ export function writeModule(page) {
       [page.modulePath, "string"],
       [page.css, "array"],
       [page.markup, "string"],
-      [page.js, "array"]
+      [page.js, "object"]
     ]); 
   } catch (error) {
     throw new Error(error);

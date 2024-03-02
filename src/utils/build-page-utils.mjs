@@ -67,9 +67,9 @@ export async function buildPage(options) {
       // console.log("MODULERES: ", moduleRes, "\n\n");
     // }
 
-    if (moduleRes.name === "a") {
-      console.log("MODULERES", moduleRes);
-    }
+    // if (moduleRes.name === "a") {
+    //   console.log("MODULERES", moduleRes);
+    // }
 
     //add a name for the page if it doesn't exist
     if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
