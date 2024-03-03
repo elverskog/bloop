@@ -1,29 +1,29 @@
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
 import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
-import loadModule from "../utils/module-utils.mjs";
 
 
 export default async function wrapper(addModule, args) {
  
-  // console.log("WRAPPER ARGS: ", args);
-
   const { moduleRes } = args;
-  
-  // console.log("MODULERES: ", moduleRes);
-
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 
-  //get menu module
-  const menuRes = await addModule("src/components/menu.mjs");
-
+  //keep track of what css tags have been added (e.g. link may appear many times on a page)
+  const addedCssNames = [ "wrapper", "menu" ];
   //add CSS for wrapper and menu as they are not part of body module stack
   let cssTags = `
     <link id="wrapperStyles" rel="stylesheet" type="text/css" href="/dist/css/wrapper.css" />\n
     <link id="menuStyles" rel="stylesheet" type="text/css" href="/dist/css/menu.css" />\n
   `;
+
   //keep track of what scripts have been added (e.g. link may appear many times on a page)
-  const addedCssNames = [ "wrapper", "menu" ];
+  const addedJsNames = [ "wrapper" ];
+  //string to store the js tags we will add by footer
+  //add scripts for wrapper as it are not part of body module stack
+  let jsTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
+
+  //get menu module
+  const menuRes = await addModule("src/components/menu.mjs");
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {
@@ -39,14 +39,12 @@ export default async function wrapper(addModule, args) {
     });
   }
 
-  //add scripts for wrapper as it are not part of body module stack
-  let jsTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
-  //keep track of what scripts have been added (e.g. link may appear many times on a page)
-  const addedJsNames = [ "wrapper" ];
-
   //create a js/script tag for each module used in the page, server-side
   if(moduleRes.js.length) {
-    moduleRes.js.forEach( obj => {
+    //reverse the order, as we want to make sure we load the main page's js last
+    ////as it may have init tags for 
+    const jsRev = moduleRes.js.reverse();
+    jsRev.forEach( obj => {
       if(typeof obj.val === "object" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
         addedJsNames.push(obj.name);
         const path = obj.modulePath.replace("src/", "dist/")

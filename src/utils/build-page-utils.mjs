@@ -7,10 +7,6 @@ import { validateArgs } from "./validation-utils.mjs";
 
 export async function buildPage(options) {
 
-  // console.log("BUILDPAGE - OPTIONS: ", options);
-
-  //const collectedModules = [];
-  
   try {
     validateArgs([
       [options.path, "string"],
@@ -29,15 +25,12 @@ export async function buildPage(options) {
     name: "",
     css: [],
     markup: "",
-    js: {},
-    inits: []
+    js: [],
+    inits: ""
   };
 
 
   async function addModule(modulePath, args) {
-
-    // console.log("ADD MODULE: ", modulePath, "\n", args);
-    // console.log("ADD MODULE: ", modulePath);
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
@@ -49,7 +42,6 @@ export async function buildPage(options) {
     try {
       module = (await import(adjustedPath)).default;    
     } catch (error) {
-      // console.log("IMPORT MODULE ERROR: ", error);
       throw new Error(`IMPORT MODULE: ${error}`);
     }
 
@@ -58,18 +50,6 @@ export async function buildPage(options) {
     } catch (error) {
       console.log("RUN MODULE ERROR: ", error);
     }
-
-    // if(!collectedModules[ moduleRes ]) {
-    //   collectedModules.push(moduleRes);
-    // }
-
-    // if (moduleRes.name === "wrapper") {
-      // console.log("MODULERES: ", moduleRes, "\n\n");
-    // }
-
-    // if (moduleRes.name === "a") {
-    //   console.log("MODULERES", moduleRes);
-    // }
 
     //add a name for the page if it doesn't exist
     if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
@@ -86,53 +66,24 @@ export async function buildPage(options) {
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.js === "object") {
       
-      // const jsObj = {
-      //   // name: moduleRes.name,
-      //   modulePath,
-      //   val: moduleRes.js    
-      // };
-
       if(typeof moduleRes.js.init === "function" && typeof moduleRes.name === "string") {
         const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
-        pageRes.inits.push(`\n p_p.${moduleRes.name}.init(${initArgs});`); 
+        pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
       }
 
-      pageRes.js[ moduleRes.name ] = {
+      pageRes.js.push({
+        name: moduleRes.name,
         modulePath,
         val: moduleRes.js    
-      };
+      });
 
 
     }
-
-    // if(typeof moduleRes?.name === "string" && typeof moduleRes.initArgs === "object") {
-    //   // pageRes.script[moduleRes.name] = moduleRes.script;    
-    //   pageRes.initArgs.push({
-    //     name: moduleRes.name,
-    //     modulePath,
-    //     initArgs: moduleRes.initArgs    
-    //   });
-    // }
-
 
     if(typeof moduleRes?.name === "string" && typeof moduleRes.markup === "string") {
       // pageRes.script[moduleRes.name] = moduleRes.script;    
       pageRes.markup = moduleRes.markup;
     }
-
-    // if(moduleRes?.name === "wrapper" && typeof moduleRes.markup === "string") {
-    //   pageRes.markup = moduleRes.markup;    
-    // }
-
-    // if(modulePath.indexOf("a.mjs") > -1) {
-    //   console.log("ADD MODULE: ", modulePath);
-    //   console.log("PAGERES: ", pageRes);
-    // }
-
-    // if (moduleRes?.name === "wrapper") {
-    //   console.log("MODULERES: ", moduleRes);
-    //   console.log("PAGERES: ", pageRes);
-    // }
 
     return pageRes;
 
@@ -142,8 +93,6 @@ export async function buildPage(options) {
   try {
 
     moduleRes = await addModule(path, { addModule }); 
-
-    // console.log("MODULERES: ", moduleRes);
 
     //add the name for page's main module
     if(typeof moduleRes?.name === "string") {
@@ -164,11 +113,6 @@ export async function buildPage(options) {
     return;
   }
 
-  // if (pageRes?.name === "a") {
-  //   console.log("PAGERES: ", pageRes);
-  // }
-
-  // console.log("PAGERES: ", pageRes);
   return pageRes;
 
 }

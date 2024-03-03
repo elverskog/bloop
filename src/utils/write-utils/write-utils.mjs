@@ -135,20 +135,18 @@ function convertFuncsToStrings(jsObjVal) {
 function writeEachJs(page, index) {
 
   try {
-    validateArgs([[page, "object"], [index, "number"]]); 
+    validateArgs([[page.js, "array"], [index, "number"]]); 
   } catch (error) {
     throw new Error(error);
   }
 
-  // const jsObj = Object.entries(page.js)[index];
-  const jsEntry = Object.entries(page.js)[index];
-  // console.log("JSENTRY: ", jsEntry);
-  const name = jsEntry[0];
-  const jsObj = jsEntry[1];
-  // console.log("JSOBJ: ", jsObj);
+  console.log("PAGE: ", page);
+  const jsObj = page.js[index];
+  const name = jsObj.name;
   const jsVal = jsObj.val;
   const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
-  const inits = page.inits ? page.inits : "";
+  //only add inits (to add listeners for example) if we are creating the main js file
+  const inits = (index === 0 && page.inits) ? page.inits : "";
   let scriptsAsString = convertFuncsToStrings(jsVal);
   let scriptWithWindow = "";
 
@@ -170,7 +168,7 @@ function writeEachJs(page, index) {
   
   index++;
 
-  if (validateObj(Object.entries(page.js)[index][0][1], "object")) {
+  if (validateObj(page.js[index], "object")) {
     writeEachJs(page, index);
   } else {
     //console.log("JS OBJ ERROR: ", page.js[index]);
@@ -192,7 +190,7 @@ export function writeJs(page) {
   
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
-  if (validateObj(Object.entries(page.js)[0][1], "object")) {
+  if (validateObj(page.js[0], "object")) {
     writeEachJs(page, 0);
   } else {
     throw new Error("writeJS failed: js object not valid at first index");
@@ -227,6 +225,12 @@ export function writeMarkup(page) {
 
 
 function cleanObjects(arrayOfObjects, key) {
+
+  let result;
+
+  if(typeof arrayOfObjects [Symbol.iterator] === 'function') {
+
+  }
   return arrayOfObjects.map( obj => {
     const cleanedObj = { ...obj };
     delete cleanedObj[ key ];
