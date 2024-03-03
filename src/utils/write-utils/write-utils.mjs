@@ -132,6 +132,8 @@ function convertFuncsToStrings(jsObjVal) {
 }
 
 
+//function to process/write a file for each module used for a given page
+//it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index) {
 
   try {
@@ -140,7 +142,11 @@ function writeEachJs(page, index) {
     throw new Error(error);
   }
 
-  console.log("PAGE: ", page);
+  if (index === 0) {
+    console.log("MODULE NAME: ", page.js[index].name);
+    console.log("PAGE INITS: ", page.inits);   
+  }
+
   const jsObj = page.js[index];
   const name = jsObj.name;
   const jsVal = jsObj.val;
@@ -180,7 +186,7 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
-  // console.log("PAGE JS: ", Object.entries(page.js)[0][1]);
+  // console.log("PAGE: ", page);
 
   try {
     validateArgs([[page.js, "object"]]); 

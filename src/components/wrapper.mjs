@@ -30,7 +30,7 @@ export default async function wrapper(addModule, args) {
     moduleRes.css.forEach( obj => {
       if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedCssNames.includes(obj.name)) {
         addedCssNames.push(obj.name);
-        const cssPath = obj.modulePath.replace("src/", "dist/")
+        const cssPath = obj.modulePath.replace("src/", "/dist/")
           .replace("components/", "css/")
           .replace("pages/", "css/")
           .replace(".mjs", ".css");
@@ -42,12 +42,13 @@ export default async function wrapper(addModule, args) {
   //create a js/script tag for each module used in the page, server-side
   if(moduleRes.js.length) {
     //reverse the order, as we want to make sure we load the main page's js last
-    ////as it may have init tags for 
-    const jsRev = moduleRes.js.reverse();
+    ////as it may have init tags for
+    //we need to clone it otherwise it messes up the write.js
+    const jsRev = [...moduleRes.js].reverse();
     jsRev.forEach( obj => {
       if(typeof obj.val === "object" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
         addedJsNames.push(obj.name);
-        const path = obj.modulePath.replace("src/", "dist/")
+        const path = obj.modulePath.replace("src/", "/dist/")
           .replace("components/", "js/")
           .replace("pages/", "js/")
           .replace(".mjs", ".js");
