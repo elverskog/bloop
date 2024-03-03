@@ -96,7 +96,7 @@ const server = http.createServer(async (req, res) => {
     headerOptions["Content-Type"] = isFetch ? "json" : "html";
 
     //path to rendered files changes based on if request is for a page or a module
-    const path = isFetch ? `${baseDir}/dist/modules-res${url}.json` : `${baseDir}/dist/markup/${url}.html`;
+    const path = isFetch ? `${baseDir}/dist/modules${url}.json` : `${baseDir}/dist/markup/${url}.html`;
     const fallbackPath = isFetch ? `${baseDir}/dist/modules-res/fourOhFour.json` : `${baseDir}/dist/markup/fourOhFour.html`;
 
     //if there is a file found for the pathname, return it
@@ -159,7 +159,7 @@ if(process.env.NODE_ENV === "production") {
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
-    // writeModule(page);
+    writeModule(page);
   });
 }
 

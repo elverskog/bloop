@@ -231,12 +231,6 @@ export function writeMarkup(page) {
 
 
 function cleanObjects(arrayOfObjects, key) {
-
-  let result;
-
-  if(typeof arrayOfObjects [Symbol.iterator] === 'function') {
-
-  }
   return arrayOfObjects.map( obj => {
     const cleanedObj = { ...obj };
     delete cleanedObj[ key ];
@@ -244,6 +238,14 @@ function cleanObjects(arrayOfObjects, key) {
   });
 }
 
+
+function cleanPage(page, key) {
+  return {
+    css: cleanObjects(page.css, key),
+    markup: page.markup,
+    js: cleanObjects(page.js, key)
+  };
+}
 
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
 export function writeModule(page) {
@@ -253,7 +255,7 @@ export function writeModule(page) {
       [page.modulePath, "string"],
       [page.css, "array"],
       [page.markup, "string"],
-      [page.js, "object"]
+      [page.js, "array"]
     ]); 
   } catch (error) {
     throw new Error(error);
@@ -264,8 +266,10 @@ export function writeModule(page) {
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
+  delete page.inits;
+
   console.log("Page: ", page);
-  const pagePathsRemoved = cleanObjects(page, "modulePath");
+  const pagePathsRemoved = cleanPage(page, "modulePath");
   console.log("Page: ", pagePathsRemoved);
 
   return write2(JSON.stringify(pagePathsRemoved), savePath);
