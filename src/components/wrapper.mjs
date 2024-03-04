@@ -16,12 +16,6 @@ export default async function wrapper(addModule, args) {
     <link id="menuStyles" rel="stylesheet" type="text/css" href="/dist/css/menu.css" />\n
   `;
 
-  //keep track of what scripts have been added (e.g. link may appear many times on a page)
-  const addedJsNames = [ "wrapper" ];
-  //string to store the js tags we will add by footer
-  //add scripts for wrapper as it are not part of body module stack
-  let jsTags = "<script src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
-
   //get menu module
   const menuRes = await addModule("src/components/menu.mjs");
 
@@ -39,6 +33,13 @@ export default async function wrapper(addModule, args) {
     });
   }
 
+
+  //keep track of what scripts have been added (e.g. link may appear many times on a page)
+  const addedJsNames = [ "wrapper" ];
+  //string to store the js tags we will add by footer
+  //add scripts for wrapper as it are not part of body module stack
+  let jsTags = "<script id=\"wrapperScript\" src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
+
   //create a js/script tag for each module used in the page, server-side
   if(moduleRes.js.length) {
     //reverse the order, as we want to make sure we load the main page's js last
@@ -52,7 +53,7 @@ export default async function wrapper(addModule, args) {
           .replace("components/", "js/")
           .replace("pages/", "js/")
           .replace(".mjs", ".js");
-        jsTags += `<script id="${obj.name}Styles" rel="stylesheet" type="text/javascript" src="${path}"></script>\n`;
+        jsTags += `<script id="${obj.name}Script" type="text/javascript" src="${path}"></script>\n`;
       }
     });
   }
@@ -131,6 +132,9 @@ export default async function wrapper(addModule, args) {
         const res = await fetch(pathname, options);
         const resParsed = JSON.parse(await p_p.wrapper.parseAndOutputStream(res));
 
+        console.log("RESPARSED JS: ", resParsed.js);
+        // return;
+
         //add CSS to head
         if(typeof resParsed.css === "object") {       
           p_p.wrapper.insertStyleSheets(resParsed.css, success => {
@@ -142,13 +146,15 @@ export default async function wrapper(addModule, args) {
               //set page title
               document.title = typeof resParsed.title === "string" ? resParsed.title : "Bloop";
               //add scripts to head
-              p_p.wrapper.insertScripts(resParsed.script, success => {
-                if(success) {
-                  console.log("insert scripts succeeded");
-                } else {
-                  console.log("insert scripts failed");
-                }
-              }, window);
+              if (typeof resParsed.js === "object") {
+                p_p.wrapper.insertScripts(resParsed.js, success => {
+                  if(success) {
+                    console.log("insert scripts succeeded");
+                  } else {
+                    console.log("insert scripts failed");
+                  }
+                }, window);
+              }
             } else {
               console.log("insert styles failed");
             }

@@ -113,14 +113,13 @@ export function writeCss(page) {
 
 //this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
 function convertFuncsToStrings(jsObjVal) {
-  
+
+  console.log("CONV FUNC TO STRING: ", jsObjVal);
+
   let result = "";
   let comma;
   let i = 1;
 
-  // console.log("OBJ: ", obj);
-  // console.log("OBJ ENTRIES LENGTH: ", Object.keys(obj).length);
-  
   for(const [key, val] of Object.entries(jsObjVal)) {
     comma = Object.entries(jsObjVal).length === i ? "" : ","; 
     result += `${ key }: ${ val.toString() }${ comma }\n`;
@@ -142,10 +141,10 @@ function writeEachJs(page, index) {
     throw new Error(error);
   }
 
-  if (index === 0) {
-    console.log("MODULE NAME: ", page.js[index].name);
-    console.log("PAGE INITS: ", page.inits);   
-  }
+  // if (index === 0) {
+  //   console.log("MODULE NAME: ", page.js[index].name);
+  //   console.log("PAGE INITS: ", page.inits);   
+  // }
 
   const jsObj = page.js[index];
   const name = jsObj.name;
@@ -207,8 +206,6 @@ export function writeJs(page) {
 }
 
 
-
-
 //function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page) {
 
@@ -247,6 +244,7 @@ function cleanPage(page, key) {
   };
 }
 
+
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
 export function writeModule(page) {
 
@@ -268,13 +266,24 @@ export function writeModule(page) {
 
   delete page.inits;
 
-  console.log("Page: ", page);
+  // console.log("Page: ", page);
   const pagePathsRemoved = cleanPage(page, "modulePath");
-  console.log("Page: ", pagePathsRemoved);
+  // console.log("Page: ", pagePathsRemoved);
+  const jsFuncsToStrings = [];
+
+  console.log("PAGEPATHSREMOVED", pagePathsRemoved.js);
+
+  pagePathsRemoved.js.forEach( mod => {
+    console.log("MOD", mod);
+    jsFuncsToStrings.push(convertFuncsToStrings(mod.val));
+  });
+
+  pagePathsRemoved.js = jsFuncsToStrings;
 
   return write2(JSON.stringify(pagePathsRemoved), savePath);
 
 }
+
 
 // //function to compress and write module results ({css, markup,script})
 // export function writeModuleResult(modulePath, content) {
