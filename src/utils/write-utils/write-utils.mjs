@@ -114,8 +114,6 @@ export function writeCss(page) {
 //this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
 function convertFuncsToStrings(jsObjVal) {
 
-  console.log("CONV FUNC TO STRING: ", jsObjVal);
-
   let result = "";
   let comma;
   let i = 1;
@@ -185,7 +183,7 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
-  // console.log("PAGE: ", page);
+  console.log("PAGE: ", page);
 
   try {
     validateArgs([[page.js, "object"]]); 
@@ -197,8 +195,6 @@ export function writeJs(page) {
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[0], "object")) {
     writeEachJs(page, 0);
-  } else {
-    throw new Error("writeJS failed: js object not valid at first index");
   }
 
   return true;
@@ -271,14 +267,11 @@ export function writeModule(page) {
   // console.log("Page: ", pagePathsRemoved);
   const jsFuncsToStrings = [];
 
-  console.log("PAGEPATHSREMOVED", pagePathsRemoved.js);
-
   pagePathsRemoved.js.forEach( mod => {
-    console.log("MOD", mod);
     jsFuncsToStrings.push(convertFuncsToStrings(mod.val));
   });
 
-  pagePathsRemoved.js = jsFuncsToStrings;
+  pagePathsRemoved.js = JSON.stringify(jsFuncsToStrings);
 
   return write2(JSON.stringify(pagePathsRemoved), savePath);
 

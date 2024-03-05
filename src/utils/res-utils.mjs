@@ -12,7 +12,9 @@ export async function parseAndOutputStream(res) {
   // done  - true if the stream has already given you all its data.
   // value - some data. Always undefined when done is true.
 
-  function processText({ done, value }) {
+  async function processText({ done, value }) {
+
+    console.log("VALUE: ", value);
 
     //exit if stream is fully parsed 
     if (done) return;
@@ -24,11 +26,11 @@ export async function parseAndOutputStream(res) {
     }
 
     // If not done, read some more, and call this function again
-    const newDoneAndVal = reader.read();
+    const newDoneAndVal = await reader.read();
     processText(newDoneAndVal);
 
   }
 
-  return  processText({ done, value });
+  return await processText({ done, value });
 
 }

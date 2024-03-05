@@ -154,13 +154,20 @@ if(process.env.NODE_ENV === "production") {
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");
   // console.log("PAGEPATHSARRAY: ", pagePathsArray);
-  const distFiles = await build(pagePathsArray);
-  distFiles.forEach(page => {
+  const buildObjectFullPages = await build(pagePathsArray, false);
+  const buildObjectModules = await build(pagePathsArray, true);
+
+  buildObjectFullPages.forEach(page => {
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
+  });
+
+  buildObjectModules.forEach(page => {
     writeModule(page);
   });
+
+
 }
 
 server.listen(PORT, () => {

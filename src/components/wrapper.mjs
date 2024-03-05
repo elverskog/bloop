@@ -130,9 +130,10 @@ export default async function wrapper(addModule, args) {
         headers.append("is-fetch", true);
         const options = { headers };  
         const res = await fetch(pathname, options);
-        const resParsed = JSON.parse(await p_p.wrapper.parseAndOutputStream(res));
+        const parsedResStream = await p_p.wrapper.parseAndOutputStream(res);
+        console.log("PARSED RES: ", parsedResStream);
+        const resParsed = JSON.parse(parsedResStream);
 
-        console.log("RESPARSED JS: ", resParsed.js);
         // return;
 
         //add CSS to head
@@ -146,15 +147,17 @@ export default async function wrapper(addModule, args) {
               //set page title
               document.title = typeof resParsed.title === "string" ? resParsed.title : "Bloop";
               //add scripts to head
-              if (typeof resParsed.js === "object") {
-                p_p.wrapper.insertScripts(resParsed.js, success => {
-                  if(success) {
-                    console.log("insert scripts succeeded");
-                  } else {
-                    console.log("insert scripts failed");
-                  }
-                }, window);
-              }
+
+              // if (typeof resParsed.js === "object") {
+              //   p_p.wrapper.insertScripts(resParsed.js, success => {
+              //     if(success) {
+              //       console.log("insert scripts succeeded");
+              //     } else {
+              //       console.log("insert scripts failed");
+              //     }
+              //   }, window);
+              // }
+
             } else {
               console.log("insert styles failed");
             }

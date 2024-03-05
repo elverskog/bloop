@@ -15,20 +15,22 @@
 //only running fn once the CSS is actually "initialized" (so we can then update the HTML and add scripts) 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-export function insertStyleSheets(cssObj, fn, scope) {
+export function insertStyleSheets(cssArray, fn, scope) {
+
+  console.log("CSS ARRAY: ", cssArray);
 
   //create an array that just lists the key of each succesfully inserted 
   //I use an object to just automatically avoid duplicates, that would come with an array
   //TODO maybe this can just be a count or a boolean?
   const completed = {};
 
-  //create a interval loop that checks if a stylesheet has been properly added for each module cssObj
+  //create a interval loop that checks if a stylesheet has been properly added for each module cssArray
   const intervalAll = setInterval(() =>
     {
       try {
         //I don't check one by one here as completedArray can't have dupes
-        if (Object.keys(completed).length === Object.keys(cssObj).length) {
-          //based on if each element in cssObj has "loaded" set (as true)
+        if (Object.keys(completed).length === Object.keys(cssArray).length) {
+          //based on if each element in cssArray has "loaded" set (as true)
           clearInterval(intervalAll);
           clearTimeout(timeoutAll);
           fn.call(scope || window, true);
@@ -47,24 +49,27 @@ export function insertStyleSheets(cssObj, fn, scope) {
     }, 7000);
 
   //function to load, validate and insert each into DOM, and update the list of completed modules
-  function insertEach(moduleName, css) {
+  function insertEach(name, val) {
+
+    console.log("NAME: ", name);
+    console.log("VAL: ", val);
 
     //if there is already a link with the ID passed, 
     //mark that module as done in "completed" and exit
-    const existingMatch = document.getElementById(`${moduleName}Styles`);
+    const existingMatch = document.getElementById(`${name}Styles`);
     if(existingMatch) {
-      completed[moduleName] = true;
+      completed[name] = true;
       return;
     }
 
     //create blob for value (CSS string) and turn it into a DOM link element
-    const styleBlob = new Blob([css], { type: "text/css" });
+    const styleBlob = new Blob([val], { type: "text/css" });
     const objectURL = URL.createObjectURL(styleBlob);
     const linkEl = document.createElement("link");
     linkEl.setAttribute("type", "text/css");
     linkEl.setAttribute("rel", "stylesheet");
     linkEl.setAttribute("href", objectURL);
-    linkEl.setAttribute("id", `${moduleName}Styles`);
+    linkEl.setAttribute("id", `${name}Styles`);
     
     // get the correct properties to check for depending on the browser
     const sheet = ("sheet" in linkEl) ? "sheet" : "styleSheet";
@@ -78,7 +83,7 @@ export function insertStyleSheets(cssObj, fn, scope) {
             // our style sheet has loaded, clear the counters, mark that module as done in "completed" and exit
             clearInterval(intervalEach);
             clearTimeout(timeoutEach);
-            completed[moduleName] = true;
+            completed[name] = true;
           }
         } catch (err) { 
           console.error(err);
@@ -100,10 +105,10 @@ export function insertStyleSheets(cssObj, fn, scope) {
   
   }
     
-  //iterate through cssObject and call function to load, validate and insert each into DOM
-  console.log("OBJECT ENTRIES: ", Object.entries);
-  for(const [moduleName, css] of Object.entries(cssObj)) {
-    insertEach(moduleName, css);
+  //iterate through cssArray and call function to load, validate and insert each into DOM
+  // console.log("CSS ARRAY ===== ", cssArray);
+  for(const cssObject of cssArray) {
+    insertEach(cssObject.name, cssObject.val);
   }
 
 }
@@ -172,7 +177,6 @@ export function insertScripts(js, fn, window) {
 
     console.log("INSERTEACH JSOBJ: ", jsObj);
     console.log("INSERTEACH JSOBJ VAL: ", jsObj.val);
-    console.log("INSERTEACH JSOBJ VAL LEN: ", Object.keys(jsObj.val).length);
 
     if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "object" || !Object.keys(jsObj.val).length) {
       console.log("insertEach passed bad value");

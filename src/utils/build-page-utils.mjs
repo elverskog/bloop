@@ -106,11 +106,13 @@ export async function buildPage(options) {
 
 
   // get the wrapper for the page
-  try {
-    await addModule("src/components/wrapper.mjs", { addModule, moduleRes });
-  } catch(err) {
-    console.log("buildPage: add wrapper error: ", err);
-    return;
+  if (!isFetch) {
+    try {
+      await addModule("src/components/wrapper.mjs", { addModule, moduleRes });
+    } catch(err) {
+      console.log("buildPage: add wrapper error: ", err);
+      return;
+    }
   }
 
   return pageRes;

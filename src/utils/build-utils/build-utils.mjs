@@ -6,11 +6,12 @@ import { validateArgs } from "../validation-utils.mjs";
 import { buildPage } from "../build-page-utils.mjs";
 
 
-export async function build(pagePathsArray) {
+export async function build(pagePathsArray, isFetch) {
 
   try {
     validateArgs([
-      [pagePathsArray, "array"]
+      [pagePathsArray, "array"],
+      [isFetch, "boolean"]
     ]); 
   } catch (error) {
     console.log("CAUGHT ERROR: ", error);
@@ -18,7 +19,7 @@ export async function build(pagePathsArray) {
   }
 
   const masterRes = Promise.all(pagePathsArray.map( async path => {
-    return await buildPage({ path, isFetch: false, res: null, isBuild: true });
+    return await buildPage({ path, isFetch, res: null, isBuild: true });
   }));
 
   return masterRes;
