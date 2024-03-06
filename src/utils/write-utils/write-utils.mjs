@@ -183,8 +183,6 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
-  console.log("PAGE: ", page);
-
   try {
     validateArgs([[page.js, "object"]]); 
   } catch (error) {
@@ -234,6 +232,7 @@ function cleanObjects(arrayOfObjects, key) {
 
 function cleanPage(page, key) {
   return {
+    title: page.title,
     css: cleanObjects(page.css, key),
     markup: page.markup,
     js: cleanObjects(page.js, key)
@@ -244,8 +243,11 @@ function cleanPage(page, key) {
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
 export function writeModule(page) {
 
+  console.log("WRITEMODULE PAGE: ", page);
+
   try {
     validateArgs([
+      [page.title, "string"],
       [page.modulePath, "string"],
       [page.css, "array"],
       [page.markup, "string"],

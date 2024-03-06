@@ -21,8 +21,9 @@ export async function buildPage(options) {
   const { path, isFetch, isBuild } = options;
   let moduleRes;
   const pageRes = {
-    modulePath: path,  //add the pathname into the page output. Need to know where to write dist files
+    title: "",
     name: "",
+    modulePath: path,  //add the pathname into the page output. Need to know where to write dist files
     css: [],
     markup: "",
     js: [],
@@ -51,11 +52,17 @@ export async function buildPage(options) {
       console.log("RUN MODULE ERROR: ", error);
     }
 
+    //add a title for the page if it doesn't exist
+    if(typeof moduleRes?.title === "string" && !pageRes.title.length) {
+      pageRes.title = moduleRes.title;    
+    }
+
     //add a name for the page if it doesn't exist
     if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
       pageRes.name = moduleRes.name;    
     }
 
+    // add CSS
     if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
       pageRes.css.push({
         name: moduleRes.name,
@@ -64,6 +71,7 @@ export async function buildPage(options) {
       });
     }
 
+    // add JS
     if(typeof moduleRes?.name === "string" && typeof moduleRes.js === "object") {
       
       if(typeof moduleRes.js.init === "function" && typeof moduleRes.name === "string") {
@@ -94,10 +102,11 @@ export async function buildPage(options) {
 
     moduleRes = await addModule(path, { addModule }); 
 
+    //add the title for page's main module (used for setting the page title on frontend)
+    pageRes.title = typeof moduleRes?.title === "string" ? moduleRes.title : ""; 
+
     //add the name for page's main module
-    if(typeof moduleRes?.name === "string") {
-      pageRes.name = moduleRes.name;    
-    }
+    pageRes.name = typeof moduleRes?.name === "string" ? moduleRes.name : "";    
 
   } catch(err) {
     console.log("buildPage: add module error: ", err);
