@@ -17,8 +17,6 @@
 
 export function insertStyleSheets(cssArray, fn, scope) {
 
-  console.log("CSS ARRAY: ", cssArray);
-
   //create an array that just lists the key of each succesfully inserted 
   //I use an object to just automatically avoid duplicates, that would come with an array
   //TODO maybe this can just be a count or a boolean?
@@ -50,9 +48,6 @@ export function insertStyleSheets(cssArray, fn, scope) {
 
   //function to load, validate and insert each into DOM, and update the list of completed modules
   function insertEach(name, val) {
-
-    console.log("NAME: ", name);
-    console.log("VAL: ", val);
 
     //if there is already a link with the ID passed, 
     //mark that module as done in "completed" and exit
@@ -129,6 +124,7 @@ export function insertStyleSheets(cssArray, fn, scope) {
 
 export function insertScripts(js, fn, window) {
 
+  console.log("JS TYPE..... ", typeof js);
   console.log("JS ..... ", js);
 
   //run callback with false if window doesn't exist
@@ -174,9 +170,6 @@ export function insertScripts(js, fn, window) {
 
   //function to load, validate and insert each into DOM, and update the list of completed modules
   function insertEach(jsObj) {
-
-    console.log("INSERTEACH JSOBJ: ", jsObj);
-    console.log("INSERTEACH JSOBJ VAL: ", jsObj.val);
 
     if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "object" || !Object.keys(jsObj.val).length) {
       console.log("insertEach passed bad value");
@@ -232,7 +225,7 @@ export function insertScripts(js, fn, window) {
     
   //iterate through jsObject and call function to load, validate and insert each into DOM
   for(const jsObj of js) {
-    console.log("JS OBJ ---- ", jsObj);
+    // console.log("JS OBJ ---- ", jsObj);
     insertEach(jsObj);
   }
 

@@ -78,6 +78,7 @@ export function writeCss(page) {
   
     const cssObj = page.css[index];
     const val = cssObj.val;
+
     const savePath = cssObj.modulePath
       .replace("src", "dist")
       .replace("pages", "css")
@@ -133,16 +134,14 @@ function convertFuncsToStrings(jsObjVal) {
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index) {
 
+
+  console.log("WRITEJS PAGE.js: ", page.js[index]);
+
   try {
-    validateArgs([[page.js, "array"], [index, "number"]]); 
+    validateArgs([[page.js, "object"], [index, "number"]]); 
   } catch (error) {
     throw new Error(error);
   }
-
-  // if (index === 0) {
-  //   console.log("MODULE NAME: ", page.js[index].name);
-  //   console.log("PAGE INITS: ", page.inits);   
-  // }
 
   const jsObj = page.js[index];
   const name = jsObj.name;
@@ -150,11 +149,11 @@ function writeEachJs(page, index) {
   const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
   //only add inits (to add listeners for example) if we are creating the main js file
   const inits = (index === 0 && page.inits) ? page.inits : "";
-  let scriptsAsString = convertFuncsToStrings(jsVal);
   let scriptWithWindow = "";
 
-  if (typeof scriptsAsString === "string" && typeof name === "string") {
-    scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
+  if (typeof jsVal === "string" && typeof name === "string") {
+    // scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
+    scriptWithWindow += `window.p_p.${jsObj.name} = \n${jsVal}\n`;
   } else {
     throw new Error("1. writeJS failed because scriptAsString or savePath invalid");
   }
@@ -163,7 +162,9 @@ function writeEachJs(page, index) {
   //check for inits in page and add them to the end of said js file
   scriptWithWindow += inits;
 
-  if (typeof scriptsAsString === "string" && typeof savePath === "string") {
+  // console.log("SCRIPTWITHWINDOW: ", scriptWithWindow);
+
+  if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
     write2(scriptWithWindow, savePath);
   } else {
     throw new Error("2. writeJS failed because scriptResAll or savePath invalid");
@@ -171,10 +172,8 @@ function writeEachJs(page, index) {
   
   index++;
 
-  if (validateObj(page.js[index], "object")) {
+  if (validateObj(page.js[index], "string")) {
     writeEachJs(page, index);
-  } else {
-    //console.log("JS OBJ ERROR: ", page.js[index]);
   }
 
 }
@@ -183,15 +182,16 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
+
   try {
-    validateArgs([[page.js, "object"]]); 
+    validateArgs([[page.js, "array"]]); 
   } catch (error) {
     throw new Error(error);
   }
   
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
-  if (validateObj(page.js[0], "object")) {
+  if (validateObj(page.js[0], "string")) {
     writeEachJs(page, 0);
   }
 
@@ -243,8 +243,6 @@ function cleanPage(page, key) {
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
 export function writeModule(page) {
 
-  console.log("WRITEMODULE PAGE: ", page);
-
   try {
     validateArgs([
       [page.title, "string"],
@@ -264,9 +262,7 @@ export function writeModule(page) {
 
   delete page.inits;
 
-  // console.log("Page: ", page);
   const pagePathsRemoved = cleanPage(page, "modulePath");
-  // console.log("Page: ", pagePathsRemoved);
   const jsFuncsToStrings = [];
 
   pagePathsRemoved.js.forEach( mod => {
@@ -278,35 +274,3 @@ export function writeModule(page) {
   return write2(JSON.stringify(pagePathsRemoved), savePath);
 
 }
-
-
-// //function to compress and write module results ({css, markup,script})
-// export function writeModuleResult(modulePath, content) {
-
-//   if(typeof modulePath === "string" && typeof content === "string") {
-
-//     //change path of module to that of where we should store the page in /dist
-//     const pagePath = modulePath.replace("src", "dist").replace("pages", "modules-res").replace("mjs", "json");
-
-//     //if in PROD, exit if the file exists (on dev always write the file)
-//     if(process.env.NODE_ENV === "production" && fs.existsSync(pagePath)) return;
-
-//     //if the dirs in the path don't exist create them
-//     const pageDirPath = pagePath.split("/").slice(0, -1).join("/").toString();
-
-//     if(!fs.existsSync(pageDirPath)) {
-//       fs.mkdirSync(pageDirPath, { recursive: true });
-//     }
-
-//     //brotli compress the string
-//     const buff = Buffer.from(content, "utf-8");
-//     const compressed = brotli.compress(buff, brotliSettings);
-//     //const compressed = content;
-
-//     fs.writeFileSync(pagePath, compressed);
-
-//   } else {
-//     console.log("compressAndWrite passed invalid module output", modulePath);
-//   }
-
-// }

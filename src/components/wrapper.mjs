@@ -47,7 +47,7 @@ export default async function wrapper(addModule, args) {
     //we need to clone it otherwise it messes up the write.js
     const jsRev = [...moduleRes.js].reverse();
     jsRev.forEach( obj => {
-      if(typeof obj.val === "object" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
+      if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
         addedJsNames.push(obj.name);
         const path = obj.modulePath.replace("src/", "/dist/")
           .replace("components/", "js/")
@@ -146,17 +146,17 @@ export default async function wrapper(addModule, args) {
               targetEl.innerHTML = resParsed.markup;
               //set page title
               document.title = typeof resParsed.title === "string" ? resParsed.title : "Bloop";
-              //add scripts to head
+              //add scripts by footer
 
-              // if (typeof resParsed.js === "object") {
-              //   p_p.wrapper.insertScripts(resParsed.js, success => {
-              //     if(success) {
-              //       console.log("insert scripts succeeded");
-              //     } else {
-              //       console.log("insert scripts failed");
-              //     }
-              //   }, window);
-              // }
+              if (typeof resParsed.js[Symbol.iterator] === "function") {
+                p_p.wrapper.insertScripts(resParsed.js, success => {
+                  if(success) {
+                    console.log("insert scripts succeeded");
+                  } else {
+                    console.log("insert scripts failed");
+                  }
+                }, window);
+              }
 
             } else {
               console.log("insert styles failed");

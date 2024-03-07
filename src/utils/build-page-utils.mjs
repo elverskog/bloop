@@ -5,6 +5,24 @@ import { validateArgs } from "./validation-utils.mjs";
 // and also needs to be passed down the "chain" of module thay might comprise a page
 
 
+//this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
+function convertJsToString(jsObjVal) {
+
+  let resultInner = "";
+  let result = "";
+
+  for(const [key, val, index] of Object.entries(jsObjVal)) {
+    const comma = (index !== Object.entries.length - 1) ? ",\n" : "\n";
+    resultInner += `${ key }: ${ val.toString() }${ comma }`; 
+  }
+
+  result = `\n{ ${ resultInner } \n}`; 
+
+  return result;
+
+}
+
+
 export async function buildPage(options) {
 
   try {
@@ -79,10 +97,15 @@ export async function buildPage(options) {
         pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
       }
 
+  
+      let jsValAsString = convertJsToString(moduleRes.js);
+     
+      // console.log("JSVALASSTRINGS: ", jsValAsStrings);
+
       pageRes.js.push({
         name: moduleRes.name,
         modulePath,
-        val: moduleRes.js    
+        val: jsValAsString 
       });
 
 
