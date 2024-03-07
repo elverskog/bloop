@@ -171,8 +171,8 @@ export function insertScripts(js, fn, window) {
   //function to load, validate and insert each into DOM, and update the list of completed modules
   function insertEach(jsObj) {
 
-    if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "object" || !Object.keys(jsObj.val).length) {
-      console.log("insertEach passed bad value");
+    if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "string") {
+      console.log("insertEach JS passed bad value");
       return;
     }
 
@@ -184,7 +184,8 @@ export function insertScripts(js, fn, window) {
     }
     
     //create blob for value (JS string) and turn it into a DOM link element
-    const scriptBlob = new Blob([jsObj.val], { type: "text/javascript" });
+    const jsValWithP_P = `window.p_p.${ jsObj.name } = ${ jsObj.val }`;
+    const scriptBlob = new Blob([jsValWithP_P], { type: "text/javascript" });
     const objectUrl = URL.createObjectURL(scriptBlob);
     const scriptEl = document.createElement("script");
     scriptEl.setAttribute("type", "module");

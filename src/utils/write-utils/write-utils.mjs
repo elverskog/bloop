@@ -112,24 +112,6 @@ export function writeCss(page) {
 }
 
 
-//this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
-function convertFuncsToStrings(jsObjVal) {
-
-  let result = "";
-  let comma;
-  let i = 1;
-
-  for(const [key, val] of Object.entries(jsObjVal)) {
-    comma = Object.entries(jsObjVal).length === i ? "" : ","; 
-    result += `${ key }: ${ val.toString() }${ comma }\n`;
-    i++;
-  }
-  
-  return `{\n\t${result}\n}`;
-
-}
-
-
 //function to process/write a file for each module used for a given page
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index) {
@@ -263,13 +245,11 @@ export function writeModule(page) {
   delete page.inits;
 
   const pagePathsRemoved = cleanPage(page, "modulePath");
-  const jsFuncsToStrings = [];
 
-  pagePathsRemoved.js.forEach( mod => {
-    jsFuncsToStrings.push(convertFuncsToStrings(mod.val));
-  });
 
-  pagePathsRemoved.js = JSON.stringify(jsFuncsToStrings);
+  //pagePathsRemoved.js = JSON.stringify([...pagePathsRemoved].js.val);
+
+  console.log("PAGEPATHSREMOVED: ", pagePathsRemoved);
 
   return write2(JSON.stringify(pagePathsRemoved), savePath);
 
