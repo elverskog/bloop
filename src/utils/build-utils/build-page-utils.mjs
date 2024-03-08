@@ -1,4 +1,4 @@
-import { validateArgs } from "./validation-utils.mjs";
+import { validateArgs } from "../validation-utils.mjs";
 
 //function to add module to a dictionary/object of results
 //it is used in the buildPage function
@@ -53,7 +53,7 @@ export async function buildPage(options) {
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
-    const adjustedPath = isBuild ? `../../${path}` : `../src/pages${path}.mjs`;
+    const adjustedPath = isBuild ? `../../../${path}` : `../../src/pages${path}.mjs`;
 
     let module;
     let moduleRes;
