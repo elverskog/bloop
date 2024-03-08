@@ -146,7 +146,7 @@ function writeEachJs(page, index) {
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
     write2(scriptWithWindow, savePath);
   } else {
-    throw new Error("WriteJs passed invalid page object")
+    throw new Error("writeJs passed invalid page object")
   }
   
   index++;
@@ -172,7 +172,7 @@ export function writeJs(page) {
   if (validateObj(page.js[0], "string")) {
     writeEachJs(page, 0);
   } else {
-    throw new Error("WriteJs passed invalid page object")
+    throw new Error("writeJs passed invalid page object")
   } 
 
   return true;
