@@ -124,9 +124,6 @@ export function insertStyleSheets(cssArray, fn, scope) {
 
 export function insertScripts(js, fn, window) {
 
-  console.log("JS TYPE..... ", typeof js);
-  console.log("JS ..... ", js);
-
   //run callback with false if window doesn't exist
   if(typeof window !== "object") {
     fn.call(window, false);

@@ -105,12 +105,10 @@ tap.test("write CSS tests", t => {
     }]
   };
 
-  // t.throws(() => writeCss(pageMissingModulePath), {
-  //   message: "Error: writePage outer - modulePath or val is not a string"
-  // }, "pageMissingModulePath");
-
   t.throws(() => writeCss(pageMissingModulePath), Error, `pageMissingModulePath ${ Error }`);
   t.match(fs.existsSync("dist/css/test.css"), false, "writeCssOrJs should fail to write test.mjs because modulePath is missing");
+
+  //////////////////////////////////////////////
 
   const pageMissingVal = {
     css: [{
@@ -121,7 +119,7 @@ tap.test("write CSS tests", t => {
   t.throws(() => writeCss(pageMissingVal), Error, `pageMissingVal ${ Error }`);
   t.match(fs.existsSync("dist/css/test.mjs"), false, "writeCssOrJs failed to write test.mjs because css is missing");
 
-  //////////////////////////////////////////////
+  // //////////////////////////////////////////////
 
   const pageBadPath = {
     css: [{
@@ -134,8 +132,8 @@ tap.test("write CSS tests", t => {
     }]
   };
 
-  t.throws(() => writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
-  t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
+  t.throws(writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
+  t.match(fs.existsSync("dist/css-test/test.css"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
 
   t.end();
 
@@ -146,34 +144,30 @@ tap.test("write CSS tests", t => {
 
 tap.test("write JS tests", t => {
  
-  const testFunction = function() {};
-
   clearFiles(["dist/js-test"]);
 
   const page = {
     js: [{
+      name: "test",
       modulePath: "src/components/test.mjs",
-      val: { init: testFunction }
+      val: "{ init: testFunction }"
     }]
   };
 
   t.match(writeJs(page), true, "writeJs returned true");
   t.match(fs.existsSync("dist/js/test.js"), true, "writeJs wrote test.js");
 
-
   clearFiles(["dist/js"]);
 
   //////////////////////////////////////////////
 
-  const pageMissingVal = {
+  const pageMissingVal = [{
     js: [{
       modulePath: "src/components/test.mjs"
     }]
-  };
+  }];
 
-  // t.match(writeJs(pageMissingVal), false, "writeJsOrJs returned false");
-
-  t.throws(() => writeJs(pageMissingVal), Error, "writeJS failed page.js does not exist at first index");
+  t.throws(() => writeJs(pageMissingVal), Error("validateArgs - undefined isn't array"), "writeJs passed invalid page object");
   t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs failed to write test.mjs because js val is missing");
 
   //////////////////////////////////////////////
@@ -181,11 +175,11 @@ tap.test("write JS tests", t => {
   const pageBadJs = {
     js: [{
       modulePath: "src/components/test.mjs",
-      val: "dfsfsdfsd"
+      val: null
     }]
   };
 
-  t.throws(() => writeJs(pageBadJs), Error, "writeJS failed page.js does not exist at first index");
+  t.throws(() => writeJs(pageBadJs), Error("WriteJs passed invalid page object"), "writeJs passed invalid page object");
   t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js val is bad");
 
   //////////////////////////////////////////////
@@ -193,22 +187,24 @@ tap.test("write JS tests", t => {
   const pageBadPath = {
     js: [{
       modulePath: "blah/js-test/test.mjs",
-      val: { init: testFunction }
+      val: "{ init: testFunction }"
     }]
   };
 
-  t.throws(() => writeJs(pageBadPath), Error, "writeJS failed page.js does not exist at first index");
+  // console.log(writeJs(pageBadPath));
+
+  t.throws(() => writeJs(pageBadPath), Error("1. writeJS failed because scriptAsString or savePath invalid"), "writeJs passed invalid page object");
   t.match(fs.existsSync("dist/css-test/test.html"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
 
   //////////////////////////////////////////////
 
   const pageMissingModulePath = {
     js: [{
-      val: { init: testFunction }
+      val: "{ init: testFunction }"
     }]
   };
 
-  t.throws(() => writeJs(pageMissingModulePath), Error, "writeJS failed page.js does not exist at first index");
+  t.throws(() => writeJs(pageMissingModulePath), Error, "writeJs passed invalid page object");
   t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs should fail to write test.mjs because modulePath is missing");
 
   //////////////////////////////////////////////

@@ -6,8 +6,6 @@ tap.test("buildPage, when passed a path to a page, with valid structure, should 
   const path = "src/utils/build-utils/mocks/mock-page.mjs";
   const result = await buildPage({ path, isFetch: false, isBuild: true });
 
-  console.log("RESULT IN TEST: ", result);
-
   t.match(result, {
     modulePath: String,
     name: String,

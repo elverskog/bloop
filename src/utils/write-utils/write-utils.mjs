@@ -116,9 +116,6 @@ export function writeCss(page) {
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index) {
 
-
-  console.log("WRITEJS PAGE.js: ", page.js[index]);
-
   try {
     validateArgs([[page.js, "object"], [index, "number"]]); 
   } catch (error) {
@@ -149,7 +146,7 @@ function writeEachJs(page, index) {
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
     write2(scriptWithWindow, savePath);
   } else {
-    throw new Error("2. writeJS failed because scriptResAll or savePath invalid");
+    throw new Error("WriteJs passed invalid page object")
   }
   
   index++;
@@ -164,7 +161,6 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
-
   try {
     validateArgs([[page.js, "array"]]); 
   } catch (error) {
@@ -175,7 +171,9 @@ export function writeJs(page) {
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[0], "string")) {
     writeEachJs(page, 0);
-  }
+  } else {
+    throw new Error("WriteJs passed invalid page object")
+  } 
 
   return true;
 
