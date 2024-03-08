@@ -1,8 +1,6 @@
-//if the command "npm prod" is run, here we run code to build every page found in /pages
-//for each page the HTML, CSS and JS for each will be stored in an analogous location in /dist
+//if the command "npm prod" is run, here we run code to buildPage every page found in /pages
 
 import { validateArgs } from "../validation-utils.mjs";
-// import fsExtra from "fs-extra";
 import { buildPage } from "../build-page-utils.mjs";
 
 
