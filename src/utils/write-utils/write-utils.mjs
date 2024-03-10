@@ -247,7 +247,7 @@ export function writeModule(page) {
 
   //pagePathsRemoved.js = JSON.stringify([...pagePathsRemoved].js.val);
 
-  console.log("PAGEPATHSREMOVED: ", pagePathsRemoved);
+  // console.log("PAGEPATHSREMOVED: ", pagePathsRemoved);
 
   return write2(JSON.stringify(pagePathsRemoved), savePath);
 

@@ -108,20 +108,24 @@ const server = http.createServer(async (req, res) => {
       console.log("server.mjs read file error: ", error);
     }
 
-    //if no file was found, try to create it and return the result
-    if (typeof output !== "object") {
+    //if no file was found, or we are in dev mode, try to create it and return the result
+    if(process.env.NODE_ENV === "development" || typeof output !== "object") {
       try {
 
-        const page = await buildPage({ path, isFetch, isProd: true });
+        const modulePath = `src/pages${ url }.mjs`;
+        console.log("MODULEPATH: ", modulePath);
 
-        console.log("PAGE: ", page);
+        const pageAsModule = await buildPage({ path: modulePath, isFetch: true, isProd: true });
+        const pageFull = await buildPage({ path: modulePath, isFetch: false, isProd: true });
+
+        // console.log("PAGE: ", page);
 
         if (isFetch) {
-          writeModule(page);
+          writeModule(pageAsModule);
         } else {
-          writeMarkup(page);
-          writeCss(page);
-          writeJs(page);
+          writeMarkup(pageFull);
+          writeCss(pageFull);
+          writeJs(pageFull);
         }
 
         output = fs.readFileSync(path, {});
@@ -182,11 +186,11 @@ if(process.env.NODE_ENV === "production") {
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");
-  // console.log("PAGEPATHSARRAY: ", pagePathsArray);
+  console.log("PAGEPATHSARRAY: ", pagePathsArray);
   const buildObjectFullPages = await build(pagePathsArray, false, true);
   const buildObjectModules = await build(pagePathsArray, true, true);
 
-  console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
+  // console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
 
   buildObjectFullPages.forEach(page => {
     writeMarkup(page);

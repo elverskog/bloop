@@ -75,9 +75,6 @@ export function getAllFiles(dirPath, result = [], extension = "mjs") {
   try {
 
     const currentFiles = fs.readdirSync(`./${dirPath}`);
-    // const currentFiles = fs.readdirSync(`./`);
-   
-    // console.log("CURRENT FILES: ", currentFiles);
 
     //loop through the files found
     currentFiles.forEach(function(file) {
@@ -89,7 +86,6 @@ export function getAllFiles(dirPath, result = [], extension = "mjs") {
         //TODO should I check the mime-type?
         // with something like https://www.npmjs.com/package/mime-types?
         result.push(`${dirPath}/${file}`);
-        // result.push(`${file}`);
       }
     });
 
