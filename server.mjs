@@ -97,7 +97,7 @@ const server = http.createServer(async (req, res) => {
 
     //path to rendered files changes based on if request is for a page or a module
     const path = isFetch ? `${baseDir}/dist/modules${url}.json` : `${baseDir}/dist/markup/${url}.html`;
-    const fallbackPath = isFetch ? `${baseDir}/dist/modules-res/fourOhFour.json` : `${baseDir}/dist/markup/fourOhFour.html`;
+    const fallbackPath = isFetch ? `${baseDir}/dist/modules/fourOhFour.json` : `${baseDir}/dist/markup/fourOhFour.html`;
 
     //if there is a file found for the pathname, return it
     //else compile the module(s) and write the related files
@@ -127,8 +127,18 @@ const server = http.createServer(async (req, res) => {
 
     //if we couldn't find and return a 404 page or module from dist, return a simple error message
     if (typeof output !== "object") {
-      output = "Sorry, an error occured trying to return this page"; 
-      console.log("server.mjs falling back to plain error message");
+      output = JSON.stringify({ 
+        title: "Error",
+        css: [{
+          name: "moduleFailedError",
+          val: `\n .module-failed-error { 
+            color: #ff0000;
+            text-align: center;
+          } /n`
+        }],
+        markup: "<p class=\"module-failed-error\">Sorry, an error occured trying to return this content.</p>" 
+      }); 
+      console.error("server.mjs falling back to plain error message");
     }
 
 

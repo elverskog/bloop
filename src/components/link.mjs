@@ -42,11 +42,12 @@ export default async function link (addModule, args) {
       
         if(typeof window === "object") {
 
-          console.log("INIT LINK");
           
           const { pathname } = args;
           const el = document.getElementById(pathname);
           
+          console.log(`INIT LINK ${ pathname }`);
+
           if(typeof el === "object") {
             el.addEventListener("click", event => {
               event.preventDefault();
