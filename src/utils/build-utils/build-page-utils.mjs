@@ -1,11 +1,11 @@
 import { validateArgs } from "../validation-utils.mjs";
 
 //function to add module to a dictionary/object of results
-//it is used in the buildPage function
-// and also needs to be passed down the "chain" of module thay might comprise a page
+//it  used in the buildPage function
+// and also needs to be passed down the "chain" of module thay might compre a page
 
 
-//this converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
+//th converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
 function convertJsToString(jsObjVal) {
 
   let resultInner = "";
@@ -25,23 +25,25 @@ function convertJsToString(jsObjVal) {
 
 export async function buildPage(options) {
 
+  console.log("BUILDPAGE: ",  options);
+
   try {
     validateArgs([
       [options.path, "string"],
       [options.isFetch, "boolean"],
-      [options.isBuild, "boolean"]
+      [options.isProd, "boolean"]
     ]); 
   } catch (error) {
-    return;
+    throw new Error(error)
   }
 
 
-  const { path, isFetch, isBuild } = options;
+  const { path, isFetch, isProd } = options;
   let moduleRes;
   const pageRes = {
     title: "",
     name: "",
-    modulePath: path,  //add the pathname into the page output. Need to know where to write dist files
+    modulePath: path,  //add the pathname into the page output. Need to know where to write dt files
     css: [],
     markup: "",
     js: [],
@@ -53,7 +55,7 @@ export async function buildPage(options) {
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
-    const adjustedPath = isBuild ? `../../../${path}` : `../../src/pages${path}.mjs`;
+    const adjustedPath = isProd ? `../../../${path}` : `../../src/pages${path}.mjs`;
 
     let module;
     let moduleRes;
@@ -70,12 +72,12 @@ export async function buildPage(options) {
       console.log("RUN MODULE ERROR: ", error);
     }
 
-    //add a title for the page if it doesn't exist
+    //add a title for the page if it doesn't ext
     if(typeof moduleRes?.title === "string" && !pageRes.title.length) {
       pageRes.title = moduleRes.title;    
     }
 
-    //add a name for the page if it doesn't exist
+    //add a name for the page if it doesn't ext
     if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
       pageRes.name = moduleRes.name;    
     }

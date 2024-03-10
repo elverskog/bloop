@@ -17,7 +17,7 @@ export async function build(pagePathsArray, isFetch) {
   }
 
   const masterRes = Promise.all(pagePathsArray.map( async path => {
-    return await buildPage({ path, isFetch, res: null, isBuild: true });
+    return await buildPage({ path, isFetch, isProd: true });
   }));
 
   return masterRes;

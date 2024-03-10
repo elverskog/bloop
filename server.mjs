@@ -1,8 +1,9 @@
 import http from "http";
 import fs from "fs";
-import moduleCompiler from "./src/moduleCompiler.mjs";
+// import moduleCompiler from "./src/moduleCompiler.mjs";
 // import { build } from "./src/utils/build-utils.mjs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
+import { buildPage } from "./src/utils/build-utils/build-page-utils.mjs";
 import { 
   clearFiles, 
   utilBaseDir,
@@ -110,7 +111,21 @@ const server = http.createServer(async (req, res) => {
     //if no file was found, try to create it and return the result
     if (typeof output !== "object") {
       try {
-        output = await moduleCompiler({ url, isFetch, res, baseDir });
+
+        const page = await buildPage({ path, isFetch, isProd: true });
+
+        console.log("PAGE: ", page);
+
+        if (isFetch) {
+          writeModule(page);
+        } else {
+          writeMarkup(page);
+          writeCss(page);
+          writeJs(page);
+        }
+
+        output = fs.readFileSync(path, {});
+
       } catch (error) {
         console.log("server.js module compile error", error); 
       }
@@ -127,18 +142,22 @@ const server = http.createServer(async (req, res) => {
 
     //if we couldn't find and return a 404 page or module from dist, return a simple error message
     if (typeof output !== "object") {
-      output = JSON.stringify({ 
-        title: "Error",
-        css: [{
-          name: "moduleFailedError",
-          val: `\n .module-failed-error { 
-            color: #ff0000;
-            text-align: center;
-          } /n`
-        }],
-        markup: "<p class=\"module-failed-error\">Sorry, an error occured trying to return this content.</p>" 
-      }); 
       console.error("server.mjs falling back to plain error message");
+      if(isFetch) {
+        output = JSON.stringify({ 
+          title: "Error",
+          css: [{
+            name: "moduleFailedError",
+            val: `\n .module-failed-error { 
+              color: #ff0000;
+              text-align: center;
+            } /n`
+          }],
+          markup: "<p class=\"module-failed-error\">Sorry, an error occured trying to return this content.</p>" 
+        }); 
+      } else {
+        output = "<p style=\"color: #ff0000; text-align: center\">Sorry, an error occured trying to return this content.</p>"; 
+      }
     }
 
 
@@ -164,8 +183,10 @@ if(process.env.NODE_ENV === "production") {
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
   const pagePathsArray = getAllFiles("src/pages");
   // console.log("PAGEPATHSARRAY: ", pagePathsArray);
-  const buildObjectFullPages = await build(pagePathsArray, false);
-  const buildObjectModules = await build(pagePathsArray, true);
+  const buildObjectFullPages = await build(pagePathsArray, false, true);
+  const buildObjectModules = await build(pagePathsArray, true, true);
+
+  console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
 
   buildObjectFullPages.forEach(page => {
     writeMarkup(page);
