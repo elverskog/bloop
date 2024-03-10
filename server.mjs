@@ -115,6 +115,10 @@ const server = http.createServer(async (req, res) => {
         const modulePath = `src/pages${ url }.mjs`;
         console.log("MODULEPATH: ", modulePath);
 
+        // I AM HERE
+        // DO I NEED TO HAVE IS ISPROD OR ISDEV AS BOTH MODES WANT ISPROD
+        // EG - BOTH MODES RITE THE FILE AND READ IT, PATHS ARE THE SAME ETC
+
         const pageAsModule = await buildPage({ path: modulePath, isFetch: true, isProd: true });
         const pageFull = await buildPage({ path: modulePath, isFetch: false, isProd: true });
 
