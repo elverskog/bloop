@@ -25,17 +25,25 @@ function convertJsToString(jsObjVal) {
 
 export async function buildPage(options) {
 
-  console.log("BUILDPAGE: ",  options);
+  // throw new TypeError("validateArgs - undefined is not a string");
 
-  try {
-    validateArgs([
-      [options.path, "string"],
-      [options.isFetch, "boolean"],
-      [options.isProd, "boolean"]
-    ]); 
-  } catch (error) {
-    throw new Error(error)
-  }
+  validateArgs([
+    [options?.path, "string"],
+    [options?.isFetch, "boolean"],
+    [options?.isProd, "boolean"]
+  ]); 
+
+
+  // try {
+  //   validateArgs([
+  //     [options?.path, "string"],
+  //     [options?.isFetch, "boolean"],
+  //     [options?.isProd, "boolean"]
+  //   ]); 
+  // } catch (error) {
+  //   // return error;
+  //   throw new Error(error);
+  // }
 
 
   const { path, isFetch, isProd } = options;
@@ -133,9 +141,10 @@ export async function buildPage(options) {
     //add the name for page's main module
     pageRes.name = typeof moduleRes?.name === "string" ? moduleRes.name : "";    
 
-  } catch(err) {
-    console.log("buildPage: add module error: ", err);
-    return;
+  } catch(error) {
+    // console.log("buildPage: add module error: ", err);
+    // return;
+    throw new Error(error);
   }
 
 

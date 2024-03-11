@@ -46,6 +46,12 @@ sessions
 /rawtest
 rawtest
 
+#tap test data
+/.tap
+.tap
+*.tap
+
+
 #block test coverage logging
 .nyc_output
 /.nyc_output
