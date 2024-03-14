@@ -23,6 +23,18 @@ function convertJsToString(jsObjVal) {
 }
 
 
+//check if imported module
+//returns an object
+//returns "name" as a string 
+//returns "css" as a string 
+//returns "markup" as a string 
+//if returns "title" it should be an string
+//if returns "js" it should be an object
+//if returns "initArgs" it should be an object
+
+
+
+
 export async function buildPage(options) {
 
   // throw new TypeError("validateArgs - undefined is not a string");
@@ -77,7 +89,7 @@ export async function buildPage(options) {
     try {
       moduleRes = await module(addModule, args);
     } catch (error) {
-      console.log("RUN MODULE ERROR: ", error);
+      throw new Error(`RUN MODULE: ${error}`);
     }
 
     //add a title for the page if it doesn't ext

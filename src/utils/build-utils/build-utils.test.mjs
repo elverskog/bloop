@@ -18,14 +18,23 @@ tap.test("build should return undefined if a valid pagePathArray or isFetch is n
 });
 
 
-tap.test("build, when passed an array with an invalid path, should return...", async t => {
+tap.test("build, when passed an array with an invalid path, should throw an error", async t => {
   const pagePathsArray = [
     "./bad-path/bad-page.mjs"
   ];
-  const result = await build(pagePathsArray, false);
-  t.match(result, [ undefined ]);
+  t.rejects(() => build(pagePathsArray, false), Error, "build-utils should throw error if file path is invalid");
   t.end();
 });
+
+
+tap.test("build, when passed an array with a valid path but an invalid module, should throw an error", async t => {
+  const pagePathsArray = [
+    "src/utils/build-utils/mocks/mock-page-bad-function.mjs"
+  ];
+  t.rejects(() => build(pagePathsArray, false), Error, "build-utils should throw error if module does not return anything");
+  t.end();
+});
+
 
 
 tap.test("build, when passed proper array of valid paths, should return an object with nodes for name, css, etc", async t => {
