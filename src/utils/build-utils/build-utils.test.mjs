@@ -27,7 +27,7 @@ tap.test("build, when passed an array with an invalid path, should throw an erro
 });
 
 
-tap.test("build, when passed an array with a valid path but an invalid module, should throw an error", async t => {
+tap.test("build, when passed an array with a valid module path but an invalid result, should throw an error", async t => {
   const pagePathsArray = [
     "src/utils/build-utils/mocks/mock-page-bad-function.mjs"
   ];

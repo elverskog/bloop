@@ -31,7 +31,31 @@ function convertJsToString(jsObjVal) {
 //if returns "title" it should be an string
 //if returns "js" it should be an object
 //if returns "initArgs" it should be an object
-
+function validateModuleRes(moduleRes) {
+  if (typeof moduleRes !== "object") {
+    throw new Error("moduleRes is not an object");
+  }
+  if (typeof moduleRes.name !== "string") {
+    throw new Error("moduleRes.name is not a string");
+  }
+  if (typeof moduleRes.css !== "string") {
+    throw new Error(`${ moduleRes.name }: moduleRes.css is not a string`);
+  }
+  if (typeof moduleRes.markup !== "string") {
+    throw new Error(`${ moduleRes.name }: moduleRes.markup is not a string`);
+  }
+  if (moduleRes.title && typeof moduleRes.title !== "string") {
+    console.log("TITLE WRONG TYPE ERROR: ");
+    throw new Error(`${ moduleRes.name }: moduleRes.title is not a string`);
+  }
+  if (moduleRes.js && typeof moduleRes.js !== "object") {
+    throw new Error(`${ moduleRes.name }: moduleRes.js is not an object`);
+  }
+  if (moduleRes.initArgs && typeof moduleRes.initArgs !== "object") {
+    throw new Error(`${ moduleRes.name }: moduleRes.initArgs is not an object`);
+  }
+  return true;
+}
 
 
 
@@ -91,6 +115,8 @@ export async function buildPage(options) {
     } catch (error) {
       throw new Error(`RUN MODULE: ${error}`);
     }
+
+    validateModuleRes(moduleRes);
 
     //add a title for the page if it doesn't ext
     if(typeof moduleRes?.title === "string" && !pageRes.title.length) {
