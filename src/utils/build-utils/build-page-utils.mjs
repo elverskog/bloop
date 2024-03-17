@@ -31,7 +31,7 @@ function convertJsToString(jsObjVal) {
 //if returns "title" it should be an string
 //if returns "js" it should be an object
 //if returns "initArgs" it should be an object
-function validateModuleRes(moduleRes) {
+export function validateModuleRes(moduleRes) {
   if (typeof moduleRes !== "object") {
     throw new Error("moduleRes is not an object");
   }
@@ -45,7 +45,6 @@ function validateModuleRes(moduleRes) {
     throw new Error(`${ moduleRes.name }: moduleRes.markup is not a string`);
   }
   if (moduleRes.title && typeof moduleRes.title !== "string") {
-    console.log("TITLE WRONG TYPE ERROR: ");
     throw new Error(`${ moduleRes.name }: moduleRes.title is not a string`);
   }
   if (moduleRes.js && typeof moduleRes.js !== "object") {
