@@ -1,7 +1,5 @@
 import http from "http";
 import fs from "fs";
-// import moduleCompiler from "./src/moduleCompiler.mjs";
-// import { build } from "./src/utils/build-utils.mjs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
 import { buildPage } from "./src/utils/build-utils/build-page-utils.mjs";
 import { 

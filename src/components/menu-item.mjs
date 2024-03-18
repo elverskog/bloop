@@ -1,12 +1,5 @@
-// import link from "./link.mjs";
-import loadModule from "../utils/module-utils.mjs";
-
 export default async function menuItem (addModule, args) {
 
-  // import loadModule from "../utils/module-utils.mjs";
-  // const linkRes = await link(label, pathname);
-  
-  //get link module
   const { label, pathname} = args; 
 
   const result = {

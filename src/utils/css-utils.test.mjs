@@ -1,12 +1,10 @@
 import tap from "tap";
-import path from "path";
-import {fileURLToPath} from "url";
 import { processCSS } from "./css-utils.mjs";
 
 
-tap.test('test module-utils', t => {
+tap.test("test css-utils", t => {
 
-  t.test('returns undefined if css is not a string', st => {
+  t.test("returns undefined if css is not a string", st => {
     st.equal(processCSS(undefined), undefined);
     st.equal(processCSS(null), undefined);
     st.equal(processCSS(123), undefined);

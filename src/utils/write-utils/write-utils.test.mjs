@@ -40,7 +40,7 @@ tap.test("writeMarkup tests", t => {
     message: "Error: validateArgs - undefined isn't string"
   }, "pageMissingModulePath");
 
-  t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write test.mjs because name is missing");
+  t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write; name is missing");
 
   //////////////////////////////////////////////
 
@@ -52,7 +52,7 @@ tap.test("writeMarkup tests", t => {
     message: "Error: validateArgs - undefined isn't string"
   },"pageMissingMarkup");
 
-  t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write test.mjs because markup is missing");
+  t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write; markup is missing");
 
   //////////////////////////////////////////////
 
@@ -106,7 +106,7 @@ tap.test("write CSS tests", t => {
   };
 
   t.throws(() => writeCss(pageMissingModulePath), Error, `pageMissingModulePath ${ Error }`);
-  t.match(fs.existsSync("dist/css/test.css"), false, "writeCssOrJs should fail to write test.mjs because modulePath is missing");
+  t.match(fs.existsSync("dist/css/test.css"), false, "writeCssOrJs should fail to write; modulePath is missing");
 
   //////////////////////////////////////////////
 
@@ -117,7 +117,7 @@ tap.test("write CSS tests", t => {
   };
 
   t.throws(() => writeCss(pageMissingVal), Error, `pageMissingVal ${ Error }`);
-  t.match(fs.existsSync("dist/css/test.mjs"), false, "writeCssOrJs failed to write test.mjs because css is missing");
+  t.match(fs.existsSync("dist/css/test.mjs"), false, "writeCssOrJs failed to write test.mjs; css is missing");
 
   // //////////////////////////////////////////////
 
@@ -133,7 +133,7 @@ tap.test("write CSS tests", t => {
   };
 
   t.throws(writeCss(pageBadPath), Error, `pageBadPath ${ Error }`);
-  t.match(fs.existsSync("dist/css-test/test.css"), false, "writeCssOrJs failed to write test.mjs as modulePath is invalid");
+  t.match(fs.existsSync("dist/css-test/test.css"), false, "writeCssOrJs failed to write; modulePath is invalid");
 
   t.end();
 
@@ -167,7 +167,7 @@ tap.test("write JS tests", t => {
     }]
   }];
 
-  t.throws(() => writeJs(pageMissingVal), Error("validateArgs - undefined isn't array"), "writeJs passed invalid page object");
+  t.throws(() => writeJs(pageMissingVal), Error("validateArgs - undefined isn't array"), "writeJs passed invalid page objetc");
   t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs failed to write test.mjs because js val is missing");
 
   //////////////////////////////////////////////
@@ -179,7 +179,7 @@ tap.test("write JS tests", t => {
     }]
   };
 
-  t.throws(() => writeJs(pageBadJs), Error("WriteJs passed invalid page object"), "writeJs passed invalid page object");
+  t.throws(() => writeJs(pageBadJs), Error("writeJs passed invalid page object"), "writeJs passed invalid page object");
   t.match(fs.existsSync("dist/js/test.mjs"), false, "writeJsOrJs failed to write test.mjs because js val is bad");
 
   //////////////////////////////////////////////

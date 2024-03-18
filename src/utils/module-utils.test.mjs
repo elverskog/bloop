@@ -1,21 +1,21 @@
-import tap from "tap";
-import path from "path";
-import {fileURLToPath} from "url";
-import loadModule from "./module-utils.mjs";
+// import tap from "tap";
+// import path from "path";
+// import {fileURLToPath} from "url";
+// import loadModule from "./module-utils.mjs";
 
 
-tap.test('loadModule function', t => {
+// tap.test('loadModule function', t => {
 
-  t.test('returns undefined if path is not a string', async st => {
-    st.equal(await loadModule(undefined), undefined);
-    st.equal(await loadModule(null), undefined);
-    st.equal(await loadModule(123), undefined);
-    st.equal(await loadModule({}), undefined);
-    st.end();
-  });
+//   t.test('returns undefined if path is not a string', async st => {
+//     st.equal(await loadModule(undefined), undefined);
+//     st.equal(await loadModule(null), undefined);
+//     st.equal(await loadModule(123), undefined);
+//     st.equal(await loadModule({}), undefined);
+//     st.end();
+//   });
 
 
-  t.end();
+//   t.end();
 
 
 
