@@ -3,29 +3,38 @@ import { JSDOM } from "jsdom";
 import { insertScripts } from "./dom-utils.mjs";
 
 
-tap.test('insertScripts function', t => {
+tap.test("insertScripts function", t => {
 
-  t.test('insertScripts should insert all scripts into DOM', async t2 => {
+  t.test("insertScripts should insert all scripts into DOM", async t2 => {
 
     //our fake window
-    const window = (new JSDOM(`<!DOCTYPE html><html><body></body></html>`)).window;
+    const window = (new JSDOM("<!DOCTYPE html><html><body></body></html>")).window;
     
     //insertScripts needs a script object, the value on the right will be the script
     //but we don't care here if the script is valid JS
     //note: the src will be hash-blob pointing at this "script"
-    const scriptsObj = {
-      scriptA: () => "window.p_p.a = {}",
-      scriptB: () => "window.p_p.b = {}",
-      scriptC: () => "window.p_p.c = {}"
-    };
+    const jsArray = [
+      {
+        name: "scriptA",
+        val: "() => window.p_p.a = {}"
+      },
+      {
+        name: "scriptB",
+        val: "() => window.p_p.b = {}"
+      },
+      {
+        name: "scriptC",
+        val: "() => window.p_p.c = {}"
+      }
+    ];
 
     //insertScripts wants a callback
     const fn = function(success) {
-      console.log("I'm just an empty callback function");
+      console.log(`I'm just an empty callback function - ${ success }`);
     };
 
     // Wait for the window to finish loading
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
 
       // Check if each script was loaded
       const script1 = window.document.getElementById("script1Script");
@@ -43,7 +52,7 @@ tap.test('insertScripts function', t => {
     });
 
     //call the function we are testing
-    insertScripts(scriptsObj, fn, window);
+    insertScripts(jsArray, fn, window);
 
     //thought we might need a time out but doesn't seem like it
     //await new Promise(resolve => setTimeout(resolve, 7000));
@@ -57,24 +66,33 @@ tap.test('insertScripts function', t => {
   });
 
 
-  t.test('insertScripts should run callback after all scripts are inserted into DOM', t2 => {
+  t.test("insertScripts should run callback after all scripts are inserted into DOM", t2 => {
 
     //our fake window
-    const window = (new JSDOM(`<!DOCTYPE html><html><body></body></html>`)).window;
+    const window = (new JSDOM("<!DOCTYPE html><html><body></body></html>")).window;
 
     //insertScripts needs a script object, the value on the right will be the script
     //but we don't care here if the script is valid JS
     //note: the src will be hash-blob pointing at this "script"
-    const scriptsObj = {
-      scriptA: () => "window.p_p.a = {}",
-      scriptB: () => "window.p_p.b = {}",
-      scriptC: () => "window.p_p.c = {}"
-    };
+    const jsArray = [
+      {
+        name: "scriptA",
+        val: "() => window.p_p.a = {}"
+      },
+      {
+        name: "scriptB",
+        val: "() => window.p_p.b = {}"
+      },
+      {
+        name: "scriptC",
+        val: "() => window.p_p.c = {}"
+      }
+    ];
 
     //insertScripts wants a callback
     const fn = function(success) {
       console.log("I'm a callback function being tested", JSON.stringify(success));
-      t2.ok(success, 'callback should be called with success=true');
+      t2.ok(success, "callback should be called with success=true");
       //close the fake window we creatd
       window.close();
       //end the test
@@ -82,7 +100,7 @@ tap.test('insertScripts function', t => {
     };
 
     //call the function we are testing
-    insertScripts(scriptsObj, fn, window);
+    insertScripts(jsArray, fn, window);
 
     //window.setTimeout(() => {}, 7000);
 
@@ -98,7 +116,7 @@ tap.test('insertScripts function', t => {
 
 
 //   t.test('insertScripts inserts script tags into the DOM', t => {
-//     const scriptsObj = {
+//     const jsArray = {
 //       module1: 'console.log("module1 loaded")',
 //       module2: 'console.log("module2 loaded")'
 //     };
@@ -110,7 +128,7 @@ tap.test('insertScripts function', t => {
 //       return { tagName };
 //     }
   
-//     insertScripts(scriptsObj, (success) => {
+//     insertScripts(jsArray, (success) => {
 //       t.test.ok(success, 'insertScripts returns success=true when all scripts have been loaded');
 //       t.test.equal(document.querySelectorAll('script').length, 2, 'insertScripts inserts 2 script tags into the DOM');
 //       t.test.equal(document.querySelectorAll('script[type="module"]').length, 2, 'insertScripts inserts 2 script tags with type="module" into the DOM');
@@ -137,7 +155,7 @@ tap.test('insertScripts function', t => {
   //   };
 
   //   // create an object with two scripts to insert
-  //   const scriptsObj = {
+  //   const jsArray = {
   //     script1: 'console.log("script 1 loaded");',
   //     script2: 'console.log("script 2 loaded");'
   //   };
@@ -149,7 +167,7 @@ tap.test('insertScripts function', t => {
   //   };
 
   //   // call the function to insert the scripts
-  //   insertScripts(scriptsObj, mockCallback);
+  //   insertScripts(jsArray, mockCallback);
 
   // });
 
@@ -166,7 +184,7 @@ tap.test('insertScripts function', t => {
   //   };
 
   //   // create an object with one script that will fail to load
-  //   const scriptsObj = {
+  //   const jsArray = {
   //     script1: 'console.log("script 1 loaded");'
   //   };
 
@@ -177,7 +195,7 @@ tap.test('insertScripts function', t => {
   //   };
 
   //   // call the function to insert the scripts
-  //   insertScripts(scriptsObj, mockCallback);
+  //   insertScripts(jsArray, mockCallback);
   // });
 
   // test('insertScripts should skip scripts that are already in the DOM', t => {
@@ -193,7 +211,7 @@ tap.test('insertScripts function', t => {
   //   };
 
   //   // create an object with two scripts to insert, one of which is already in the DOM
-  //   const scriptsObj = {
+  //   const jsArray = {
   //     script1: 'console.log("script 1 loaded");',
   //     script2: 'console.log("script 2 loaded");'
   //   };
@@ -205,7 +223,7 @@ tap.test('insertScripts function', t => {
   //   };
 
   //   // call the function to insert the scripts
-  //   insertScripts(scriptsObj, mockCallback);
+  //   insertScripts(jsArray, mockCallback);
   // });
 
   t.end();

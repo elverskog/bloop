@@ -10,7 +10,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //module/util to add stylesheets to head client side
-//accept an object with a string for each module needed
+//accept an array of objects { name, val } with val as a string for each module needed
 //turn each string of CSS into a blob (in memory) and create a link in head
 //only running fn once the CSS is actually "initialized" (so we can then update the HTML and add scripts) 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ export function insertStyleSheets(cssArray, fn, scope) {
 //turn each string of JS into a blob (in memory) and create a link in head
 //only running fn once the JS is actually "initialized"
 //arguments:
-//jsObj - key equals the module name, value is the script as a string
+//js - an array of objects { name, val, etc } where val is the actual js
 //fn - a callback function - see utilization of function for clarity
 //scope - the scope the callabck function is called (TODO - may get rid of this)
 //document - this is really just needed for unit testing. Where puppeteer is used to create a DOM on the server
@@ -221,6 +221,7 @@ export function insertScripts(js, fn, window) {
   
   }
     
+  console.log("JS ---- ", js);
   //iterate through jsObject and call function to load, validate and insert each into DOM
   for(const jsObj of js) {
     // console.log("JS OBJ ---- ", jsObj);
