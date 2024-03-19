@@ -1,5 +1,5 @@
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
-import { insertStyleSheets, insertScripts } from "../utils/dom-utils.mjs";
+import { insertStyleSheets, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
 
 
 export default async function wrapper(addModule, args) {
@@ -114,6 +114,7 @@ export default async function wrapper(addModule, args) {
       },
       parseAndOutputStream,
       insertStyleSheets,
+      insertEachScript,
       insertScripts,
 
       //function to just get the module for the body

@@ -102,6 +102,12 @@ export function insertStyleSheets(cssArray, fn, scope) {
     
   //iterate through cssArray and call function to load, validate and insert each into DOM
   // console.log("CSS ARRAY ===== ", cssArray);
+  // cssArray, fn, scope
+  
+  // if (typeof Array, fn, scope) {
+    
+  // }
+
   for(const cssObject of cssArray) {
     insertEach(cssObject.name, cssObject.val);
   }
@@ -122,32 +128,102 @@ export function insertStyleSheets(cssArray, fn, scope) {
 //document - this is really just needed for unit testing. Where puppeteer is used to create a DOM on the server
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+//function to load, validate and insert each into DOM, and update the list of completed modules
+export function insertEachScript(jsObj, completedList, document) {
+
+  if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "string") {
+    return "insertEach passed invalid args";
+  }
+
+  //if there is already a link with the ID passed, return success as true and exit
+  const existingMatch = document.getElementById(`${jsObj}Script`);
+  if(existingMatch) {
+    completedList[jsObj.name] = true;
+    return;
+  }
+  
+  //create blob for value (JS string) and turn it into a DOM link element
+  const jsValWithP_P = `window.p_p.${ jsObj.name } = ${ jsObj.val }`;
+  const scriptBlob = new Blob([jsValWithP_P], { type: "text/javascript" });
+  const objectUrl = URL.createObjectURL(scriptBlob);
+  const scriptEl = document.createElement("script");
+  scriptEl.setAttribute("type", "module");
+  scriptEl.setAttribute("src", objectUrl);
+  scriptEl.setAttribute("id", `${jsObj.name}Script`);
+
+  //start loop to check if script was loaded (every 10 milliseconds)
+  const intervalEach = setInterval( () =>  
+    {
+      try {
+        //TODO: I'm not sure if this is OK (or maybe better)
+        //here we just test if the script element was created but we don't know if the script got atached to window
+        //the problem is that for unit testing, it seems JSDOM doesn't actually run the script inserted???
+        //also not testing the script being attached to window is actually more agnostic because the script may conceivably not do that 
+        //if (typeof window.p_p[moduleName] === "object") {
+        if (typeof document.getElementById("#{moduleName}Script") === "object") {
+          // our style sheet has loaded, clear the counters, mark that module as done in "completed" and exit
+          clearInterval(intervalEach);
+          clearTimeout(timeoutEach);
+          completedList[jsObj.name] = true;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 10),                                                   
+    //set another slower timer for when to abandon effort
+    timeoutEach = setTimeout(() => {
+      //our script insert has failed, clear the counters and return
+      clearInterval(intervalEach);            
+      clearTimeout(timeoutEach);
+      return;
+    }, 7000);
+
+  //insert the script tag into the DOM
+  document.body.appendChild(scriptEl);
+
+}
+
+
 export function insertScripts(js, fn, window) {
+
+  console.log("JS: ", js);
+
+  if (js === null || typeof js !== "object" && typeof js[Symbol.iterator] !== "function") {
+    throw new TypeError("insertScript passed invalid js array");
+  }
+  if (typeof fn !== "function") {
+    throw new TypeError("insertScript passed invalid callback function");
+  }
+  if (typeof window?.document !== "object") {
+    throw new TypeError("insertScript passed invalid window");
+  }
+
+  //for unit testing (test uses JSDOM to pass in a "fake" window)
+  const document = window.document;
+  //create an array that just lists the key of each succesfully inserted script; to avoid dupes 
+  const completedList = {};
 
   //run callback with false if window doesn't exist
   if(typeof window !== "object") {
     fn.call(window, false);
   }
 
-  //if window.p_p doesn't exist create it
+  // if window.p_p doesn't exist create it
+  // and add wrapper.insertEachScript to it
+  // this is for testing
   if(typeof window.p_p !== "object") {
     window.p_p = {};
+    window.p_p.wrapper = {};
+    window.p_p.wrapper.insertEachScript = insertEachScript;
   }
-
-  //for unit testing (test uses JSDOM to pass in a "fake" window)
-  const document = window.document;
-
-  //create an array that just lists the key of each succesfully inserted 
-  //I use an object to just automatically avoid duplicates, that would come with an array
-  //TODO maybe this can just be a count or a boolean?
-  const completed = {};
 
   //interval to check the completed object, to see if it matches the length of the passed in jsObj 
   const intervalAll = setInterval(() =>
     {
       try {
         //I don't check the value here, one by one here, as completedArray can't have dupes
-        if (Object.keys(completed).length === Object.keys(js).length) {
+        if (Object.keys(completedList).length === Object.keys(js).length) {
           //based on if each element in script has "loaded" set (as true)
           clearInterval(intervalAll);
           clearTimeout(timeoutAll);
@@ -159,73 +235,23 @@ export function insertScripts(js, fn, window) {
     }, 10),                                                   
     //set another slower timer for when to abandon effort
     timeoutAll = setTimeout(() => {       
-      //our script insertion process has failed, so clear the the above interval, fire the callback with success as false
+      //script insertion process failed, so clear the the above interval, fire the callback with success as false
       clearInterval(intervalAll);            
       clearTimeout(timeoutAll);              
       fn.call(window, false);
     }, 7000);
 
-  //function to load, validate and insert each into DOM, and update the list of completed modules
-  function insertEach(jsObj) {
+   
+  // console.log("JS ---- ", js);
+  // console.log("JS ITERATOR ---- ", js[Symbol.iterator]);
 
-    if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "string") {
-      console.log("insertEach JS passed bad value");
-      return;
-    }
-
-    //if there is already a link with the ID passed, return success as true and exit
-    const existingMatch = document.getElementById(`${jsObj}Script`);
-    if(existingMatch) {
-      completed[jsObj.name] = true;
-      return;
-    }
-    
-    //create blob for value (JS string) and turn it into a DOM link element
-    const jsValWithP_P = `window.p_p.${ jsObj.name } = ${ jsObj.val }`;
-    const scriptBlob = new Blob([jsValWithP_P], { type: "text/javascript" });
-    const objectUrl = URL.createObjectURL(scriptBlob);
-    const scriptEl = document.createElement("script");
-    scriptEl.setAttribute("type", "module");
-    scriptEl.setAttribute("src", objectUrl);
-    scriptEl.setAttribute("id", `${jsObj.name}Script`);
-
-    //start loop to check if script was loaded (every 10 milliseconds)
-    const intervalEach = setInterval( () =>  
-      {
-        try {
-          //TODO: I'm not sure if this is OK (or maybe better)
-          //here we just test if the script element was created but we don't know if the script got atached to window
-          //the problem is that for unit testing, it seems JSDOM doesn't actually run the script inserted???
-          //also not testing the script being attached to window is actually more agnostic because the script may conceivably not do that 
-          //if (typeof window.p_p[moduleName] === "object") {
-          if (typeof document.getElementById("#{moduleName}Script") === "object") {
-            // our style sheet has loaded, clear the counters, mark that module as done in "completed" and exit
-            clearInterval(intervalEach);
-            clearTimeout(timeoutEach);
-            completed[jsObj.name] = true;
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }, 10),                                                   
-      //set another slower timer for when to abandon effort
-      timeoutEach = setTimeout(() => {
-        //our script insert has failed, clear the counters and return
-        clearInterval(intervalEach);            
-        clearTimeout(timeoutEach);
-        return;
-      }, 7000);
-
-    //insert the script tag into the DOM
-    document.body.appendChild(scriptEl);
-  
-  }
-    
-  console.log("JS ---- ", js);
   //iterate through jsObject and call function to load, validate and insert each into DOM
   for(const jsObj of js) {
-    // console.log("JS OBJ ---- ", jsObj);
-    insertEach(jsObj);
+    try {
+      window.p_p.wrapper.insertEachScript(jsObj, completedList, window.document);
+    } catch (error) {
+      throw new TypeError(error); 
+    }
   }
 
 }
