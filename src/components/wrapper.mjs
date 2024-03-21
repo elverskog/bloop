@@ -1,5 +1,5 @@
 import { parseAndOutputStream } from "../utils/res-utils.mjs";
-import { insertStyleSheets, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
+import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
 
 
 export default async function wrapper(addModule, args) {
@@ -114,6 +114,7 @@ export default async function wrapper(addModule, args) {
       },
       parseAndOutputStream,
       insertStyleSheets,
+      insertEachStyleSheet,
       insertEachScript,
       insertScripts,
 
@@ -162,7 +163,7 @@ export default async function wrapper(addModule, args) {
             } else {
               console.log("insert styles failed");
             }
-          });
+          }, window);
         }
 
       }
