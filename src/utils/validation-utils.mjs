@@ -1,34 +1,38 @@
 // validate an array of "tuples" 
 // e.g. [ [ foo, "bar" ], etc ] 
 
+
+export function validateArg(pair) {
+  console.log("PAIR: ", pair);
+  const result = (
+    pair !== undefined
+    && Array.isArray(pair)
+    && pair.length === 2
+    && pair[0] !== null
+    && pair[1] !== null
+    && typeof pair[1] === "string"
+  );
+  console.log("VALIDATE ARG RES: ", result);
+  return result;
+}
+
+
+export function validateType(type) {
+  return [
+    "boolean",
+    "string",
+    "object",
+    "function",
+    "number",
+    "bigint"
+  ].includes(type);  
+}
+
+
 export function validateArgs(args) {
 
   // console.log("ARGS: ", args);
   // console.log("TYPEOF ARGS: ", typeof args);
-
-  function exists(pair) {
-    const result = (
-      pair
-      && typeof pair === "object"
-      && pair.length === 2
-      && pair[0]
-      && pair[1]
-      && typeof pair[1] === "string"
-    );
-    return result;
-  }
-
-  function isStandardType(type) {
-    return [
-      "boolean",
-      "string",
-      "object",
-      "function",
-      "number",
-      "bigint"
-    ].includes(type);  
-  }
-
 
   let res;
 
@@ -37,12 +41,12 @@ export function validateArgs(args) {
   }
 
   const isCorrectType = pair => {
-    
+  
     switch (true) {
-      case exists:
+      case validateArg:
         res = true;
         break;
-      case isStandardType(pair[1]):
+      case validateType(pair[1]):
         // console.log("CASE IS STANDARD");
         res = typeof pair[0] === pair[1];  
         break;
