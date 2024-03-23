@@ -14,9 +14,11 @@ tap.test("test validateArg (single)", async t => {
 });
 
 
-// tap.test("test validateType", async t => {
-
-// });
+tap.test("test validateType", async t => {
+  t.match(await validateType(), false, "validateType should return false, if passed no arg");
+  t.match(await validateType("huh?"), false, "validateType should return false, if passed invalid type string");
+  t.match(await validateType("number"), true, "validateType should return true, if passed valid type string");
+});
 
 
 tap.test("validateArgs should receive an error if not passed an array of tuples", async t => {
