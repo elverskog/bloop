@@ -29,8 +29,7 @@ export function validateType(type) {
 
 export function validateArgs(args) {
 
-  let res;
-  let resEvery;
+  let resArray = [];
 
   if(typeof args === "undefined" || !Array.isArray(args) || !Array.isArray(args[0])) {
     throw new Error("ValidateArgs didn't receive list of tuples");
@@ -40,33 +39,32 @@ export function validateArgs(args) {
   
     switch (true) {
       case !validateArg(pair):
-        resEvery = new Error("pair is not valid");  
+        resArray.push(new Error("pair is not valid"));  
         break;
       case validateType(pair[1]):
-        console.log("CASE IS VALID TYPE", pair);
-        resEvery = typeof pair[0] === pair[1] 
-          ? true : new Error(`validateArgs - ${ pair[0] } isn't ${ pair[1] }`);  
+        if(typeof pair[0] !== pair[1]) {
+          resArray.push(new Error(`validateArgs - ${ pair[0] } is not ${ pair[1] }`));  
+        }
         break;
       case pair[1] === "array": 
-        resEvery = Array.isArray(pair[0])
-          ? true : new Error(`validateArgs - ${ pair[0] } isn't array`);
+        if (!Array.isArray(pair[0])) {
+          resArray.push(new Error(`validateArgs - ${ pair[0] } is not array`));
+        }
         break;
       default:
-        resEvery = new Error("validateArgs - case is default. this should not happen");
+        resArray.push(new Error("validateArgs - case is default. this should not happen"));
         break;
-    }
-
-    // console.log("EVERY RES: ", resEvery);
-    if (resEvery instanceof Error) {
-      res = resEvery;
-      return false;
-    } else {
-      return resEvery;
     }
 
   });
 
-  console.log("RES: ", res);
-  return res;
+
+  if(resArray.length) {
+    resArray.forEach(resError => {
+      throw resError;
+    });
+  } else {
+    return true;
+  }
 
 }
