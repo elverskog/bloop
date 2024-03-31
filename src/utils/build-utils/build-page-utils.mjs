@@ -60,25 +60,11 @@ export function validateModuleRes(moduleRes) {
 
 export async function buildPage(options) {
 
-  // throw new TypeError("validateArgs - undefined is not a string");
-
-  // const valRes = validateArgs([
-  //   [options?.path, "string"],
-  //   [options?.isProd, "boolean"],
-  //   [options?.isFetch, "boolean"],
-  // ]); 
-
-  // console.log("VAL RES", valRes);
-
-  const valRes = validateArgs([
+  validateArgs([
     [options?.path, "string"],
     [options?.isFetch, "boolean"],
     [options?.isProd, "boolean"]
   ]); 
-
-  if (valRes instanceof Error) {
-    throw new Error(error);
-  }
 
   const { path, isFetch, isProd } = options;
   let moduleRes;

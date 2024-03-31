@@ -1,6 +1,22 @@
 // validate an array of "tuples" 
 // e.g. [ [ foo, "bar" ], etc ] 
 
+export function validateArgsArgs(args) {
+
+  let res = true;
+
+  res = (args && args[0][Symbol.iterator] && Array.isArray(args[1]));
+
+  res = args[1].every(element => typeof element === "string");
+
+  if(res === false) {
+    throw new Error("ValidateArgs didn't receive list of tuples");
+  } else {
+    return res;
+  }
+
+}
+
 
 export function validateArg(pair) {
   const result = (
@@ -27,13 +43,9 @@ export function validateType(type) {
 }
 
 
-export function validateArgs(args) {
+export function validateArgs(args, types) {
 
   let resArray = [];
-
-  if(typeof args === "undefined" || !Array.isArray(args) || !Array.isArray(args[0])) {
-    throw new Error("ValidateArgs didn't receive list of tuples");
-  }
 
   args.every(pair => {
   

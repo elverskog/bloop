@@ -22,11 +22,10 @@ function validateObj(obj, valType) {
 
 function write2(val, savePath) {
 
-  try {
-    validateArgs([ [ val, "string" ], [ savePath, "string" ] ]); 
-  } catch (error) {
-    throw new Error(error);
-  }
+  validateArgs([
+    [ val, "string" ], 
+    [ savePath, "string" ] ]
+  ); 
 
   let buff;
   let compressed;
@@ -68,11 +67,9 @@ export function writeCss(page) {
 
   let index = 0;
 
-  try {
-    validateArgs([[page.css, "array"]]); 
-  } catch (error) {
-    throw new Error(error);
-  }
+  validateArgs([
+    [page.css, "array"]
+  ]); 
 
   function writeEach() {
   
@@ -116,11 +113,10 @@ export function writeCss(page) {
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index) {
 
-  try {
-    validateArgs([[page.js, "object"], [index, "number"]]); 
-  } catch (error) {
-    throw new Error(error);
-  }
+  validateArgs([
+    [page.js, "object"], 
+    [index, "number"]
+  ]); 
 
   const jsObj = page.js[index];
   const name = jsObj.name;
@@ -146,7 +142,7 @@ function writeEachJs(page, index) {
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
     write2(scriptWithWindow, savePath);
   } else {
-    throw new Error("writeJs passed invalid page object")
+    throw new Error("writeJs passed invalid page object");
   }
   
   index++;
@@ -161,18 +157,14 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
-  try {
-    validateArgs([[page.js, "array"]]); 
-  } catch (error) {
-    throw new Error(error);
-  }
+  validateArgs([[page.js, "array"]]); 
   
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[0], "string")) {
     writeEachJs(page, 0);
   } else {
-    throw new Error("writeJs passed invalid page object")
+    throw new Error("writeJs passed invalid page object");
   } 
 
   return true;
@@ -183,11 +175,7 @@ export function writeJs(page) {
 //function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page) {
 
-  try {
-    validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
-  } catch (error) {
-    throw new Error(error);
-  }
+  validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
 
   const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "markup/").replace(".mjs", ".html");
 
@@ -223,17 +211,13 @@ function cleanPage(page, key) {
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
 export function writeModule(page) {
 
-  try {
-    validateArgs([
-      [page.title, "string"],
-      [page.modulePath, "string"],
-      [page.css, "array"],
-      [page.markup, "string"],
-      [page.js, "array"]
-    ]); 
-  } catch (error) {
-    throw new Error(error);
-  }
+  validateArgs([
+    [page.title, "string"],
+    [page.modulePath, "string"],
+    [page.css, "array"],
+    [page.markup, "string"],
+    [page.js, "array"]
+  ]); 
 
   const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "modules/").replace(".mjs", ".json");
 
