@@ -1,16 +1,26 @@
 // validate an array of "tuples" 
 // e.g. [ [ foo, "bar" ], etc ] 
 
-export function validateArgsArgs(args) {
+export function validateArgsArgs(args, types) {
 
   let res = true;
 
-  res = (args && args[0][Symbol.iterator] && Array.isArray(args[1]));
-
-  res = args[1].every(element => typeof element === "string");
+  res = (!!args && !!types && args[Symbol.iterator] && Array.isArray(types));
+  
+  if(res) {
+    res = types.every(type => typeof type === "string" && 
+      [
+        "boolean",
+        "string",
+        "object",
+        "function",
+        "number",
+        "bigint"
+      ].includes(type));
+  }
 
   if(res === false) {
-    throw new Error("ValidateArgs didn't receive list of tuples");
+    throw new Error("ValidateArgs itself did not receive valid args");
   } else {
     return res;
   }

@@ -11,9 +11,26 @@ tap.test("test validateArgs to see if called with valid args", async t => {
   //   t.match(validateArgsArgs(arguments, ["string", "boolean"]), true, "returns true if passed valid args");
   // })("a string", someBool = true);
 
-  t.match((async function() {
+  t.match(await (async function() {
     return await validateArgsArgs(arguments, ["string", "boolean"]);
-  })("a string", true), true, "returns true if passed valid args");
+  })("a string", true), true, "returns true if passed 2 valid args");
+
+  const testFunc = () => true;
+  t.match(await (async function() {
+    return await validateArgsArgs(arguments, ["string", "boolean", "object", "function"]);
+  })("a string", true, {}, testFunc), true, "returns true if 4 passed valid args");
+
+  t.throws( () => validateArgsArgs([ null ]), Error("ValidateArgs itself did not receive valid args"), "throws errors if passed no arguments arg");
+  
+  t.throws( (args = "a string") => validateArgsArgs(args), Error("ValidateArgs itself did not receive valid args"), "throws errors if passed no type array");
+  
+  t.throws( (args = "a string") => validateArgsArgs(args, [ null ]), Error("ValidateArgs itself did not receive valid args"), "throws errors if passed null as single element in types list");
+  
+  t.throws( (args = "a string") => validateArgsArgs(args, [ "a string", null ]), Error("ValidateArgs itself did not receive valid args"), "throws errors if passed null in types list");
+
+  t.throws( (args = "a string") => validateArgsArgs(args, [ "string", "notvalidtype" ]), Error("ValidateArgs itself did not receive valid args"), "throws errors if passed a non-valid type in types list");
+
+
 
 });
 
