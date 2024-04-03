@@ -29,6 +29,21 @@ tap.test("test validateArgs to see if called with valid args", async t => {
     validateArgsArgs({}, []);
   }, Error("ValidateArgsArgs - received non-arguments arg argument"));
 
+  t.throws(() => (function () {
+    validateArgsArgs(arguments, "not an array");
+  })("a string"), Error("ValidateArgsArgs - received non-array types argument"));
+
+  t.throws(() => (function () {
+    validateArgsArgs(arguments, ["string", "array"]);
+  })("a string"), Error("ValidateArgsArgs - args length does not match types length"));
+
+  t.throws(() => (function () {
+    validateArgsArgs(arguments, ["string", "array", "dog"]);
+  })("a string"), Error("validateargsargs - some of the types array are invalid"));
+
+
+
+
 
 
   // t.throws(await (async function () {

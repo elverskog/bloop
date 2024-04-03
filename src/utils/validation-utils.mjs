@@ -15,10 +15,25 @@ export function validateArgsArgs(args, types) {
 
   valArgsResHandler(Array.isArray(types), "ValidateArgsArgs - received non-array types argument"); 
 
-  valArgsResHandler(args.length === types.length, "ValidateArgsArgs - args length does not match types length");
+  valArgsResHandler(args.length === types.length, "validateargsargs - args length does not match types length");
 
-  valArgsResHandler(types.every(type => {
-    return typeof type === "string" && 
+  // valArgsResHandler(types.every(type => {
+  //   return typeof type === "string" && 
+  //     [
+  //       "boolean",
+  //       "string",
+  //       "object",
+  //       "function",
+  //       "number",
+  //       "bigint"
+  //     ].includes(type);
+  // }), "validateargsargs - some of the types array are invalid");
+
+  
+
+  types.every(type => {
+    valArgsResHandler(typeof type === "string", "validateargsargs - some of the types array are not strings");
+    valArgsResHandler(
       [
         "boolean",
         "string",
@@ -26,8 +41,9 @@ export function validateArgsArgs(args, types) {
         "function",
         "number",
         "bigint"
-      ].includes(type);
+      ].includes(type));
   }));
+
 
   return true;
 
