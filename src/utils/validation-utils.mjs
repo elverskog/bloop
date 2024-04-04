@@ -5,45 +5,35 @@ export function valArgsResHandler(res, errMessage = "generic validateArgs error"
   return;
 }
 
-// throw new Error("ValidateArgs itself did not receive valid args");
 
 export function validateArgsArgs(args, types) {
 
-  valArgsResHandler(arguments.length === 2, "ValidateArgsArgs did not receive 2 arguments");
+  valArgsResHandler(arguments.length === 2, "validateArgsArgs did not receive 2 arguments");
 
-  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "ValidateArgsArgs - received non-arguments arg argument"); 
+  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - received non-arguments arg argument"); 
 
-  valArgsResHandler(Array.isArray(types), "ValidateArgsArgs - received non-array types argument"); 
+  valArgsResHandler(Array.isArray(types), "validateArgsArgs - received non-array types argument"); 
 
-  valArgsResHandler(args.length === types.length, "validateargsargs - args length does not match types length");
-
-  // valArgsResHandler(types.every(type => {
-  //   return typeof type === "string" && 
-  //     [
-  //       "boolean",
-  //       "string",
-  //       "object",
-  //       "function",
-  //       "number",
-  //       "bigint"
-  //     ].includes(type);
-  // }), "validateargsargs - some of the types array are invalid");
-
-  
+  valArgsResHandler(args.length === types.length, "validateArgsArgs - args length does not match types length");
 
   types.every(type => {
-    valArgsResHandler(typeof type === "string", "validateargsargs - some of the types array are not strings");
+    
+    valArgsResHandler(typeof type === "string", "validateArgsArgs - some of the types array are not strings");
+
     valArgsResHandler(
       [
         "boolean",
         "string",
         "object",
+        "array",
         "function",
         "number",
         "bigint"
-      ].includes(type));
-  }));
+      ].includes(type), "validateArgsArgs - some of the types array are not names of valid types");
 
+    return true;
+
+  });
 
   return true;
 
@@ -52,19 +42,26 @@ export function validateArgsArgs(args, types) {
 
 export function validateArgs(args, types) {
 
+
   if(validateArgsArgs(args, types)) {
 
-    console.log("KEEP GOING", );
-
-    args.every((arg, index) => {
+    [ ...args ].every((arg, index) => {
     
+      console.log("ARG/TYPE: ", arg, types[index]);
+      
       if (types[index] === "array") {
-        valArgsResHandler(Array.isArray(arg));
+        valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ arg } is not ${ types[index] }`);
       } else {
-        valArgsResHandler(typeof arg === types[index]);
+        valArgsResHandler(typeof arg === types[index], `validateArgsArgs - ${ arg } is not ${ types[index] }`);
       }
 
+      return true;
+
     });
+
+  } else {
+
+    valArgsResHandler(false, "validateArgsArgs - fallback for fail");
 
   }
 
