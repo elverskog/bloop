@@ -58,15 +58,10 @@ export function validateModuleRes(moduleRes) {
 
 
 
-export async function buildPage(options) {
+export async function buildPage(path, isFetch, isProd) {
 
-  validateArgs([
-    [options?.path, "string"],
-    [options?.isFetch, "boolean"],
-    [options?.isProd, "boolean"]
-  ]); 
+  validateArgs(arguments, ["string", "boolean", "boolean"]);
 
-  const { path, isFetch, isProd } = options;
   let moduleRes;
   const pageRes = {
     title: "",

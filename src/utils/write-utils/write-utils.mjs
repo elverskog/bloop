@@ -22,10 +22,7 @@ function validateObj(obj, valType) {
 
 function write2(val, savePath) {
 
-  validateArgs([
-    [ val, "string" ], 
-    [ savePath, "string" ] ]
-  ); 
+  validateArgs(arguments, ["string", "string"]); 
 
   let buff;
   let compressed;
@@ -67,9 +64,10 @@ export function writeCss(page) {
 
   let index = 0;
 
-  validateArgs([
-    [page.css, "array"]
-  ]); 
+  validateArgs(arguments, ["object"]); 
+  (function() {
+    validateArgs(arguments, ["array"]); 
+  })(page.css);
 
   function writeEach() {
   
@@ -113,10 +111,7 @@ export function writeCss(page) {
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index) {
 
-  validateArgs([
-    [page.js, "object"], 
-    [index, "number"]
-  ]); 
+  validateArgs(arguments, ["object", "number"]); 
 
   const jsObj = page.js[index];
   const name = jsObj.name;
@@ -157,7 +152,10 @@ function writeEachJs(page, index) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page) {
 
-  validateArgs([[page.js, "array"]]); 
+  validateArgs(arguments, ["object"]); 
+  (function () { 
+    validateArgs(arguments, ["array"]); 
+  })(page.js); 
   
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
@@ -175,7 +173,10 @@ export function writeJs(page) {
 //function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page) {
 
-  validateArgs([[page.modulePath, "string"], [page.markup, "string"]]); 
+  validateArgs(arguments,["object"]); 
+  (function() {
+    validateArgs(arguments, ["string", "string"]);
+  })(page.modulePath, page.markup);
 
   const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "markup/").replace(".mjs", ".html");
 
@@ -211,13 +212,9 @@ function cleanPage(page, key) {
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
 export function writeModule(page) {
 
-  validateArgs([
-    [page.title, "string"],
-    [page.modulePath, "string"],
-    [page.css, "array"],
-    [page.markup, "string"],
-    [page.js, "array"]
-  ]); 
+  (function() {
+    validateArgs(arguments, ["string", "string", "array", "string", "array"]);
+  })(page.title, page.modulePath, page.css, page.markup, page.js);
 
   const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "modules/").replace(".mjs", ".json");
 

@@ -67,30 +67,3 @@ export function validateArgs(args, types) {
 
 }
 
-
-
-  // args.every(pair => {
-  
-  //   switch (true) {
-  //     case !validateArg(pair):
-  //       resArray.push(new Error("pair is not valid"));  
-  //       break;
-  //     case validateType(pair[1]):
-  //       if(typeof pair[0] !== pair[1]) {
-  //         resArray.push(new Error(`validateArgs - ${ pair[0] } is not ${ pair[1] }`));  
-  //       }
-  //       break;
-  //     case pair[1] === "array": 
-  //       if (!Array.isArray(pair[0])) {
-  //         resArray.push(new Error(`validateArgs - ${ pair[0] } is not array`));
-  //       }
-  //       break;
-  //     default:
-  //       resArray.push(new Error("validateArgs - case is default. this should not happen"));
-  //       break;
-  //   }
-
-  // });
-
-
-

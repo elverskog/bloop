@@ -6,18 +6,10 @@ import { buildPage } from "./build-page-utils.mjs";
 
 export async function build(pagePathsArray, isFetch) {
 
-  try {
-    validateArgs([
-      [pagePathsArray, "array"],
-      [isFetch, "boolean"]
-    ]); 
-  } catch (error) {
-    console.log("CAUGHT ERROR: ", error);
-    return;
-  }
+  validateArgs(arguments, ["array", "boolean", "boolean"]);
 
   const masterRes = Promise.all(pagePathsArray.map( async path => {
-    return await buildPage({ path, isFetch, isProd: true });
+    return await buildPage(path, isFetch, true);
   }));
 
   return masterRes;
