@@ -36,9 +36,7 @@ tap.test("writeMarkup tests", t => {
     <html>dsfasdf</html>`
   };
 
-  t.throws(() => writeMarkup(pageMissingModulePath), {
-    message: "Error: validateArgs - undefined isn't string"
-  }, "pageMissingModulePath");
+  t.throws(() => writeMarkup(pageMissingModulePath), Error("validateArgsArgs - undefined is not string"));
 
   t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write; name is missing");
 
@@ -48,9 +46,7 @@ tap.test("writeMarkup tests", t => {
     modulePath: "src/markup/test-markup.mjs",
   };
 
-  t.throws(() => writeMarkup(pageMissingMarkup), {
-    message: "Error: validateArgs - undefined isn't string"
-  },"pageMissingMarkup");
+  t.throws(() => writeMarkup(pageMissingMarkup), Error("validateArgsArgs - undefined is not string"));
 
   t.match(fs.existsSync("src/dist/markup/test-markup.mjs"), false, "writeMarkup failed to write; markup is missing");
 
@@ -62,9 +58,7 @@ tap.test("writeMarkup tests", t => {
     <html>dsfasdf</html>`
   };
 
-  t.throws(() => writeMarkup(pageBadModulePath), {
-    message: "Error: validateArgs - null isn't string"
-  });
+  t.throws(() => writeMarkup(pageBadModulePath), Error("validateArgsArgs - null is not string"));
 
   t.end();
 
@@ -167,7 +161,7 @@ tap.test("write JS tests", t => {
     }]
   }];
 
-  t.throws(() => writeJs(pageMissingVal), Error("validateArgs - undefined isn't array"), "writeJs passed invalid page objetc");
+  t.throws(() => writeJs(pageMissingVal), Error("validateArgsArgs - undefined is not array"));
   t.match(fs.existsSync("dist/js/test.js"), false, "writeJsOrJs failed to write test.mjs because js val is missing");
 
   //////////////////////////////////////////////
