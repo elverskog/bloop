@@ -8,12 +8,16 @@ export function valArgsResHandler(res, errMessage = "generic validateArgs error"
 
 export function validateArgsArgs(args, types) {
 
+  // console.log("ARGUMENTS: ", arguments);
+
   valArgsResHandler(arguments.length === 2, "validateArgsArgs did not receive 2 arguments");
 
-  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - received non-arguments arg argument"); 
+  valArgsResHandler(args.length > 0, "validateArgsArgs arg argument did not have any elements");
 
   valArgsResHandler(Array.isArray(types), "validateArgsArgs - received non-array types argument"); 
 
+  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - received non-arguments arg argument"); 
+  
   valArgsResHandler(args.length === types.length, "validateArgsArgs - args length does not match types length");
 
   types.every(type => {

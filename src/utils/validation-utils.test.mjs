@@ -11,6 +11,7 @@ tap.test("test valArgsResHandler", async t => {
   t.throws(() => valArgsResHandler(false), Error("generic validateArgs error"));
   t.throws(() => valArgsResHandler(false, "custom message"), Error("custom message"));
   t.match(await valArgsResHandler(true), undefined);
+  t.end();
 });
 
 
@@ -37,8 +38,12 @@ tap.test("test validateArgsArgs", async t => {
     validateArgsArgs(arguments);
   })("a string"), Error("validateArgsArgs did not receive 2 arguments"));
 
+  t.throws(() => (function () {
+    validateArgsArgs(arguments, [ "string" ]);
+  })(), Error("validateArgsArgs arg argument did not have any elements"));
+
   t.throws(() => {
-    validateArgsArgs({}, []);
+    validateArgsArgs("a string", []);
   }, Error("validateArgsArgs - received non-arguments arg argument"));
 
   t.throws(() => (function () {
@@ -56,6 +61,8 @@ tap.test("test validateArgsArgs", async t => {
   t.throws(() => (function () {
     validateArgsArgs(arguments, ["string", "array", "frog"]);
   })("a string", [ "test" ], {}), Error("validateArgsArgs - some of the types array are not names of valid types"));
+
+  t.end();
 
 });
 
@@ -127,6 +134,8 @@ tap.test("test validateArgs", async t => {
   t.throws(() => (function() {
     validateArgs(arguments, ["string", "bigint"]);
   })("a string", [ "test" ]), Error("validateArgsArgs - test is not bigint"));
+
+  t.end();
 
 });
 

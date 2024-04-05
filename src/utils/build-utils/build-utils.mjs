@@ -4,7 +4,7 @@ import { validateArgs } from "../validation-utils.mjs";
 import { buildPage } from "./build-page-utils.mjs";
 
 
-export async function build(pagePathsArray, isFetch) {
+export async function build(pagePathsArray, isFetch, isProd) {
 
   validateArgs(arguments, ["array", "boolean", "boolean"]);
 

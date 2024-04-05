@@ -59,6 +59,8 @@ tap.test("build-page-utils.validateModuleRes tests", async t => {
     initArgs: "",
   }), Error, "validateModuleRes should throw error if module does not return initArgs as string (if initArgs is returned at all)");
 
+  t.end();
+
 });
 
 /////////////////////////////////////////////////////////////////////////////
