@@ -14,10 +14,10 @@ export function validateArgsArgs(args, types) {
 
   valArgsResHandler(args.length > 0, "validateArgsArgs arg argument did not have any elements");
 
+  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - received non-arguments arg argument"); 
+
   valArgsResHandler(Array.isArray(types), "validateArgsArgs - received non-array types argument"); 
 
-  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - received non-arguments arg argument"); 
-  
   valArgsResHandler(args.length === types.length, "validateArgsArgs - args length does not match types length");
 
   types.every(type => {
@@ -51,12 +51,15 @@ export function validateArgs(args, types) {
 
     [ ...args ].every((arg, index) => {
     
-      console.log("ARG/TYPE: ", arg, types[index]);
-      
+      // console.log("ARG/TYPE: ", arg, types[index]);
+      // console.log("ARG NAME: ", Object.prototype.toString.call);
+     
+      const name = typeof arg === "string" ? arg : Object.prototype.toString.call(arg); 
+
       if (types[index] === "array") {
-        valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ arg } is not ${ types[index] }`);
+        valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ name } is not ${ types[index] }`);
       } else {
-        valArgsResHandler(typeof arg === types[index], `validateArgsArgs - ${ arg } is not ${ types[index] }`);
+        valArgsResHandler(typeof arg === types[index], `validateArgsArgs - ${ name } is not ${ types[index] }`);
       }
 
       return true;

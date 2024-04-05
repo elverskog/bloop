@@ -4,9 +4,11 @@ import { validateArgs } from "../validation-utils.mjs";
 import { buildPage } from "./build-page-utils.mjs";
 
 
-export async function build(pagePathsArray, isFetch, isProd) {
+export async function build(pagePathsArray, isFetch, isProd = true) {
 
-  validateArgs(arguments, ["array", "boolean", "boolean"]);
+  console.log("BUILD ARGUMENTS: ", arguments);
+
+  validateArgs(arguments, ["array", "boolean"]);
 
   const masterRes = Promise.all(pagePathsArray.map( async path => {
     return await buildPage(path, isFetch, true);
