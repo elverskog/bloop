@@ -209,8 +209,6 @@ export function insertEachScript(jsObj, completedList, document) {
 
 export function insertScripts(js, fn, window) {
 
-  console.log("JS: ", js);
-
   if (js === null || typeof js !== "object" && typeof js[Symbol.iterator] !== "function") {
     throw new TypeError("insertScript passed invalid js array");
   }

@@ -6,8 +6,6 @@ import { buildPage } from "./build-page-utils.mjs";
 
 export async function build(pagePathsArray, isFetch, isProd = true) {
 
-  console.log("BUILD ARGUMENTS: ", arguments);
-
   validateArgs(arguments, ["array", "boolean"]);
 
   const masterRes = Promise.all(pagePathsArray.map( async path => {

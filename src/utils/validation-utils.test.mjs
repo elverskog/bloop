@@ -113,11 +113,11 @@ tap.test("test validateArgs", async t => {
 
   t.throws(() => (function() {
     validateArgs(arguments, ["string", "boolean"]);
-  })("a string", [ "test" ]), Error("validateArgsArgs - test is not boolean"));
+  })("a string", [ "test" ]), Error("validateArgsArgs - [object Array] is not boolean"));
 
   t.throws(() => (function() {
     validateArgs(arguments, ["string", "string"]);
-  })("a string", [ "test" ]), Error("validateArgsArgs - test is not string"));
+  })("a string", [ "test" ]), Error("validateArgsArgs - [object Array] is not string"));
 
   t.throws(() => (function() {
     validateArgs(arguments, ["string", "object"]);
@@ -133,7 +133,7 @@ tap.test("test validateArgs", async t => {
 
   t.throws(() => (function() {
     validateArgs(arguments, ["string", "bigint"]);
-  })("a string", [ "test" ]), Error("validateArgsArgs - test is not bigint"));
+  })("a string", [ "test" ]), Error("validateArgsArgs - [object Array] is not bigint"));
 
   t.end();
 

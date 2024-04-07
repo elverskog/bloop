@@ -51,9 +51,6 @@ export function validateArgs(args, types) {
 
     [ ...args ].every((arg, index) => {
     
-      // console.log("ARG/TYPE: ", arg, types[index]);
-      // console.log("ARG NAME: ", Object.prototype.toString.call);
-     
       const name = typeof arg === "string" ? arg : Object.prototype.toString.call(arg); 
 
       if (types[index] === "array") {
