@@ -2,7 +2,7 @@
 export async function parseAndOutputStream(res) {
 
   //this function is only for browser
-  if(typeof window !== "object") return;
+  // if(typeof window !== "object") return;
 
   const result = "";
   const decoder = new TextDecoder();

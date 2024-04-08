@@ -1,29 +1,108 @@
-
 import tap from "tap";
 import { parseAndOutputStream } from "./res-utils.mjs";
+import { ReadableStream } from "node:stream/web";
+
+function createStream({ id, text, version }) {
+  const chunks = text.split(" ").map(
+    (textChunk, index, fullArray) =>
+      "data:" +
+      JSON.stringify({
+        text: index === fullArray.length - 1 ? textChunk : textChunk + " ",
+        version,
+        id,
+      })
+  );
+
+  return new ReadableStream({
+    
+    start(controller) {
+      controller.enqueue(
+        Buffer.from(
+          "data:" +
+            JSON.stringify({
+              text: "",
+              version,
+              id,
+            }) +
+            chunks[0]
+        )
+      );
+
+      for (let i = 1; i < chunks.length; i++) {
+        if (i === chunks.length - 1) {
+          // Fragment the last chunk, to test correct merging of partial responses
+          const partialChunks = [
+            chunks[i].substring(0, Math.floor(chunks[i].length * 0.5)),
+            chunks[i].substring(Math.floor(chunks[i].length * 0.5)),
+          ];
+          setTimeout(() => controller.enqueue(Buffer.from(partialChunks[0])), i);
+          setTimeout(() => controller.enqueue(Buffer.from(partialChunks[1])), i + 1);
+        } else {
+          setTimeout(() => controller.enqueue(Buffer.from(chunks[i])), i);
+        }
+      }
+
+      setTimeout(() => controller.close(), chunks.length + 1);
+    },
+  });
+}
+
+
+
+
+function makeString(length) {
+  let result = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
 
 
 tap.test("test parseAndOutputStream", async t => {
 
+  const text = makeString(5);
+  // const encoder = new TextEncoder();
+  // const encString = encoder.encode(string);
 
-  let interval;
-  
-  const stream = new ReadableStream({
+  // @ts-expect-error We only mock a partial Response
+  const encString = {
+    ok: true,
+    body: createStream({
+      text,
+      version: "test:version",
+      id: "test:id",
+    }),
+  };
 
-    start(controller) {
-      interval = setInterval(() => {
-        let string = randomChars();
+// function makeString(length) {
 
-        // Add the string to the stream
-        controller.enqueue(string);
+  console.log("ENC STRING", encString);
 
-        // show it on the screen
-        let listItem = document.createElement("li");
-        listItem.textContent = string;
-        list1.appendChild(listItem);
-      }, 1000); 
-    }
-  });
+  t.match(await parseAndOutputStream(encString), text);
+
+  // let interval;
+
+  // const stream = new ReadableStream({
+
+  //   start(controller) {
+  //     interval = setInterval(() => {
+
+  //       let string = makeString(512);
+
+  //       // Add the string to the stream
+  //       controller.enqueue(string);
+
+  //     }, 1000); 
+  //   }
+  // });
+
+
+
 
   // const pagePathsArray = ["src/utils/build-utils/mocks/mock-page.mjs"];
 
