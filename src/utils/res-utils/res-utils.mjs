@@ -14,8 +14,6 @@ export async function parseAndOutputStream(res) {
 
   async function processText({ done, value }) {
 
-    console.log("VALUE: ", value);
-
     //exit if stream is fully parsed 
     if (done) return;
 

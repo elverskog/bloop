@@ -1,4 +1,4 @@
-import { parseAndOutputStream } from "../utils/res-utils.mjs";
+import { parseAndOutputStream } from "../utils/res-utils/res-utils.mjs";
 import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
 
 
