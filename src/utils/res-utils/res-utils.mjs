@@ -1,8 +1,6 @@
 //accept a stream, parse it and set it as the content inside 
 export async function parseAndOutputStream(res) {
 
-  console.log("RES BODY: ", res.body.getReader);
-
   //this function is only for browser
   // if(typeof window !== "object") return;
 
@@ -16,8 +14,6 @@ export async function parseAndOutputStream(res) {
 
   async function processText({ done, value }) {
 
-    console.log("PROCCESSTEXT: ", done, value);
-
     //exit if stream is fully parsed 
     if (done) return;
 
@@ -29,6 +25,7 @@ export async function parseAndOutputStream(res) {
 
     // If not done, read some more, and call this function again
     const newDoneAndVal = await reader.read();
+
     processText(newDoneAndVal);
 
   }

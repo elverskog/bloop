@@ -7,6 +7,19 @@ import testModule from "./mocks/mock-module.json" assert { type: "json" };
 
 let server;
 
+function makeString(length) {
+  let result = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+const plainString = makeString(5000);
 
 function serverStart() {
 
@@ -19,7 +32,7 @@ function serverStart() {
 
   server = http.createServer(async (req, res) => {
     res.writeHead(200, headerOptions);
-    res.write("asdfasdfsdf sdf sdf asdfsaf sdfsfd sdfsf sfdas");
+    res.write(plainString);
     res.end();
   });
 
@@ -28,6 +41,7 @@ function serverStart() {
   });
 
 }
+
 
 
 
@@ -42,7 +56,7 @@ tap.test("test parseAndOutputStream", async t => {
   // const parsedResStream = await parseAndOutputStream(res);
   // console.log("PARSED RES: ", parsedResStream);
 
-  t.match(await parseAndOutputStream(res), "asdfasdfsdf sdf sdf asdfsaf sdfsfd sdfsf sfdas");
+  t.match(await parseAndOutputStream(res), plainString);
 
   global.setTimeout(() => {
     server.close();
