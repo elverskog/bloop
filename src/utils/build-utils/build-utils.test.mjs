@@ -12,10 +12,10 @@ tap.test("test build", async t => {
 
   t.rejects(() => build(), Error("validateArgsArgs arg argument did not have any elements"));
   t.rejects(() => build(pagePathsArray), Error("validateArgsArgs - args length does not match types length"));
-  t.rejects(() => build(pagePathsArray, null), Error("[object Null] is not boolean"));
-  t.rejects(() => build(null, false), Error("[object Null] is not array"));
+  t.rejects(() => build(pagePathsArray, null, false), Error("[object Null] is not boolean"));
+  t.rejects(() => build(null, false, false), Error("[object Null] is not array"));
 
-  const result = await build(pagePathsArray, false);
+  const result = await build(pagePathsArray, false, false);
   t.match(result, [{
     title: String,
     name: String,

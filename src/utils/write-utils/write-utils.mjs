@@ -20,7 +20,7 @@ function validateObj(obj, valType) {
 }
 
 
-function write2(val, savePath) {
+export function write(val, savePath, compress) {
 
   validateArgs(arguments, ["string", "string"]); 
 
@@ -60,7 +60,7 @@ function write2(val, savePath) {
 
 
 //function to compress and write css files for a full page request
-export function writeCss(page) {
+export function writeCss(page, compress, compress) {
 
   let index = 0;
 
@@ -80,7 +80,7 @@ export function writeCss(page) {
       .replace("components", "css")
       .replace("mjs", "css");
 
-    write2(val, savePath);
+    write(val, savePath, compress);
     index++;
   
     //recurse on current function (writeEach)
@@ -109,7 +109,7 @@ export function writeCss(page) {
 
 //function to process/write a file for each module used for a given page
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
-function writeEachJs(page, index) {
+function writeEachJs(page, index, compress) {
 
   validateArgs(arguments, ["object", "number"]); 
 
@@ -135,7 +135,7 @@ function writeEachJs(page, index) {
   // console.log("SCRIPTWITHWINDOW: ", scriptWithWindow);
 
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
-    write2(scriptWithWindow, savePath);
+    write(scriptWithWindow, savePath, compress);
   } else {
     throw new Error("writeJs passed invalid page object");
   }
@@ -143,14 +143,14 @@ function writeEachJs(page, index) {
   index++;
 
   if (validateObj(page.js[index], "string")) {
-    writeEachJs(page, index);
+    writeEachJs(page, index, compress);
   }
 
 }
 
 
 //function to compress and write js files for a full page request///////////////////////////
-export function writeJs(page) {
+export function writeJs(page, compress) {
 
   validateArgs(arguments, ["object"]); 
   (function () { 
@@ -160,7 +160,7 @@ export function writeJs(page) {
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[0], "string")) {
-    writeEachJs(page, 0);
+    writeEachJs(page, 0, compress);
   } else {
     throw new Error("writeJs passed invalid page object");
   } 
@@ -183,7 +183,7 @@ export function writeMarkup(page) {
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
-  return write2(page.markup, savePath);
+  return write(page.markup, savePath, compress);
 
   // return true;
 
@@ -210,7 +210,7 @@ function cleanPage(page, key) {
 
 
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
-export function writeModule(page) {
+export function writeModule(page, compress) {
 
   (function() {
     validateArgs(arguments, ["string", "string", "array", "string", "array"]);
@@ -230,6 +230,6 @@ export function writeModule(page) {
 
   // console.log("PAGEPATHSREMOVED: ", pagePathsRemoved);
 
-  return write2(JSON.stringify(pagePathsRemoved), savePath);
+  return write(JSON.stringify(pagePathsRemoved), savePath, compress);
 
 }

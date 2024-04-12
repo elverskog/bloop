@@ -1,12 +1,61 @@
 import tap from "tap";
 import fs from "fs-extra";
 import { 
+  write,
   writeMarkup, 
   writeCss,
   writeJs
   // writeModuleResult, 
 } from "./write-utils.mjs";
 import { clearFiles } from "../dir-utils/dir-utils.mjs";
+
+
+function makeString(length) {
+  let result = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+
+
+// WRITE (GENERIC) TESTS ////////////////////////////////////////////////////////////////
+
+tap.test("write tests", t => {
+ 
+  t.match(write(makeString(333), "dist/markup/test-file.txt"), true, "write with valid args returned true");
+  t.match(fs.existsSync("dist/markup/test-file.txt"), true, "write wrote test-file.txt");
+
+  clearFiles(["dist/markup",]);
+
+  //////////////////////////////////////////////
+ 
+  t.match(write(makeString(333), "dist/test/test-file.txt"), true, "write with new dir returned true");
+  t.match(fs.existsSync("dist/test/test-file.txt"), true, "write wrote test-file.txt in new dir");
+
+  clearFiles(["dist/test",]);
+
+  //////////////////////////////////////////////
+
+  t.throws(() => write(), Error("validateArgsArgs arg argument did not have any elements"));
+
+  t.throws(() => write(makeString(333)), Error("validateArgsArgs - args length does not match types length"));
+
+  t.throws(() => write(null, "dist/markup/test-file.txt"), Error("[object Null] is not string"));
+
+  t.throws(() => write(makeString(333), null), Error("[object Null] is not string"));
+
+  t.end();
+
+});
+
+
+
 
 
 //WRITE MARKUP TESTS/////////////////////////////////////////////////////////////////////
