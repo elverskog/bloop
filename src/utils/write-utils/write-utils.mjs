@@ -22,8 +22,9 @@ function validateObj(obj, valType) {
 
 export function write(val, savePath, compress) {
 
-  validateArgs(arguments, ["string", "string"]); 
+  validateArgs(arguments, ["string", "string", "boolean"]); 
 
+  let text = val;
   let buff;
   let compressed;
   let dirPath;
@@ -39,17 +40,17 @@ export function write(val, savePath, compress) {
   }
 
   buff = Buffer.from(val, "utf-8");
-  
-  try {
-    compressed = brotli.compress(buff, brotliSettings);
-  } catch (error) {
-    throw new Error(`COMPRESS FAILED: ${error}`);
+ 
+  if (compress) {
+    try {
+      text = brotli.compress(buff, brotliSettings);
+    } catch (error) {
+      throw new Error(`COMPRESS FAILED: ${error}`);
+    }
   }
 
   try {
-    // fs.writeFileSync(savePath, compressed);
-    // console.log("PATH: ", path);
-    fs.writeFileSync(savePath, val);
+    fs.writeFileSync(savePath, text);
   } catch (error) {
     throw new Error(`WRITE FAILED: ${error}`);
   }
@@ -59,48 +60,39 @@ export function write(val, savePath, compress) {
 }
 
 
-//function to compress and write css files for a full page request
-export function writeCss(page, compress, compress) {
 
-  let index = 0;
+function writeEachCss(cssObj, compress) {
+
+  validateArgs(arguments, ["object", "boolean"]); 
+
+  (function() {
+    validateArgs(arguments, ["string", "string"]); 
+  })(cssObj.val, cssObj.modulePath);
+
+  const val = cssObj.val;
+  const savePath = cssObj.modulePath
+    .replace("src", "dist")
+    .replace("pages", "css")
+    .replace("components", "css")
+    .replace("mjs", "css");
+
+  write(val, savePath, compress);
+
+}
+
+
+//function to compress and write css files for a full page request
+export function writeCss(page, compress = false) {
 
   validateArgs(arguments, ["object"]); 
+
   (function() {
     validateArgs(arguments, ["array"]); 
   })(page.css);
 
-  function writeEach() {
-  
-    const cssObj = page.css[index];
-    const val = cssObj.val;
-
-    const savePath = cssObj.modulePath
-      .replace("src", "dist")
-      .replace("pages", "css")
-      .replace("components", "css")
-      .replace("mjs", "css");
-
-    write(val, savePath, compress);
-    index++;
-  
-    //recurse on current function (writeEach)
-    if(page.css[index]) {
-
-      if (validateObj(page.css[index], "string")) {
-        writeEach();
-      } else {
-        throw new Error("writePage in write - modulePath or val is not a string");
-      }
-
-    }
-
-  }
-
-  if (validateObj(page.css[index], "string")) {
-    writeEach();
-  } else {
-    throw new Error("writePage outer - modulePath or val is not a string");
-  }
+  page.css.forEach(cssObj => {
+    writeEachCss(cssObj, compress);
+  });
 
   return true;
 
@@ -111,7 +103,7 @@ export function writeCss(page, compress, compress) {
 //it calls itself until it runs out of objects in the array page.js ///////////////////////////
 function writeEachJs(page, index, compress) {
 
-  validateArgs(arguments, ["object", "number"]); 
+  validateArgs(arguments, ["object", "number", "boolean"]); 
 
   const jsObj = page.js[index];
   const name = jsObj.name;
@@ -150,7 +142,7 @@ function writeEachJs(page, index, compress) {
 
 
 //function to compress and write js files for a full page request///////////////////////////
-export function writeJs(page, compress) {
+export function writeJs(page, compress = false) {
 
   validateArgs(arguments, ["object"]); 
   (function () { 
@@ -171,8 +163,9 @@ export function writeJs(page, compress) {
 
 
 //function to compress and write markup files for a full page request /////////////////////////////////////////
-export function writeMarkup(page) {
+export function writeMarkup(page, compress = false) {
 
+  // validateArgs(arguments,["object", "boolean"]); 
   validateArgs(arguments,["object"]); 
   (function() {
     validateArgs(arguments, ["string", "string"]);
@@ -210,7 +203,7 @@ function cleanPage(page, key) {
 
 
 //function to compress and write module ({css, markup,script} passed to browser in one file) //////////////
-export function writeModule(page, compress) {
+export function writeModule(page, compress = false) {
 
   (function() {
     validateArgs(arguments, ["string", "string", "array", "string", "array"]);
