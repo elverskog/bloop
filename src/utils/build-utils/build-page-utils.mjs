@@ -74,7 +74,16 @@ export async function buildPage(path, isFetch, isProd) {
   };
 
 
+  // I am here
+  // can i break this function out
+  // likely moving pageRes outside buildPage
+  // OR can I funnel it's result into pageRes
+  // each time it is called
+
+
   async function addModule(modulePath, args) {
+
+    console.log("ADD MODULE: ", modulePath);
 
     const path = modulePath === "/" ? "/a" : modulePath;
     //if for build, just use what was passed in, else need to construct the full path from URL  
