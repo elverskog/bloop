@@ -5,7 +5,7 @@ import { validateArgs } from "../validation-utils.mjs";
 // and also needs to be passed down the "chain" of module thay might compre a page
 
 
-//converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
+//th converts { init: [Function: init], ...etc } to an object where "Function: init" is a string
 function convertJsToString(jsObjVal) {
 
   let resultInner = "";
@@ -57,22 +57,100 @@ export function validateModuleRes(moduleRes) {
 }
 
 
+async function addModule(modulePath, args) {
 
-export async function buildPage(path, isFetch, isProd) {
+  const path = modulePath === "/" ? "/a" : modulePath;
+  //if for build, just use what was passed in, else need to construct the full path from URL  
+  // const adjustedPath = isProd ? `../../../${path}` : `../../src/pages${path}.mjs`;
+  const adjustedPath = `../../../${path}`;
+
+  let module;
+  let moduleRes;
+
+  try {
+    module = (await import(adjustedPath)).default;    
+  } catch (error) {
+    throw new Error(`IMPORT MODULE: ${error}`);
+  }
+
+  try {
+    moduleRes = await module(addModule, args);
+  } catch (error) {
+    throw new Error(`RUN MODULE: ${error}`);
+  }
+
+  validateModuleRes(moduleRes);
+
+  //add a title for the page if it doesn't exist
+  if(typeof moduleRes?.title === "string" && !pageRes.title.length) {
+    pageRes.title = moduleRes.title;    
+  }
+
+  //add a name for the page if it doesn't exist
+  if(typeof moduleRes?.name === "string" && !pageRes.name.length) {
+    pageRes.name = moduleRes.name;    
+  }
+
+  // add CSS
+  if(typeof moduleRes?.name === "string" && typeof moduleRes.css === "string") {
+    pageRes.css.push({
+      name: moduleRes.name,
+      modulePath,
+      val: moduleRes.css    
+    });
+  }
+
+  // add JS
+  if(typeof moduleRes?.name === "string" && typeof moduleRes.js === "object") {
+    
+    if(typeof moduleRes.js.init === "function" && typeof moduleRes.name === "string") {
+      const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
+      pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
+    }
+
+    let jsValAsString = convertJsToString(moduleRes.js);
+    
+    // console.log("JSVALASSTRINGS: ", jsValAsStrings);
+
+    pageRes.js.push({
+      name: moduleRes.name,
+      modulePath,
+      val: jsValAsString 
+    });
+
+  }
+
+  // add markup
+
+  console.log("BUILD MARKUP: ", moduleRes.markup);
+  if(typeof moduleRes?.name === "string" && typeof moduleRes.markup === "string") {
+    // pageRes.script[moduleRes.name] = moduleRes.script;    
+    pageRes.markup = moduleRes.markup;
+  }
+
+  return pageRes;
+
+}
+
+
+export async function buildPage(path, isFetch) {
 
   validateArgs(arguments, ["string", "boolean", "boolean"]);
 
-  let moduleRes;
   const pageRes = {
     title: "",
     name: "",
-    modulePath: path,  //add the pathname into the page output. Need to know where to write dt files
+    modulePath: "",  //add the pathname into the page output. Need to know where to write dt files
     css: [],
     markup: "",
     js: [],
-    inits: ""
+    inits: "",
+    addModule
   };
 
+  pageRes.modulePath = path;
+
+  let moduleRes;
 
   // I am here
   // can i break this function out
@@ -81,75 +159,9 @@ export async function buildPage(path, isFetch, isProd) {
   // each time it is called
 
 
-  async function addModule(modulePath, args) {
-
-    console.log("ADD MODULE: ", modulePath);
-
-    const path = modulePath === "/" ? "/a" : modulePath;
-    //if for build, just use what was passed in, else need to construct the full path from URL  
-    const adjustedPath = isProd ? `../../../${path}` : `../../src/pages${path}.mjs`;
-
-    let module;
-    let moduleRes;
-
-    try {
-      module = (await import(adjustedPath)).default;    
-    } catch (error) {
-      throw new Error(`IMPORT MODULE: ${error}`);
-    }
-
-    try {
-      moduleRes = await module(addModule, args);
-    } catch (error) {
-      throw new Error(`RUN MODULE: ${error}`);
-    }
-
-    (args => validateArgs(args, [ "object" ]))(moduleRes);
-
-    const { name, title, css, js, markup } = moduleRes;
-
-    (args => {
-      validateArgs(args, [ "string", "string", "string", "string", "object"  ]);
-    })(name, title, css, js, markup);
-
-    //add a name for the page if it doesn't ext
-    pageRes.name = pageRes.name.length ? pageRes.name : name;    
-
-    //add a title for the page if it doesn't ext
-    pageRes.title = pageRes.title.length ? pageRes.title : title;    
-
-    // add CSS
-    pageRes.css.push({
-      name: moduleRes.name,
-      modulePath,
-      val: moduleRes.css    
-    });
-
-    // add inits if js has init function
-    if(typeof js.init === "function") {
-      const initArgs = typeof initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
-      pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
-    }
-
-    // add JS
-    pageRes.js.push({
-      name: moduleRes.name,
-      modulePath,
-      val: convertJsToString(js)
-    });
-
-    //add markup here we just use the markup from the last module
-    pageRes.markup = markup;
-
-    return pageRes;
-
-  }
-
-
   try {
-
+    //impt: addModule actually returns a populated version of pageRes
     moduleRes = await addModule(path, { addModule }); 
-
     //add the title for page's main module (used for setting the page title on frontend)
     pageRes.title = typeof moduleRes?.title === "string" ? moduleRes.title : ""; 
 
@@ -161,7 +173,6 @@ export async function buildPage(path, isFetch, isProd) {
     // return;
     throw new Error(error);
   }
-
 
   // get the wrapper for the page
   if (!isFetch) {

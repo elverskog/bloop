@@ -14,7 +14,7 @@ export function validateArgsArgs(args, types) {
 
   valArgsResHandler(args.length > 0, "validateArgsArgs arg argument did not have any elements");
 
-  valArgsResHandler(Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - received non-arguments arg argument"); 
+  valArgsResHandler(Array.isArray(args) || Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - didn't receive array or arguments as arg argument"); 
 
   valArgsResHandler(Array.isArray(types), "validateArgsArgs - received non-array types argument"); 
 
@@ -49,8 +49,52 @@ export function validateArgs(args, types) {
 
   if(validateArgsArgs(args, types)) {
 
-    [ ...args ].every((arg, index) => {
-    
+    //loop through types not args as args may be missing
+    types.every((type, index) => {
+
+      //if type starts with a tilda only validate if it exists
+      //do this by setting a default valid value if the arg is missing
+      //TODO this assumes optional args are at the end which is fragile
+      const genFakeArg = type => {
+        let result;
+        switch (type) {
+          case "string":
+            result = "string";
+            break;
+          case "boolean":
+            result = true;
+            break;
+          case "object":
+            result = {};
+            break;
+          case "array":
+            result = [];
+            break;
+          case "function":
+            result = () => true;
+            break;
+          case "number":
+            result = 222;
+            break;
+          case "bigint":
+            result = BigInt(452345234534532);
+            break;
+          default:
+            result = null;
+            break;
+        }
+        return result;
+      };
+
+      //I AM HERE
+      //CHANGE THIS
+      //THE ABOVE IS NONESENSE
+      //JUST MAKE A FUNCTION VALIDATEARG
+      //AND A CONDITONAL FOE TILDA ETC
+
+      const arg = (type.indexOf("~") === 0 && !args[index]) ? genFakeArg(type) : args[index]; 
+
+      //get name (type) of arg for better errors
       const name = typeof arg === "string" ? arg : Object.prototype.toString.call(arg); 
 
       if (types[index] === "array") {

@@ -166,7 +166,6 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-
   }
 
   res.writeHead(status, headerOptions);
@@ -187,16 +186,19 @@ if(process.env.NODE_ENV === "production") {
   ]);
   //get an array of paths to all valid pages
   //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
-  // const pagePathsArray = getAllFiles("src/pages");
-  const pagePathsArray = ["src/pages/a.mjs"];
-  console.log("PAGEPATHSARRAY: ", pagePathsArray);
+  const pagePathsArray = getAllFiles("src/pages");
+  // console.log("PAGEPATHSARRAY: ", pagePathsArray);
   const buildObjectFullPages = await build(pagePathsArray, false, true);
   // console.log("BUILD OBJECT FULL PAGES: ", buildObjectFullPages);
   const buildObjectModules = await build(pagePathsArray, true, true);
 
   // console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
 
+  
   buildObjectFullPages.forEach(page => {
+
+    console.log("PAGE", page);
+
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
@@ -205,7 +207,6 @@ if(process.env.NODE_ENV === "production") {
   buildObjectModules.forEach(page => {
     writeModule(page);
   });
-
 
 }
 

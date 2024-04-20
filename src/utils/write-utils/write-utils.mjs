@@ -176,6 +176,8 @@ export function writeMarkup(page, compress = false) {
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
+  // console.log("PAGE MARKUP", page.markup);
+
   return write(page.markup, savePath, compress);
 
   // return true;
