@@ -49,58 +49,29 @@ export function validateArgs(args, types) {
 
   if(validateArgsArgs(args, types)) {
 
+    let typeEdit;
+
     //loop through types not args as args may be missing
     types.every((type, index) => {
 
-      //if type starts with a tilda only validate if it exists
-      //do this by setting a default valid value if the arg is missing
-      //TODO this assumes optional args are at the end which is fragile
-      const genFakeArg = type => {
-        let result;
-        switch (type) {
-          case "string":
-            result = "string";
-            break;
-          case "boolean":
-            result = true;
-            break;
-          case "object":
-            result = {};
-            break;
-          case "array":
-            result = [];
-            break;
-          case "function":
-            result = () => true;
-            break;
-          case "number":
-            result = 222;
-            break;
-          case "bigint":
-            result = BigInt(452345234534532);
-            break;
-          default:
-            result = null;
-            break;
-        }
-        return result;
-      };
-
-      //I AM HERE
-      //CHANGE THIS
-      //THE ABOVE IS NONESENSE
-      //JUST MAKE A FUNCTION VALIDATEARG
-      //AND A CONDITONAL FOE TILDA ETC
-
-      const arg = (type.indexOf("~") === 0 && !args[index]) ? genFakeArg(type) : args[index]; 
+      const arg = args[index]; 
 
       //get name (type) of arg for better errors
       const name = typeof arg === "string" ? arg : Object.prototype.toString.call(arg); 
 
-      if (types[index] === "array") {
-        valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ name } is not ${ types[index] }`);
+      //if string denoting type starts with a tilda and arg is missing return true
+      if(type.indexOf("~") === 0) {
+        if(!args[index]) {
+          return true; 
+        } else {
+          typeEdit = type.replace("~", "");
+        }
+      }
+
+      if (typeEdit === "array") {
+        valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ name } is not ${ typeEdit }`);
       } else {
-        valArgsResHandler(typeof arg === types[index], `validateArgsArgs - ${ name } is not ${ types[index] }`);
+        valArgsResHandler(typeof arg === types[index], `validateArgsArgs - ${ name } is not ${ typeEdit }`);
       }
 
       return true;
