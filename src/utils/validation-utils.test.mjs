@@ -44,7 +44,7 @@ tap.test("test validateArgsArgs", async t => {
 
   t.throws(() => {
     validateArgsArgs("a string", []);
-  }, Error("validateArgsArgs - received non-arguments arg argument"));
+  }, Error("validateArgsArgs - did not receive array or arguments as arg argument"));
 
   t.throws(() => (function () {
     validateArgsArgs(arguments, "not an array");
@@ -67,11 +67,13 @@ tap.test("test validateArgsArgs", async t => {
 });
 
 
-tap.test("test validateArgs", async t => {
+tap.test("test validateArgs passed args", async t => {
 
   t.match(await (async function() {
     return await validateArgsArgs(arguments, ["string", "boolean"]);
   })("a string", true), true, "returns true if passed 2 valid args with valid type matches");
+
+  t.match(await validateArgsArgs([ "a string", true ], ["string", "boolean"]), true, "returns true if passed valid array as args with type matches");
 
   t.match(await (async function() {
     return await validateArgsArgs(arguments, ["boolean"]);
@@ -134,6 +136,49 @@ tap.test("test validateArgs", async t => {
   t.throws(() => (function() {
     validateArgs(arguments, ["string", "bigint"]);
   })("a string", [ "test" ]), Error("validateArgsArgs - [object Array] is not bigint"));
+
+  t.end();
+
+});
+
+
+tap.test("test validateArgs passed args as an array", async t => {
+
+  t.match(await validateArgsArgs([ "a string", true ], ["string", "boolean"]), true, "returns true if passed args array matches types");
+
+  t.match(await validateArgsArgs([ true ], [ "boolean" ]), true, "returns true if passed valid boolean match");
+
+  t.match(await validateArgsArgs([ "a string" ], ["string"]), true, "returns true if passed valid string match");
+
+  t.match(await validateArgsArgs([ {} ], ["object"]), true, "returns true if passed valid object match");
+
+  t.match(await validateArgsArgs([ ["a string"] ], ["array"]), true, "returns true if passed valid array match");
+
+  t.match(await validateArgsArgs([ () => true ], ["function"]), true, "returns true if passed valid string match");
+
+  t.match(await validateArgsArgs([ 222 ], ["number"]), true, "returns true if passed valid number match");
+
+  t.match(await validateArgsArgs([ BigInt(43523454345424) ], ["bigint"]), true, "returns true if passed valid bigint match");
+
+  function testFunc() {
+    validateArgs([ "a string", { foo: "bar" } ], [ "string", "string" ]);
+    return "success";
+  }
+  t.throws(() => testFunc(), undefined, "validateArgs passed invalid args, should throw error and parent function should cease execution" );
+
+  t.throws(() => validateArgs([ "a string", "test" ], ["string", "array"]), Error("validateArgsArgs - test is not array"));
+
+  t.throws(() => validateArgs([ "a string", [ "test" ] ], ["string", "boolean"]), Error("validateArgsArgs - [object Array] is not boolean"));
+
+  t.throws(() => validateArgs([ "a string", [ "test" ] ], ["string", "string"]), Error("validateArgsArgs - [object Array] is not string"));
+
+  t.throws(() => validateArgs([ "a string", "test" ], ["string", "object"]), Error("validateArgsArgs - test is not object"));
+
+  t.throws(() => validateArgs([ "a string", "test" ], ["string", "function"]), Error("validateArgsArgs - test is not function"));
+
+  t.throws(() => validateArgs([ "a string", "test" ], ["string", "number"]), Error("validateArgsArgs - test is not number"));
+
+  t.throws(() => validateArgs([ "a string", [ "test" ] ], ["string", "bigint"]), Error("validateArgsArgs - [object Array] is not bigint"));
 
   t.end();
 

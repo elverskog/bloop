@@ -14,7 +14,7 @@ export function validateArgsArgs(args, types) {
 
   valArgsResHandler(args.length > 0, "validateArgsArgs arg argument did not have any elements");
 
-  valArgsResHandler(Array.isArray(args) || Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - didn't receive array or arguments as arg argument"); 
+  valArgsResHandler(Array.isArray(args) || Object.prototype.toString.call(args) === "[object Arguments]", "validateArgsArgs - did not receive array or arguments as arg argument"); 
 
   valArgsResHandler(Array.isArray(types), "validateArgsArgs - received non-array types argument"); 
 
@@ -63,10 +63,10 @@ export function validateArgs(args, types) {
       if(type.indexOf("~") === 0) {
         if(!args[index]) {
           return true; 
-        } else {
-          typeEdit = type.replace("~", "");
         }
       }
+
+      typeEdit = type.replace("~", "");
 
       if (typeEdit === "array") {
         valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ name } is not ${ typeEdit }`);
