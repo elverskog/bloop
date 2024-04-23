@@ -1,8 +1,9 @@
 import { parseAndOutputStream } from "../utils/res-utils/res-utils.mjs";
 import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
+import { page } from "../utils/build-utils/build-page-utils.mjs";
 
 
-export default async function wrapper(addModule, args) {
+export default async function wrapper(args) {
  
   const { moduleRes } = args;
   const bodyMarkup = moduleRes.markup;
@@ -17,7 +18,7 @@ export default async function wrapper(addModule, args) {
   `;
 
   //get menu module
-  const menuRes = await addModule("src/components/menu.mjs");
+  const menuRes = await page.addModule("src/components/menu.mjs");
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {

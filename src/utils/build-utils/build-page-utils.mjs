@@ -57,122 +57,113 @@ export function validateModuleRes(moduleRes) {
 }
 
 
+export const page = {
 
-export async function buildPage(path, isFetch, isProd) {
+  title: "",
+  name: "",
+  modulePath: "",  //write files to dirs based off this
+  css: [],
+  markup: "",
+  js: [],
+  inits: "",
 
-  validateArgs(arguments, ["string", "boolean", "boolean"]);
-
-  let moduleRes;
-  const pageRes = {
-    title: "",
-    name: "",
-    modulePath: path,  //add the pathname into the page output. Need to know where to write dt files
-    css: [],
-    markup: "",
-    js: [],
-    inits: ""
-  };
-
-
-  // I am here
-  // can i break this function out
-  // likely moving pageRes outside buildPage
-  // OR can I funnel it's result into pageRes
-  // each time it is called
-
-
-  async function addModule(modulePath, args) {
-
-    console.log("ADD MODULE: ", modulePath);
-
-    const path = modulePath === "/" ? "/a" : modulePath;
-    //if for build, just use what was passed in, else need to construct the full path from URL  
-    const adjustedPath = isProd ? `../../../${path}` : `../../src/pages${path}.mjs`;
+  addModule: async (modulePath, args) => {
 
     let module;
     let moduleRes;
+    const modulePathRel = modulePath === "/" ? "../../../a" : `../../../${modulePath}`; //handle homepage
 
     try {
-      module = (await import(adjustedPath)).default;    
+      module = (await import(modulePathRel)).default;    
     } catch (error) {
       throw new Error(`IMPORT MODULE: ${error}`);
     }
 
     try {
-      moduleRes = await module(addModule, args);
+      moduleRes = await module(page, args);
     } catch (error) {
       throw new Error(`RUN MODULE: ${error}`);
     }
 
-    (args => validateArgs(args, [ "object" ]))(moduleRes);
+    console.log("MODULE RES: ", moduleRes);
 
-    const { name, title, css, js, markup } = moduleRes;
+    validateArgs([ moduleRes ], [ "object" ]);
 
-    (args => {
-      validateArgs(args, [ "string", "string", "string", "string", "object"  ]);
-    })(name, title, css, js, markup);
+    const { name, title, css, markup, js } = moduleRes;
 
-    //add a name for the page if it doesn't ext
-    pageRes.name = pageRes.name.length ? pageRes.name : name;    
+    // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
 
-    //add a title for the page if it doesn't ext
-    pageRes.title = pageRes.title.length ? pageRes.title : title;    
+    //add a name for the page if it doesn't exist (use the first module in chains name)
+    page.name = page.name.length ? page.name : name;    
+
+    //add a title for the page if it doesn't exist (use the first module in chains title)
+    page.title = page.title.length ? page.title : title;    
 
     // add CSS
-    pageRes.css.push({
+    page.css.push({
       name: moduleRes.name,
       modulePath,
       val: moduleRes.css    
     });
 
     // add inits if js has init function
-    if(typeof js.init === "function") {
-      const initArgs = typeof initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
-      pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
-    }
+    if(js) {
+      if(typeof js.init === "function") {
+        const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
+        page.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
+      }
 
-    // add JS
-    pageRes.js.push({
-      name: moduleRes.name,
-      modulePath,
-      val: convertJsToString(js)
-    });
+      // add JS
+      page.js.push({
+        name: moduleRes.name,
+        modulePath,
+        val: convertJsToString(js)
+      });
+    }
 
     //add markup here we just use the markup from the last module
-    pageRes.markup = markup;
+    page.markup = markup;
 
-    return pageRes;
+    return page;
 
-  }
+  },
 
 
-  try {
+  getPage: async () => page,
 
-    moduleRes = await addModule(path, { addModule }); 
+
+  buildPage: async function (path, isFetch) {
+
+    validateArgs(arguments, ["string", "boolean"]);
+
+    let moduleRes;
+
+    // I am here
+    // can i break this function out
+    // likely moving pageRes outside buildPage
+    // OR can I funnel it's result into pageRes
+    // each time it is called
+
+    moduleRes = await page.addModule(path); 
 
     //add the title for page's main module (used for setting the page title on frontend)
-    pageRes.title = typeof moduleRes?.title === "string" ? moduleRes.title : ""; 
+    page.title = typeof moduleRes?.title === "string" ? moduleRes.title : ""; 
 
     //add the name for page's main module
-    pageRes.name = typeof moduleRes?.name === "string" ? moduleRes.name : "";    
+    page.name = typeof moduleRes?.name === "string" ? moduleRes.name : "";    
 
-  } catch(error) {
-    // console.log("buildPage: add module error: ", err);
-    // return;
-    throw new Error(error);
-  }
-
-
-  // get the wrapper for the page
-  if (!isFetch) {
-    try {
-      await addModule("src/components/wrapper.mjs", { addModule, moduleRes });
-    } catch(err) {
-      console.log("buildPage: add wrapper error: ", err);
-      return;
+    // get the wrapper for the page
+    if (!isFetch) {
+      try {
+        await page.addModule("src/components/wrapper.mjs", { addModule, moduleRes });
+      } catch(err) {
+        console.log("buildPage: add wrapper error: ", err);
+        return;
+      }
     }
+
+    return page;
+
   }
 
-  return pageRes;
-
-}
+};

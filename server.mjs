@@ -1,7 +1,7 @@
 import http from "http";
 import fs from "fs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
-import { buildPage } from "./src/utils/build-utils/build-page-utils.mjs";
+import { page } from "./src/utils/build-utils/build-page-utils.mjs";
 import { 
   clearFiles, 
   utilBaseDir,
@@ -117,8 +117,8 @@ const server = http.createServer(async (req, res) => {
         // DO I NEED TO HAVE IS ISPROD OR ISDEV AS BOTH MODES WANT ISPROD
         // EG - BOTH MODES RITE THE FILE AND READ IT, PATHS ARE THE SAME ETC
 
-        const pageAsModule = await buildPage({ path: modulePath, isFetch: true, isProd: true });
-        const pageFull = await buildPage({ path: modulePath, isFetch: false, isProd: true });
+        const pageAsModule = await page.buildPage(modulePath, true);
+        const pageFull = await page.buildPage(modulePath, false);
 
         // console.log("PAGE: ", page);
 
@@ -185,20 +185,17 @@ if(process.env.NODE_ENV === "production") {
     "dist/modules"
   ]);
   //get an array of paths to all valid pages
-  //const pagePathsArray = getAllPages(`${baseDir}/src/pages`);
-  const pagePathsArray = getAllFiles("src/pages");
-  // console.log("PAGEPATHSARRAY: ", pagePathsArray);
-  const buildObjectFullPages = await build(pagePathsArray, false, true);
+  // const pagePathsArray = getAllFiles("src/pages");
+  const pagePathsArray = [ "src/pages/a.mjs" ];
+  console.log("PAGEPATHSARRAY: ", pagePathsArray);
+  const buildObjectFullPages = await build(pagePathsArray, false);
   // console.log("BUILD OBJECT FULL PAGES: ", buildObjectFullPages);
-  const buildObjectModules = await build(pagePathsArray, true, true);
+  const buildObjectModules = await build(pagePathsArray, true);
 
-  // console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
+  console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
 
-  
   buildObjectFullPages.forEach(page => {
-
     console.log("PAGE", page);
-
     writeMarkup(page);
     writeCss(page);
     writeJs(page);

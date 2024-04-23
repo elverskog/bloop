@@ -1,4 +1,4 @@
-export default async function link (addModule, args) {
+export default async function link (args) {
 
   let { label, pathname } = args;
 
