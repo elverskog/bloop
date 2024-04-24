@@ -80,18 +80,21 @@ export const page = {
     }
 
     try {
-      moduleRes = await module(page, args);
+      moduleRes = await module(args);
     } catch (error) {
       throw new Error(`RUN MODULE: ${error}`);
     }
 
-    console.log("MODULE RES: ", moduleRes);
+    console.log("---MODULE RES: ", moduleRes);
 
     validateArgs([ moduleRes ], [ "object" ]);
 
     const { name, title, css, markup, js } = moduleRes;
 
     // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
+
+    //add a name for the page if it doesn't exist (use the first module in chains name)
+    page.modulePath = page.modulePath.length ? page.modulePath : modulePath;    
 
     //add a name for the page if it doesn't exist (use the first module in chains name)
     page.name = page.name.length ? page.name : name;    
@@ -146,6 +149,8 @@ export const page = {
 
     moduleRes = await page.addModule(path); 
 
+    // console.log("MODULE RES: ", moduleRes);
+
     //add the title for page's main module (used for setting the page title on frontend)
     page.title = typeof moduleRes?.title === "string" ? moduleRes.title : ""; 
 
@@ -155,7 +160,7 @@ export const page = {
     // get the wrapper for the page
     if (!isFetch) {
       try {
-        await page.addModule("src/components/wrapper.mjs", { addModule, moduleRes });
+        await page.addModule("src/components/wrapper.mjs", { moduleRes });
       } catch(err) {
         console.log("buildPage: add wrapper error: ", err);
         return;

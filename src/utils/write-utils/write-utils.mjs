@@ -22,6 +22,8 @@ function validateObj(obj, valType) {
 
 export function write(val, savePath, compress) {
 
+  console.log("SAVEPATH: ", savePath);
+
   validateArgs(arguments, ["string", "string", "boolean"]); 
 
   let text = val;

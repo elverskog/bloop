@@ -192,7 +192,7 @@ if(process.env.NODE_ENV === "production") {
   // console.log("BUILD OBJECT FULL PAGES: ", buildObjectFullPages);
   const buildObjectModules = await build(pagePathsArray, true);
 
-  console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
+  // console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
 
   buildObjectFullPages.forEach(page => {
     console.log("PAGE", page);
