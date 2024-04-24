@@ -1,6 +1,6 @@
 import { validateArgs } from "../validation-utils.mjs";
 
-//function to add module to a dictionary/object of results
+//functions to add module to a dictionary/object of results
 //it  used in the buildPage function
 // and also needs to be passed down the "chain" of module thay might compre a page
 
@@ -59,16 +59,24 @@ export function validateModuleRes(moduleRes) {
 
 export const page = {
 
-  title: "",
-  name: "",
-  modulePath: "",  //write files to dirs based off this
-  css: [],
-  markup: "",
-  js: [],
-  inits: "",
+  pageRes: {},
+
+  clearPageRes: () => { 
+    page.pageRes = {
+      title: "",
+      name: "",
+      modulePath: "",  //write files to dirs based off this
+      css: [],
+      markup: "",
+      js: [],
+      inits: "",
+    };
+  },
 
   addModule: async (modulePath, args) => {
 
+    console.log("PATH", modulePath);
+    
     let module;
     let moduleRes;
     const modulePathRel = modulePath === "/" ? "../../../a" : `../../../${modulePath}`; //handle homepage
@@ -85,8 +93,8 @@ export const page = {
       throw new Error(`RUN MODULE: ${error}`);
     }
 
-    console.log("---MODULE RES: ", moduleRes);
-
+    console.log("MODULERES NAME: ", moduleRes.name);
+    
     validateArgs([ moduleRes ], [ "object" ]);
 
     const { name, title, css, markup, js } = moduleRes;
@@ -94,30 +102,34 @@ export const page = {
     // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
 
     //add a name for the page if it doesn't exist (use the first module in chains name)
-    page.modulePath = page.modulePath.length ? page.modulePath : modulePath;    
+    page.pageRes.modulePath = page.pageRes.modulePath.length ? page.pageRes.modulePath : modulePath;    
+
+    console.log("PAGERES PATH: ", page.pageRes.modulePath);
 
     //add a name for the page if it doesn't exist (use the first module in chains name)
-    page.name = page.name.length ? page.name : name;    
+    page.pageRes.name = page.pageRes.name.length ? page.pageRes.name : name;    
+
+    console.log("PAGERES NAME: ", page.pageRes.name);
 
     //add a title for the page if it doesn't exist (use the first module in chains title)
-    page.title = page.title.length ? page.title : title;    
+    page.pageRes.title = page.pageRes.title.length ? page.pageRes.title : title;    
 
     // add CSS
-    page.css.push({
+    page.pageRes.css.push({
       name: moduleRes.name,
       modulePath,
-      val: moduleRes.css    
+      val: css    
     });
 
     // add inits if js has init function
     if(js) {
       if(typeof js.init === "function") {
         const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
-        page.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
+        page.pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
       }
 
       // add JS
-      page.js.push({
+      page.pageRes.js.push({
         name: moduleRes.name,
         modulePath,
         val: convertJsToString(js)
@@ -125,37 +137,23 @@ export const page = {
     }
 
     //add markup here we just use the markup from the last module
-    page.markup = markup;
+    page.pageRes.markup = markup;
 
-    return page;
+    return page.pageRes;
 
   },
 
 
-  getPage: async () => page,
+  getPage: async () => page.pageRes,
 
 
   buildPage: async function (path, isFetch) {
 
     validateArgs(arguments, ["string", "boolean"]);
 
-    let moduleRes;
-
-    // I am here
-    // can i break this function out
-    // likely moving pageRes outside buildPage
-    // OR can I funnel it's result into pageRes
-    // each time it is called
-
-    moduleRes = await page.addModule(path); 
-
-    // console.log("MODULE RES: ", moduleRes);
-
-    //add the title for page's main module (used for setting the page title on frontend)
-    page.title = typeof moduleRes?.title === "string" ? moduleRes.title : ""; 
-
-    //add the name for page's main module
-    page.name = typeof moduleRes?.name === "string" ? moduleRes.name : "";    
+    page.clearPageRes();
+    
+    const moduleRes = await page.addModule(path); 
 
     // get the wrapper for the page
     if (!isFetch) {
@@ -166,8 +164,8 @@ export const page = {
         return;
       }
     }
-
-    return page;
+    
+    return page.pageRes;
 
   }
 

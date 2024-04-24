@@ -185,17 +185,15 @@ if(process.env.NODE_ENV === "production") {
     "dist/modules"
   ]);
   //get an array of paths to all valid pages
-  // const pagePathsArray = getAllFiles("src/pages");
-  const pagePathsArray = [ "src/pages/a.mjs" ];
+  const pagePathsArray = getAllFiles("src/pages");
+  // const pagePathsArray = [ "src/pages/a.mjs" ];
   console.log("PAGEPATHSARRAY: ", pagePathsArray);
   const buildObjectFullPages = await build(pagePathsArray, false);
   // console.log("BUILD OBJECT FULL PAGES: ", buildObjectFullPages);
   const buildObjectModules = await build(pagePathsArray, true);
 
-  // console.log("BUILD OBJECT FULL: ", buildObjectFullPages);
-
   buildObjectFullPages.forEach(page => {
-    console.log("PAGE", page);
+    // console.log("PAGE", page.name, page.markup);
     writeMarkup(page);
     writeCss(page);
     writeJs(page);
