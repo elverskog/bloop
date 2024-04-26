@@ -57,116 +57,118 @@ export function validateModuleRes(moduleRes) {
 }
 
 
-export const page = {
+async function addModule(modulePath, args) {
 
-  pageRes: {},
+  // console.log("ADDMODULE: ", this, modulePath, args);
+  
+  let module;
+  let moduleRes;
+  const modulePathRel = modulePath === "/" ? "../../../a" : `../../../${modulePath}`; //handle homepage
 
-  clearPageRes: () => { 
-    page.pageRes = {
-      title: "",
-      name: "",
-      modulePath: "",  //write files to dirs based off this
-      css: [],
-      markup: "",
-      js: [],
-      inits: "",
-    };
-  },
-
-  addModule: async (modulePath, args) => {
-
-    console.log("PATH", modulePath);
-    
-    let module;
-    let moduleRes;
-    const modulePathRel = modulePath === "/" ? "../../../a" : `../../../${modulePath}`; //handle homepage
-
-    try {
-      module = (await import(modulePathRel)).default;    
-    } catch (error) {
-      throw new Error(`IMPORT MODULE: ${error}`);
-    }
-
-    try {
-      moduleRes = await module(args);
-    } catch (error) {
-      throw new Error(`RUN MODULE: ${error}`);
-    }
-
-    console.log("MODULERES NAME: ", moduleRes.name);
-    
-    validateArgs([ moduleRes ], [ "object" ]);
-
-    const { name, title, css, markup, js } = moduleRes;
-
-    // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
-
-    //add a name for the page if it doesn't exist (use the first module in chains name)
-    page.pageRes.modulePath = page.pageRes.modulePath.length ? page.pageRes.modulePath : modulePath;    
-
-    console.log("PAGERES PATH: ", page.pageRes.modulePath);
-
-    //add a name for the page if it doesn't exist (use the first module in chains name)
-    page.pageRes.name = page.pageRes.name.length ? page.pageRes.name : name;    
-
-    console.log("PAGERES NAME: ", page.pageRes.name);
-
-    //add a title for the page if it doesn't exist (use the first module in chains title)
-    page.pageRes.title = page.pageRes.title.length ? page.pageRes.title : title;    
-
-    // add CSS
-    page.pageRes.css.push({
-      name: moduleRes.name,
-      modulePath,
-      val: css    
-    });
-
-    // add inits if js has init function
-    if(js) {
-      if(typeof js.init === "function") {
-        const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
-        page.pageRes.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
-      }
-
-      // add JS
-      page.pageRes.js.push({
-        name: moduleRes.name,
-        modulePath,
-        val: convertJsToString(js)
-      });
-    }
-
-    //add markup here we just use the markup from the last module
-    page.pageRes.markup = markup;
-
-    return page.pageRes;
-
-  },
-
-
-  getPage: async () => page.pageRes,
-
-
-  buildPage: async function (path, isFetch) {
-
-    validateArgs(arguments, ["string", "boolean"]);
-
-    page.clearPageRes();
-    
-    const moduleRes = await page.addModule(path); 
-
-    // get the wrapper for the page
-    if (!isFetch) {
-      try {
-        await page.addModule("src/components/wrapper.mjs", { moduleRes });
-      } catch(err) {
-        console.log("buildPage: add wrapper error: ", err);
-        return;
-      }
-    }
-    
-    return page.pageRes;
-
+  try {
+    module = (await import(modulePathRel)).default;    
+  } catch (error) {
+    throw new Error(`IMPORT MODULE: ${error}`);
   }
 
-};
+  try {
+    moduleRes = await module(args);
+  } catch (error) {
+    throw new Error(`RUN MODULE: ${error}`);
+  }
+
+  // console.log("MODULERES-----------: ", moduleRes);
+  
+  // validateArgs([ moduleRes ], [ "object" ]);
+
+  const { name, title, css, markup, js } = moduleRes;
+
+  // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
+
+  //add a name for the page if it doesn't exist (use the first module in chains name)
+  this.modulePath = this.modulePath.length ? this.modulePath : modulePath;    
+
+  // console.log("PAGERES PATH: ", this.modulePath);
+
+  //add a name for the page if it doesn't exist (use the first module in chain)
+  this.name = this.name.length ? this.name : name;    
+
+  // console.log("PAGERES NAME: ", this.name);
+
+  //add a title for the page if it doesn't exist (use the first module in chains title)
+  this.title = this.title.length ? this.title : title;    
+
+  // add CSS
+  this.css.push({
+    name: moduleRes.name,
+    modulePath,
+    val: css    
+  });
+
+  // add inits if js has init function
+  if(js) {
+    if(typeof js.init === "function") {
+      const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
+      this.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
+    }
+
+    // add JS
+    this.js.push({
+      name: moduleRes.name,
+      modulePath,
+      val: convertJsToString(js)
+    });
+  }
+
+  //add markup here we just use the markup from the last module
+  this.markup = markup;
+
+  return this;
+
+}
+
+
+export async function buildPage(path, isFetch) {
+
+  validateArgs(arguments, ["string", "boolean"]);
+
+  console.log("BUILDPAGE: ", this, path, isFetch);
+
+  await this.addModule.call(this, path); 
+
+
+  // get the wrapper for the page if a fullpage request
+  if (!isFetch) {
+    console.log("GET WRAPPER");
+    try {
+      await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
+    } catch(err) {
+      throw new Error(`buildPage: add wrapper error: ${ err }`);
+    }
+  }
+  
+  console.log("MOD RES: ", this);
+  return this;
+
+}
+
+
+export function page() {
+
+  this.title = "";
+  this.name = "";
+  this.modulePath = "";  //write files to dirs based off this
+  this.css = [];
+  this.markup = "";
+  this.js = [];
+  this.inits = "";
+
+  this.buildPage = async function(path, isFetch) {
+    await buildPage.call(this, path, isFetch);
+  };
+
+  this.addModule = async function(modulePath, args) {
+    await addModule.call(this, modulePath, args);
+  };
+}
+

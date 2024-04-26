@@ -10,7 +10,8 @@ export async function build(pagePathsArray, isFetch) {
   validateArgs(arguments, ["array", "boolean"]);
 
   const masterRes = Promise.all(pagePathsArray.map( async path => {
-    return await page.buildPage(path, isFetch);
+    const pageObj = new page();
+    return await pageObj.buildPage(path, isFetch);
   }));
 
   return masterRes;

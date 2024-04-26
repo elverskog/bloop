@@ -6,6 +6,9 @@ import { page } from "../utils/build-utils/build-page-utils.mjs";
 export default async function wrapper(args) {
  
   const { moduleRes } = args;
+
+  console.log("MODULERES IN WRAPPER: ", moduleRes);
+
   const bodyMarkup = moduleRes.markup;
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 

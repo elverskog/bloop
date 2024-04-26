@@ -186,11 +186,11 @@ if(process.env.NODE_ENV === "production") {
   ]);
   //get an array of paths to all valid pages
   const pagePathsArray = getAllFiles("src/pages");
-  // const pagePathsArray = [ "src/pages/a.mjs" ];
+  // const pagePathsArray = [ "src/pages/b.mjs" ];
   console.log("PAGEPATHSARRAY: ", pagePathsArray);
   const buildObjectFullPages = await build(pagePathsArray, false);
   // console.log("BUILD OBJECT FULL PAGES: ", buildObjectFullPages);
-  const buildObjectModules = await build(pagePathsArray, true);
+  // const buildObjectModules = await build(pagePathsArray, true);
 
   buildObjectFullPages.forEach(page => {
     // console.log("PAGE", page.name, page.markup);
@@ -199,9 +199,9 @@ if(process.env.NODE_ENV === "production") {
     writeJs(page);
   });
 
-  buildObjectModules.forEach(page => {
-    writeModule(page);
-  });
+  // buildObjectModules.forEach(page => {
+  //   writeModule(page);
+  // });
 
 }
 
