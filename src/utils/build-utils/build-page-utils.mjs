@@ -71,13 +71,14 @@ async function addModule(modulePath, args) {
     throw new Error(`IMPORT MODULE: ${error}`);
   }
 
+  console.log("CALL MODULE: ", args);
   try {
-    moduleRes = await module(args);
+    moduleRes = await module.call(this, args);
   } catch (error) {
     throw new Error(`RUN MODULE: ${error}`);
   }
 
-  // console.log("MODULERES-----------: ", moduleRes);
+  console.log("MODULERES-----------: ", moduleRes);
   
   // validateArgs([ moduleRes ], [ "object" ]);
 
@@ -138,14 +139,19 @@ export async function buildPage(path, isFetch) {
 
 
   // get the wrapper for the page if a fullpage request
+
   if (!isFetch) {
-    console.log("GET WRAPPER");
-    try {
-      await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
-    } catch(err) {
-      throw new Error(`buildPage: add wrapper error: ${ err }`);
-    }
+    await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
   }
+
+  // if (!isFetch) {
+  //   console.log("GET WRAPPER THIS: ", this);
+  //   try {
+  //     await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
+  //   } catch(err) {
+  //     throw new Error(`buildPage: add wrapper error: ${ err }`);
+  //   }
+  // }
   
   console.log("MOD RES: ", this);
   return this;
@@ -164,11 +170,11 @@ export function page() {
   this.inits = "";
 
   this.buildPage = async function(path, isFetch) {
-    await buildPage.call(this, path, isFetch);
+    return await buildPage.call(this, path, isFetch);
   };
 
   this.addModule = async function(modulePath, args) {
-    await addModule.call(this, modulePath, args);
+    return await addModule.call(this, modulePath, args);
   };
 }
 

@@ -1,6 +1,3 @@
-import { page } from "../utils/build-utils/build-page-utils.mjs";
-
-
 export default async function menu() {
 
   const result = {
@@ -16,12 +13,12 @@ export default async function menu() {
     }`,
     markup: `
       <menu class="menu">
-        ${ (await page.addModule("src/components/menu-item.mjs", { label: "A", pathname: "/a" })).markup }
-        ${ (await page.addModule("src/components/menu-item.mjs", { label: "B", pathname: "/b" })).markup }
-        ${ (await page.addModule("src/components/menu-item.mjs", { label: "C", pathname: "/c" })).markup }
-        ${ (await page.addModule("src/components/menu-item.mjs", { label: "Lev1", pathname: "/level1/lev1-page" })).markup }
-        ${ (await page.addModule("src/components/menu-item.mjs", { label: "Lev2", pathname: "/level1/level2/lev2-page" })).markup }
-        ${ (await page.addModule("src/components/menu-item.mjs", { label: "?", pathname: "/asadasd" })).markup }
+        ${ (await this.addModule("src/components/menu-item.mjs", { label: "A", pathname: "/a" })).markup }
+        ${ (await this.addModule("src/components/menu-item.mjs", { label: "B", pathname: "/b" })).markup }
+        ${ (await this.addModule("src/components/menu-item.mjs", { label: "C", pathname: "/c" })).markup }
+        ${ (await this.addModule("src/components/menu-item.mjs", { label: "Lev1", pathname: "/level1/lev1-page" })).markup }
+        ${ (await this.addModule("src/components/menu-item.mjs", { label: "Lev2", pathname: "/level1/level2/lev2-page" })).markup }
+        ${ (await this.addModule("src/components/menu-item.mjs", { label: "?", pathname: "/asadasd" })).markup }
       </menu>
     `
   };

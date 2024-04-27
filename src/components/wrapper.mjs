@@ -1,6 +1,5 @@
 import { parseAndOutputStream } from "../utils/res-utils/res-utils.mjs";
 import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
-import { page } from "../utils/build-utils/build-page-utils.mjs";
 
 
 export default async function wrapper(args) {
@@ -9,7 +8,7 @@ export default async function wrapper(args) {
 
   console.log("MODULERES IN WRAPPER: ", moduleRes);
 
-  const bodyMarkup = moduleRes.markup;
+  const bodyMarkup = moduleRes?.markup ? moduleRes?.markup : "";
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 
   //keep track of what css tags have been added (e.g. link may appear many times on a page)
@@ -20,8 +19,11 @@ export default async function wrapper(args) {
     <link id="menuStyles" rel="stylesheet" type="text/css" href="/dist/css/menu.css" />\n
   `;
 
+
   //get menu module
-  const menuRes = await page.addModule("src/components/menu.mjs");
+  const menuRes = await this.addModule("src/components/menu.mjs");
+  console.log("MENURES: ", menuRes);
+
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {

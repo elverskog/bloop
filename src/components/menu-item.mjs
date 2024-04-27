@@ -1,5 +1,3 @@
-import { page } from "../utils/build-utils/build-page-utils.mjs";
-
 export default async function menuItem (args) {
 
   const { label, pathname} = args; 
@@ -35,7 +33,7 @@ export default async function menuItem (args) {
     `,
     markup: `
       <menuitem>
-        ${ (await page.addModule("src/components/link.mjs", { label, pathname })).markup }
+        ${ (await this.addModule("src/components/link.mjs", { label, pathname })).markup }
       </menuitem>
     `
   };
