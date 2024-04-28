@@ -8,8 +8,6 @@ export function valArgsResHandler(res, errMessage = "generic validateArgs error"
 
 export function validateArgsArgs(args, types) {
 
-  // console.log("ARGUMENTS: ", arguments);
-
   valArgsResHandler(arguments.length === 2, "validateArgsArgs did not receive 2 arguments");
 
   valArgsResHandler(args.length > 0, "validateArgsArgs arg argument did not have any elements");
@@ -18,9 +16,27 @@ export function validateArgsArgs(args, types) {
 
   valArgsResHandler(Array.isArray(types), "validateArgsArgs - received non-array types argument"); 
 
-  valArgsResHandler(args.length === types.length, "validateArgsArgs - args length does not match types length");
+  //handle "~", which is used to denote an optional type/arg
+  const tildaIndexes = types.map( type => type.indexOf("~") === 0);
+  const typesTildaStripped = types.map( type => type.replace("~", ""));
 
-  types.every(type => {
+  valArgsResHandler(() => {
+    let result;
+    if (args.length === types.length) {
+      result = true; 
+    } else if (tildaIndexes.length) {
+      const argsAdj = [ ...args ];
+      tildaIndexes.map(tildaIndex => {
+        delete argsAdj[tildaIndex]; 
+      });  
+      result = argsAdj.length === types.length;
+    } else {
+      result = false;
+    }
+    return result; 
+  }, "validateArgsArgs - args length does not match types length");
+
+  typesTildaStripped.every(type => {
     
     valArgsResHandler(typeof type === "string", "validateArgsArgs - some of the types array are not strings");
 
@@ -46,7 +62,6 @@ export function validateArgsArgs(args, types) {
 
 export function validateArgs(args, types) {
 
-
   if(validateArgsArgs(args, types)) {
 
     let typeEdit;
@@ -71,7 +86,7 @@ export function validateArgs(args, types) {
       if (typeEdit === "array") {
         valArgsResHandler(Array.isArray(arg), `validateArgsArgs - ${ name } is not ${ typeEdit }`);
       } else {
-        valArgsResHandler(typeof arg === types[index], `validateArgsArgs - ${ name } is not ${ typeEdit }`);
+        valArgsResHandler(typeof arg === typeEdit, `validateArgsArgs - ${ name } is not ${ typeEdit }`);
       }
 
       return true;

@@ -58,9 +58,9 @@ export function validateModuleRes(moduleRes) {
 
 
 async function addModule(modulePath, args) {
-
-  // console.log("ADDMODULE: ", this, modulePath, args);
   
+  validateArgs(arguments, ["string", "~object"]);
+
   let module;
   let moduleRes;
   const modulePathRel = modulePath === "/" ? "../../../a" : `../../../${modulePath}`; //handle homepage
@@ -71,16 +71,14 @@ async function addModule(modulePath, args) {
     throw new Error(`IMPORT MODULE: ${error}`);
   }
 
-  console.log("CALL MODULE: ", args);
   try {
     moduleRes = await module.call(this, args);
   } catch (error) {
     throw new Error(`RUN MODULE: ${error}`);
   }
 
-  console.log("MODULERES-----------: ", moduleRes);
   
-  // validateArgs([ moduleRes ], [ "object" ]);
+  validateArgs([ moduleRes ], [ "object" ]);
 
   const { name, title, css, markup, js } = moduleRes;
 
@@ -89,12 +87,8 @@ async function addModule(modulePath, args) {
   //add a name for the page if it doesn't exist (use the first module in chains name)
   this.modulePath = this.modulePath.length ? this.modulePath : modulePath;    
 
-  // console.log("PAGERES PATH: ", this.modulePath);
-
   //add a name for the page if it doesn't exist (use the first module in chain)
   this.name = this.name.length ? this.name : name;    
-
-  // console.log("PAGERES NAME: ", this.name);
 
   //add a title for the page if it doesn't exist (use the first module in chains title)
   this.title = this.title.length ? this.title : title;    
@@ -129,14 +123,11 @@ async function addModule(modulePath, args) {
 }
 
 
-export async function buildPage(path, isFetch) {
+export async function buildPage(path, isFetch, args) {
 
-  validateArgs(arguments, ["string", "boolean"]);
+  validateArgs(arguments, ["string", "boolean", "~object"]);
 
-  console.log("BUILDPAGE: ", this, path, isFetch);
-
-  await this.addModule.call(this, path); 
-
+  await this.addModule.call(this, path, args); 
 
   // get the wrapper for the page if a fullpage request
 
@@ -145,7 +136,6 @@ export async function buildPage(path, isFetch) {
   }
 
   // if (!isFetch) {
-  //   console.log("GET WRAPPER THIS: ", this);
   //   try {
   //     await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
   //   } catch(err) {
@@ -153,7 +143,6 @@ export async function buildPage(path, isFetch) {
   //   }
   // }
   
-  console.log("MOD RES: ", this);
   return this;
 
 }
@@ -169,8 +158,8 @@ export function page() {
   this.js = [];
   this.inits = "";
 
-  this.buildPage = async function(path, isFetch) {
-    return await buildPage.call(this, path, isFetch);
+  this.buildPage = async function(path, isFetch, args) {
+    return await buildPage.call(this, path, isFetch, args);
   };
 
   this.addModule = async function(modulePath, args) {

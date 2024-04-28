@@ -6,8 +6,6 @@ export default async function wrapper(args) {
  
   const { moduleRes } = args;
 
-  console.log("MODULERES IN WRAPPER: ", moduleRes);
-
   const bodyMarkup = moduleRes?.markup ? moduleRes?.markup : "";
   const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
 
@@ -22,8 +20,6 @@ export default async function wrapper(args) {
 
   //get menu module
   const menuRes = await this.addModule("src/components/menu.mjs");
-  console.log("MENURES: ", menuRes);
-
 
   //create a css/link tag for each module used in the page, server-side
   if(moduleRes.css.length) {
@@ -139,7 +135,6 @@ export default async function wrapper(args) {
         const options = { headers };  
         const res = await fetch(pathname, options);
         const parsedResStream = await p_p.wrapper.parseAndOutputStream(res);
-        console.log("PARSED RES: ", parsedResStream);
         const resParsed = JSON.parse(parsedResStream);
 
         // return;

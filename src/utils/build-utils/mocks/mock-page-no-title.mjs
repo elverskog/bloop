@@ -1,4 +1,4 @@
-export default async function mockPage(addModule, args) {
+export default async function mockPage(args) {
 
   const result = {
     name: "mockPage",
