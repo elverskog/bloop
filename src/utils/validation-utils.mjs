@@ -20,7 +20,7 @@ export function validateArgsArgs(args, types) {
   const tildaIndexes = types.map( type => type.indexOf("~") === 0);
   const typesTildaStripped = types.map( type => type.replace("~", ""));
 
-  valArgsResHandler(() => {
+  valArgsResHandler((() => {
     let result;
     if (args.length === types.length) {
       result = true; 
@@ -34,7 +34,7 @@ export function validateArgsArgs(args, types) {
       result = false;
     }
     return result; 
-  }, "validateArgsArgs - args length does not match types length");
+  })(), "validateArgsArgs - args length does not match types length");
 
   typesTildaStripped.every(type => {
     
