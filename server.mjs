@@ -116,9 +116,9 @@ const server = http.createServer(async (req, res) => {
         // I AM HERE
         // DO I NEED TO HAVE IS ISPROD OR ISDEV AS BOTH MODES WANT ISPROD
         // EG - BOTH MODES RITE THE FILE AND READ IT, PATHS ARE THE SAME ETC
-
-        const pageAsModule = await page.buildPage(modulePath, true);
-        const pageFull = await page.buildPage(modulePath, false);
+        const pageObj = new page();
+        const pageAsModule = await pageObj.buildPage(modulePath, true);
+        const pageFull = await pageObj.buildPage(modulePath, false);
 
         // console.log("PAGE: ", page);
 
