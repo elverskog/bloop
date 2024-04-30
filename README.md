@@ -13,7 +13,7 @@ The approach might, of course, be good for some things and not others...or maybe
 * Development and production modes share as much code/process as possible.
 
 ## Approach
-* First site visits and page refreshes load a standard HTML page with only the CSS and JS needed, then called
+* First site visits and page refreshes load a standard HTML page, with tags for only the CSS and JS needed for that page.
 * Navigating within the site only updates content that changes (e.g. the main content area). 
 * A _single_ response for loading new content should include the CSS, markup and JS in _one_ file. 
 * The browser receives content as pre-rendered markup. This markup may be delivered as a full HTML document or as part of a JSON document as a string. 
@@ -31,8 +31,8 @@ For anything more complex, say a blog, a data source could be integrated. Reperc
 ### Server
 
 There are four types of server responses:
-1. Files: When the URL has a filename and extension (of a few accepted types), try to return a file (_to-do: handle file 404 errors for files_).
-2. Full Pages: If the URL does not have a file with extension and there is not an `is-fetch: "true"` in the request headers, it will look for rendered HTML file. If the file doesn't exist (which is an error) the server will try to build it. 
+1. Files: When the URL has a filename and extension (e.g. "page-a.css"), try to return a file (_to-do: handle file 404 errors for files_).
+2. Full Pages: If the URL does not have an extension and there is not an `is-fetch: "true"` in the request headers (e.g. "/shoes/red"), it will look for rendered HTML file. If the file doesn't exist (which is an error) the server will try to build it. 
 3. Partials: If the URL does not have an extension and there is an `is-fetch: "true"` in the request headers, return a JSON file with CSS, Markup and JS sections. This JSON is then un-packed and handled on the client.
 4. 404: If the page-path (a path with no extension) was not found or a file was not found return a 404 page, similar to step 2. _There's currently no handling for other types of errors, re-routing approach etc. (to-do)_
 
