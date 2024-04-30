@@ -14,8 +14,8 @@ The approach might, of course, be good for some things and not others...or maybe
 
 ## Approach
 * First site visits and page refreshes load a standard HTML page, with tags for only the CSS and JS needed for that page.
-* Navigating within the site only updates content that changes (e.g. the main content area). 
-* A _single_ response for loading new content should include the CSS, markup and JS in _one_ file. 
+* Navigating within the site only loads content and updates section(s), that should change (e.g. the main content area). 
+* A response for such a partial content change should include only the CSS, markup and JS needed, _in one file_. 
 * The browser receives content as pre-rendered markup. This markup may be delivered as a full HTML document or as part of a JSON document as a string. 
 * Event listeners are attached to new DOM elements before they are inserted into document.
 * State and data retrieval should be defined in _and controlled by_ the URL as much as possible. 
