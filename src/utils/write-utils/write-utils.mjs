@@ -114,7 +114,6 @@ function writeEachJs(page, index, compress) {
   let scriptWithWindow = "";
 
   if (typeof jsVal === "string" && typeof name === "string") {
-    // scriptWithWindow += `window.p_p.${jsObj.name} = \n${scriptsAsString}\n`;
     scriptWithWindow += `window.p_p.${jsObj.name} = \n${jsVal}\n`;
   } else {
     throw new Error("1. writeJS failed because scriptAsString or savePath invalid");
@@ -123,8 +122,6 @@ function writeEachJs(page, index, compress) {
   //if we are the first element, as it is the main js for the page,
   //check for inits in page and add them to the end of said js file
   scriptWithWindow += inits;
-
-  // console.log("SCRIPTWITHWINDOW: ", scriptWithWindow);
 
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
     write(scriptWithWindow, savePath, compress);
@@ -165,7 +162,6 @@ export function writeJs(page, compress = false) {
 //function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page, compress = false) {
 
-  // validateArgs(arguments,["object", "boolean"]); 
   validateArgs(arguments,["object"]); 
   (function() {
     validateArgs(arguments, ["string", "string"]);
@@ -175,8 +171,6 @@ export function writeMarkup(page, compress = false) {
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
-
-  // console.log("PAGE MARKUP", page.markup);
 
   return write(page.markup, savePath, compress);
 
@@ -219,11 +213,6 @@ export function writeModule(page, compress = false) {
   delete page.inits;
 
   const pagePathsRemoved = cleanPage(page, "modulePath");
-
-
-  //pagePathsRemoved.js = JSON.stringify([...pagePathsRemoved].js.val);
-
-  // console.log("PAGEPATHSREMOVED: ", pagePathsRemoved);
 
   return write(JSON.stringify(pagePathsRemoved), savePath, compress);
 

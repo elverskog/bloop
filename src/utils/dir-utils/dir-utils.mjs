@@ -3,8 +3,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 
-
-
 //function to clear various directories in dist
 export function clearFiles(paths) {
 
@@ -24,9 +22,7 @@ export function clearFiles(paths) {
 }
 
 
-
 //a simple util module (a singleton? oh no!) to set and pass the base file path around
-//TODO is this code still needed?
 let baseDir; 
 
 export const utilBaseDir = {

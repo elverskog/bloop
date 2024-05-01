@@ -8,8 +8,6 @@ export function valArgsResHandler(res, errMessage = "generic validateArgs error"
 
 export function validateArgsArgs(args, types) {
 
-  console.log("VALIDATEARGSARGS: ", args, types);
-
   valArgsResHandler(arguments.length === 2, "validateArgsArgs did not receive 2 arguments");
 
   valArgsResHandler(args.length > 0, "validateArgsArgs arg argument did not have any elements");
@@ -28,8 +26,6 @@ export function validateArgsArgs(args, types) {
   });
 
   const typesTildaStripped = types.map( type => type.replace("~", ""));
-
-  console.log("TYPESTILDASTRIPPED: ", typesTildaStripped);
 
   valArgsResHandler((() => {
     let result;
