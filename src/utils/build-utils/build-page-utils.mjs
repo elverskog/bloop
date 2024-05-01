@@ -58,7 +58,10 @@ export function validateModuleRes(moduleRes) {
 
 
 async function addModule(modulePath, args) {
-  
+
+  // console.log("ADDMODULE PATH: ", modulePath);
+  // console.log("ADDMODULE ARGS: ", args);
+
   validateArgs(arguments, ["string", "~object"]);
 
   let module;

@@ -1,0 +1,26 @@
+[
+  {
+    "label": "A",
+    "path": "/a"
+  },
+  {
+    "label": "B",
+    "path": "/b"
+  },
+  {
+    "label": "C",
+    "path": "/c"
+  },
+  {
+    "label": "Lev1",
+    "path": "/level1/lev1-page"
+  },
+  {
+    "label": "Lev2",
+    "path": "/level1/level2/lev2-page"
+  },
+  {
+    "label": "?",
+    "path": "/adfdfdfdf"
+  }
+]

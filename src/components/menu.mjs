@@ -1,4 +1,25 @@
+import fakeMenu from "../data/fake-menu.json" assert { type: "json" };
+import { validateArgs } from "../utils/validation-utils.mjs";
+
+export async function getMenuItems(fakeMenu) {
+
+  let res = "";
+
+  for (let index = 0; index < fakeMenu.length; index++) {
+    const item = fakeMenu[index];
+    if (typeof item.label === "string" && typeof item.path === "string") {
+      res += (await this.addModule("src/components/menu-item.mjs", { label: item.label, pathname: item.path })).markup;
+    }
+  }
+
+  return res;
+
+}
+
+
 export default async function menu() {
+
+  const menuItems = await getMenuItems.call(this, fakeMenu);
 
   const result = {
     name: "menu",
@@ -13,12 +34,7 @@ export default async function menu() {
     }`,
     markup: `
       <menu class="menu">
-        ${ (await this.addModule("src/components/menu-item.mjs", { label: "A", pathname: "/a" })).markup }
-        ${ (await this.addModule("src/components/menu-item.mjs", { label: "B", pathname: "/b" })).markup }
-        ${ (await this.addModule("src/components/menu-item.mjs", { label: "C", pathname: "/c" })).markup }
-        ${ (await this.addModule("src/components/menu-item.mjs", { label: "Lev1", pathname: "/level1/lev1-page" })).markup }
-        ${ (await this.addModule("src/components/menu-item.mjs", { label: "Lev2", pathname: "/level1/level2/lev2-page" })).markup }
-        ${ (await this.addModule("src/components/menu-item.mjs", { label: "?", pathname: "/asadasd" })).markup }
+        ${ menuItems }    
       </menu>
     `
   };
