@@ -1,5 +1,3 @@
-//if the command "npm prod" is run, here we run code to buildPage every page found in /pages
-
 import { validateArgs } from "../validation-utils.mjs";
 import { page } from "./build-page-utils.mjs";
 
