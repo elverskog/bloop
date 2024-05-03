@@ -1,6 +1,6 @@
 import http from "http";
 import fs from "fs";
-import { getPages } from "./src/data/data-utils.mjs";
+import { getPagesData } from "./src/data/data-utils.mjs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
 import { page } from "./src/utils/build-utils/build-page-utils.mjs";
 import { 
@@ -186,12 +186,12 @@ if(process.env.NODE_ENV === "production") {
     "dist/modules"
   ]);
   //get an array of paths to all valid pages
-  const pageData = await getPages();
+  const pagesData = await getPagesData();
 
-  console.log("PAGEDATA: ", pageData);
+  console.log("PAGEsDATA: ", pagesData);
 
-  const buildObjectFullPages = await build(pageData, false);
-  const buildObjectModules = await build(pageData, true);
+  const buildObjectFullPages = await build(pagesData, false);
+  const buildObjectModules = await build(pagesData, true);
 
   buildObjectFullPages.forEach(page => {
     writeMarkup(page);

@@ -57,25 +57,28 @@ export function validateModuleRes(moduleRes) {
 }
 
 
-async function addModule(modulePath, args) {
+async function addModule(data, args) {
 
   // console.log("ADDMODULE PATH: ", modulePath);
   // console.log("ADDMODULE ARGS: ", args);
 
-  validateArgs(arguments, ["string", "~object"]);
+  validateArgs(arguments, ["object", "~object"]);
+ 
+  if(data.template !== "string") {
+    throw new Error("addModule passed data without template path");
+  }
 
   let module;
   let moduleRes;
-  const modulePathRel = modulePath === "/" ? "../../../a" : `../../../${modulePath}`; //handle homepage
 
   try {
-    module = (await import(modulePathRel)).default;    
+    module = (await import(`../../../${ data.template }.mjs`)).default;    
   } catch (error) {
     throw new Error(`IMPORT MODULE: ${error}`);
   }
 
   try {
-    moduleRes = await module.call(this, args);
+    moduleRes = await module.call(this, data);
   } catch (error) {
     throw new Error(`RUN MODULE: ${error}`);
   }
@@ -83,28 +86,30 @@ async function addModule(modulePath, args) {
   
   validateArgs([ moduleRes ], [ "object" ]);
 
-  const { name, title, css, markup, js } = moduleRes;
+  const { css, markup, js } = moduleRes;
 
   // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
 
-  //add a name for the page if it doesn't exist (use the first module in chains name)
-  this.modulePath = this.modulePath.length ? this.modulePath : modulePath;    
+  //add a path for the page if it doesn't exist (e.g. use the first module in chains name)
+  //we use this as the save location
+  this.modulePath = this.modulePath.length ? this.modulePath : data.name;    
 
-  //add a name for the page if it doesn't exist (use the first module in chain)
-  this.name = this.name.length ? this.name : name;    
+  //add a name for the page if it doesn't exist (e.g. use the first module in chain)
+  this.name = this.name.length ? this.name : data.name; 
 
-  //add a title for the page if it doesn't exist (use the first module in chains title)
-  this.title = this.title.length ? this.title : title;    
+  //add a title for the page if it doesn't exist (e.g. use the first module in chains title)
+  this.title = this.title.length ? this.title : data.title;    
 
   // add CSS
   this.css.push({
-    name: moduleRes.name,
-    modulePath,
+    name: data.name,
+    modulePath: this.modulePath,
     val: css    
   });
 
   // add inits if js has init function
   if(js) {
+
     if(typeof js.init === "function") {
       const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
       this.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
@@ -112,10 +117,11 @@ async function addModule(modulePath, args) {
 
     // add JS
     this.js.push({
-      name: moduleRes.name,
-      modulePath,
+      name: data.name,
+      modulePath: this.modulePath,
       val: convertJsToString(js)
     });
+
   }
 
   //add markup here we just use the markup from the last module
@@ -126,26 +132,17 @@ async function addModule(modulePath, args) {
 }
 
 
-export async function buildPage(path, isFetch, args) {
+export async function buildPage(pageData, isFetch, args) {
 
-  validateArgs(arguments, ["string", "boolean", "~object"]);
+  validateArgs(arguments, ["object", "boolean", "~object"]);
 
-  await this.addModule.call(this, path, args); 
+  await this.addModule.call(this, pageData, args); 
 
   // get the wrapper for the page if a fullpage request
-
   if (!isFetch) {
-    await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
+    await this.addModule.call(this, { template: "src/components/wrapper.mjs" }, { moduleRes: this });
   }
 
-  // if (!isFetch) {
-  //   try {
-  //     await this.addModule.call(this, "src/components/wrapper.mjs", { moduleRes: this });
-  //   } catch(err) {
-  //     throw new Error(`buildPage: add wrapper error: ${ err }`);
-  //   }
-  // }
-  
   return this;
 
 }
@@ -161,12 +158,13 @@ export function page() {
   this.js = [];
   this.inits = "";
 
-  this.buildPage = async function(path, isFetch, args) {
-    return await buildPage.call(this, path, isFetch, args);
+  this.buildPage = async function(pageData, isFetch, args) {
+    return await buildPage.call(this, pageData, isFetch, args);
   };
 
   this.addModule = async function(modulePath, args) {
     return await addModule.call(this, modulePath, args);
   };
+
 }
 

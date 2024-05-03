@@ -2,14 +2,13 @@ import { validateArgs } from "../validation-utils.mjs";
 import { page } from "./build-page-utils.mjs";
 
 
-// export async function build(pagePathsArray, isFetch, isProd = true) {
-export async function build(pagePathsArray, isFetch) {
+export async function build(pagesData, isFetch) {
 
   validateArgs(arguments, ["array", "boolean"]);
 
-  const masterRes = Promise.all(pagePathsArray.map( async path => {
+  const masterRes = Promise.all(pagesData.map( async pagesData => {
     const pageObj = new page();
-    return await pageObj.buildPage(path, isFetch);
+    return await pageObj.buildPage(pagesData, isFetch);
   }));
 
   return masterRes;
