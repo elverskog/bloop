@@ -178,17 +178,20 @@ const server = http.createServer(async (req, res) => {
 
 //run build script if on prod on start
 if(process.env.NODE_ENV === "production") {
+  
   console.log("BUILD");
+  
   clearFiles([
     "dist/css",
     "dist/js",
     "dist/markup",
     "dist/modules"
   ]);
+
   //get an array of paths to all valid pages
   const pagesData = await getPagesData();
 
-  console.log("PAGEsDATA: ", pagesData);
+  // console.log("PAGEsDATA: ", pagesData);
 
   const buildObjectFullPages = await build(pagesData, false);
   const buildObjectModules = await build(pagesData, true);

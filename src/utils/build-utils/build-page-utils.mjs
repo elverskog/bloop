@@ -59,12 +59,14 @@ export function validateModuleRes(moduleRes) {
 
 async function addModule(data, args) {
 
-  // console.log("ADDMODULE PATH: ", modulePath);
+  console.log("ADDMODULE ARGUMENTS: ", arguments);
+  console.log("ADDMODULE DATA: ", data);
   // console.log("ADDMODULE ARGS: ", args);
 
   validateArgs(arguments, ["object", "~object"]);
  
-  if(data.template !== "string") {
+  if(typeof data.template !== "string") {
+    console.log("ERROR: ", data);
     throw new Error("addModule passed data without template path");
   }
 
@@ -72,13 +74,13 @@ async function addModule(data, args) {
   let moduleRes;
 
   try {
-    module = (await import(`../../../${ data.template }.mjs`)).default;    
+    module = (await import(`../../../${ data.template }`)).default;    
   } catch (error) {
     throw new Error(`IMPORT MODULE: ${error}`);
   }
 
   try {
-    moduleRes = await module.call(this, data);
+    moduleRes = await module.call(this, data, args);
   } catch (error) {
     throw new Error(`RUN MODULE: ${error}`);
   }
@@ -134,6 +136,8 @@ async function addModule(data, args) {
 
 export async function buildPage(pageData, isFetch, args) {
 
+  console.log("BUILDPAGE: ", pageData);
+
   validateArgs(arguments, ["object", "boolean", "~object"]);
 
   await this.addModule.call(this, pageData, args); 
@@ -162,8 +166,8 @@ export function page() {
     return await buildPage.call(this, pageData, isFetch, args);
   };
 
-  this.addModule = async function(modulePath, args) {
-    return await addModule.call(this, modulePath, args);
+  this.addModule = async function(pageData, args) {
+    return await addModule.call(this, pageData, args);
   };
 
 }
