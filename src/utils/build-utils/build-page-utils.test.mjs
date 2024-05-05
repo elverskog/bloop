@@ -78,7 +78,7 @@ tap.test("build-page-utils should return a valid object under certain conditions
     "content": "Eleifend blandit dis curae;. Proin inceptos parturient arcu volutpat tempor ut dolor! Viverra ante nulla sollicitudin platea. Eleifend aliquam sagittis volutpat."
   };
   // const resultAllGood = await pageObj.buildPage(data, true, { label: "test" });
-  const resultAllGood = await pageObj.buildPage(data, false, { label: "test" });
+  const resultAllGood = await pageObj.buildPage(data.template, data, false, { label: "test" });
 
   t.match(resultAllGood, {
     modulePath: String,

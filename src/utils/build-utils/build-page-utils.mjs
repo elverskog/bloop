@@ -59,17 +59,15 @@ export function validateModuleRes(moduleRes) {
 }
 
 
-async function addModule(data, args) {
+async function addModule(modulePath, data, args) {
 
   console.log("ADDMODULE ARGUMENTS: ", arguments);
   console.log("ADDMODULE DATA: ", data);
   // console.log("ADDMODULE ARGS: ", args);
 
-  validateArgs(arguments, ["object", "~object"]);
+  validateArgs(arguments, ["string", "~object", "~object"]);
 
-  validateArgs(arguments, ["object", "~object"]);
-
-  if(typeof data.template !== "string") {
+  if(typeof modulePath !== "string") {
     console.log("ERROR: ", data);
     throw new Error("addModule passed data without template path");
   }
@@ -78,7 +76,7 @@ async function addModule(data, args) {
   let moduleRes;
 
   try {
-    module = (await import(`../../../${ data.template }`)).default;    
+    module = (await import(`../../../${ modulePath }`)).default;    
   } catch (error) {
     throw new Error(`IMPORT MODULE: ${error}`);
   }
@@ -97,7 +95,7 @@ async function addModule(data, args) {
 
   //add a path for the page if it doesn't exist (e.g. use the first module in chains name)
   //we use this as the save location
-  this.modulePath = this.modulePath.length ? this.modulePath : data.name;    
+  this.modulePath = this,modulePath.length ? this.modulePath : modulePath;    
 
   //add a name for the page if it doesn't exist (e.g. use the first module in chain)
   this.name = this.name.length ? this.name : data.name; 
@@ -106,14 +104,18 @@ async function addModule(data, args) {
   this.title = this.title.length ? this.title : data.title;    
 
   // add CSS
-  this.css.push({
-    name: data.name,
-    modulePath: this.modulePath,
-    val: css    
-  });
+  if(typeof moduleRes.css === "string") {
+    this.css.push({
+      name: data.name,
+      modulePath: modulePath,
+      val: css    
+    });
+  }
 
   // add inits if js has init function
-  if(js) {
+  if(typeof moduleRes.js === "object") {
+
+    const js = moduleRes.js;
 
     if(typeof js.init === "function") {
       const initArgs = typeof moduleRes.initArgs === "object" ? JSON.stringify(moduleRes.initArgs) : "";
@@ -130,25 +132,26 @@ async function addModule(data, args) {
   }
 
   //add markup here we just use the markup from the last module
-  this.markup = markup;
+  if(typeof moduleRes.markup === "string") {
+    this.markup = moduleRes.markup;
+  }
 
   return this;
 
 }
 
 
-export async function buildPage(pageData, isFetch, args) {
+export async function buildPage(template, pageData, isFetch, args) {
 
   console.log("BUILDPAGE: ", pageData);
 
-  validateArgs(arguments, ["object", "boolean", "~object"]);
+  validateArgs(arguments, ["string", "object", "boolean", "~object"]);
 
-  await this.addModule.call(this, pageData, args); 
+  await this.addModule.call(this, template, pageData, args); 
 
   // get the wrapper for the page if a fullpage request
   if (!isFetch) {
-    pageData.template = "src/components/wrapper.mjs";
-    await this.addModule.call(this, pageData);
+    await this.addModule.call(this, "src/components/wrapper.mjs");
   }
 
   return this;
@@ -166,12 +169,12 @@ export function page() {
   this.js = [];
   this.inits = "";
 
-  this.buildPage = async function(pageData, isFetch, args) {
-    return await buildPage.call(this, pageData, isFetch, args);
+  this.buildPage = async function(template, pageData, isFetch, args) {
+    return await buildPage.call(this, template, pageData, isFetch, args);
   };
 
-  this.addModule = async function(pageData, args) {
-    return await addModule.call(this, pageData, args);
+  this.addModule = async function(modulePath, pageData, args) {
+    return await addModule.call(this, modulePath, pageData, args);
   };
 
 }

@@ -4,6 +4,7 @@ import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScrip
 
 export default async function wrapper(data) {
 
+
   const bodyMarkup = this?.markup ? this.markup : "";
   const title = typeof data.title === "string" ? data.title : "Bloop";
 
