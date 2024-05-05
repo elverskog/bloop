@@ -2,12 +2,10 @@ import { parseAndOutputStream } from "../utils/res-utils/res-utils.mjs";
 import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
 
 
-export default async function wrapper(args) {
- 
-  const { moduleRes } = args;
+export default async function wrapper(data) {
 
-  const bodyMarkup = moduleRes?.markup ? moduleRes?.markup : "";
-  const title = typeof moduleRes.title === "string" ? moduleRes.title : "Bloop";
+  const bodyMarkup = this?.markup ? this.markup : "";
+  const title = typeof data.title === "string" ? data.title : "Bloop";
 
   //keep track of what css tags have been added (e.g. link may appear many times on a page)
   const addedCssNames = [ "wrapper", "menu" ];
@@ -22,8 +20,8 @@ export default async function wrapper(args) {
   const menuRes = await this.addModule("src/components/menu.mjs");
 
   //create a css/link tag for each module used in the page, server-side
-  if(moduleRes.css.length) {
-    moduleRes.css.forEach( obj => {
+  if(this.css.length) {
+    this.css.forEach( obj => {
       if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedCssNames.includes(obj.name)) {
         addedCssNames.push(obj.name);
         const cssPath = obj.modulePath.replace("src/", "/dist/")
@@ -43,11 +41,11 @@ export default async function wrapper(args) {
   let jsTags = "<script id=\"wrapperScript\" src=\"/dist/js/wrapper.js\" type=\"text/javascript\"></script>\n";
 
   //create a js/script tag for each module used in the page, server-side
-  if(moduleRes.js.length) {
+  if(this.js.length) {
     //reverse the order, as we want to make sure we load the main page's js last
     ////as it may have init tags for
     //we need to clone it otherwise it messes up the write.js
-    const jsRev = [...moduleRes.js].reverse();
+    const jsRev = [...this.js].reverse();
     jsRev.forEach( obj => {
       if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
         addedJsNames.push(obj.name);

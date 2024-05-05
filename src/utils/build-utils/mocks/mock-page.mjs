@@ -1,8 +1,8 @@
-export default async function mockPage(args) {
+export default async function mockPage(data, args) {
 
   const result = {
-    name: "mockPage",
-    title: "Mock Page",
+    name: data.name,
+    title: data.title,
     css: `
       .mockpage {
         font-size: 35em;
@@ -16,7 +16,7 @@ export default async function mockPage(args) {
     `,
     markup: `
       <div id="mock" class="mockpage">
-        Mock page - ${ args.label }
+        Mock page - ${ data.label }
       </div> 
       <div id="subPage" class="subPage">
       </div> 

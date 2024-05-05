@@ -32,6 +32,7 @@ function convertJsToString(jsObjVal) {
 //if returns "js" it should be an object
 //if returns "initArgs" it should be an object
 export function validateModuleRes(moduleRes) {
+
   if (typeof moduleRes !== "object") {
     throw new Error("moduleRes is not an object");
   }
@@ -54,6 +55,7 @@ export function validateModuleRes(moduleRes) {
     throw new Error(`${ moduleRes.name }: moduleRes.initArgs is not an object`);
   }
   return true;
+
 }
 
 
@@ -64,7 +66,9 @@ async function addModule(data, args) {
   // console.log("ADDMODULE ARGS: ", args);
 
   validateArgs(arguments, ["object", "~object"]);
- 
+
+  validateArgs(arguments, ["object", "~object"]);
+
   if(typeof data.template !== "string") {
     console.log("ERROR: ", data);
     throw new Error("addModule passed data without template path");
@@ -84,7 +88,6 @@ async function addModule(data, args) {
   } catch (error) {
     throw new Error(`RUN MODULE: ${error}`);
   }
-
   
   validateArgs([ moduleRes ], [ "object" ]);
 
@@ -144,7 +147,8 @@ export async function buildPage(pageData, isFetch, args) {
 
   // get the wrapper for the page if a fullpage request
   if (!isFetch) {
-    await this.addModule.call(this, { template: "src/components/wrapper.mjs" }, { moduleRes: this });
+    pageData.template = "src/components/wrapper.mjs";
+    await this.addModule.call(this, pageData);
   }
 
   return this;

@@ -70,7 +70,14 @@ tap.test("build-page-utils.validateModuleRes tests", async t => {
 tap.test("build-page-utils should return a valid object under certain conditions", async t => {
 
   const pageObj = new page();
-  const data = { template: "src/utils/build-utils/mocks/mock-page.mjs" };
+  const data = { 
+    template: "src/utils/build-utils/mocks/mock-page.mjs", 
+    "name": "a",
+    "title": "A",
+    "header1": "A",
+    "content": "Eleifend blandit dis curae;. Proin inceptos parturient arcu volutpat tempor ut dolor! Viverra ante nulla sollicitudin platea. Eleifend aliquam sagittis volutpat."
+  };
+  // const resultAllGood = await pageObj.buildPage(data, true, { label: "test" });
   const resultAllGood = await pageObj.buildPage(data, false, { label: "test" });
 
   t.match(resultAllGood, {
