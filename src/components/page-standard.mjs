@@ -3,7 +3,9 @@ import { validateArgs } from "../utils/validation-utils.mjs";
 
 export default async function pageDefault(pageData) {
 
-  validateArgs(pageData, [ "string", "string", "string", "string" ]);
+  // console.log("PAGE DEFAULT: ", Object.values(pageData));
+
+  validateArgs(Object.values(pageData), [ "string", "string", "string", "string", "string" ]);
 
   const result = {
     name: pageData.name,

@@ -112,7 +112,7 @@ const server = http.createServer(async (req, res) => {
       try {
 
         const modulePath = `src/pages${ url }.mjs`;
-        console.log("MODULEPATH: ", modulePath);
+        // console.log("MODULEPATH: ", modulePath);
 
         // I AM HERE
         // DO I NEED TO HAVE IS ISPROD OR ISDEV AS BOTH MODES WANT ISPROD
@@ -186,7 +186,7 @@ if(process.env.NODE_ENV === "production") {
     "dist/js",
     "dist/markup",
     "dist/modules"
-  ]);
+  ])
 
   //get an array of paths to all valid pages
   const pagesData = await getPagesData();
@@ -196,7 +196,9 @@ if(process.env.NODE_ENV === "production") {
   const buildObjectFullPages = await build(pagesData, false);
   const buildObjectModules = await build(pagesData, true);
 
+
   buildObjectFullPages.forEach(page => {
+    console.log("PAGE MOD PATH: ", page.modulePath);
     writeMarkup(page);
     writeCss(page);
     writeJs(page);

@@ -61,16 +61,14 @@ export function validateModuleRes(moduleRes) {
 
 async function addModule(modulePath, data, args) {
 
-  console.log("ADDMODULE ARGUMENTS: ", arguments);
-  console.log("ADDMODULE DATA: ", data);
-  // console.log("ADDMODULE ARGS: ", args);
+  //note: "this" here is the master object of all the modules for the page
+
+  // console.log("MODULEPATH: ", modulePath);
+  // console.log("PAGE/THIS CSS LENGTH: ", this.css.length);
+  // console.log("ADDMODULE ARGUMENTS: ", arguments);
+  // console.log("ADDMODULE DATA.NAME: ", data?.name);
 
   validateArgs(arguments, ["string", "~object", "~object"]);
-
-  if(typeof modulePath !== "string") {
-    console.log("ERROR: ", data);
-    throw new Error("addModule passed data without template path");
-  }
 
   let module;
   let moduleRes;
@@ -89,26 +87,34 @@ async function addModule(modulePath, data, args) {
   
   validateArgs([ moduleRes ], [ "object" ]);
 
-  const { css, markup, js } = moduleRes;
+  // console.log("MODULE RES: ", moduleRes);
 
-  // validateArgs([ name, title, css, markup, js ], [ "string", "string", "string", "string", "object" ]);
+  // validateArgs([ moduleRes.name, moduleRes.css, moduleRes.markup, moduleRes.js ], [ "string", "~string", "~string", "~string", "~object" ]);
 
   //add a path for the page if it doesn't exist (e.g. use the first module in chains name)
   //we use this as the save location
-  this.modulePath = this,modulePath.length ? this.modulePath : modulePath;    
+  if(!this,modulePath.length) {
+    console.log("THIS MOD PATH: ", this.modulePath, this.modulePath.length);
+    console.log("PASSED MOD PATH: ", modulePath);
+    this.modulePath = modulePath;    
+  }
 
-  //add a name for the page if it doesn't exist (e.g. use the first module in chain)
-  this.name = this.name.length ? this.name : data.name; 
+  //if data.name exists, assume this is a page level module and use it as the page name
+  if(data?.name) {
+    this.name = data.name; 
+  }
 
   //add a title for the page if it doesn't exist (e.g. use the first module in chains title)
-  this.title = this.title.length ? this.title : data.title;    
+  if(data?.title) {
+    this.title = data.title;    
+  }
 
   // add CSS
   if(typeof moduleRes.css === "string") {
     this.css.push({
-      name: data.name,
+      name: moduleRes.name,
       modulePath: modulePath,
-      val: css    
+      val: moduleRes.css    
     });
   }
 
@@ -124,7 +130,7 @@ async function addModule(modulePath, data, args) {
 
     // add JS
     this.js.push({
-      name: data.name,
+      name: moduleRes.name,
       modulePath: this.modulePath,
       val: convertJsToString(js)
     });
@@ -143,7 +149,7 @@ async function addModule(modulePath, data, args) {
 
 export async function buildPage(template, pageData, isFetch, args) {
 
-  console.log("BUILDPAGE: ", pageData);
+  // console.log("BUILDPAGE: ", pageData);
 
   validateArgs(arguments, ["string", "object", "boolean", "~object"]);
 

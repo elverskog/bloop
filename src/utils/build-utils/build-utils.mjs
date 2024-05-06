@@ -8,7 +8,7 @@ export async function build(pagesData, isFetch) {
 
   const masterRes = Promise.all(pagesData.map( async pagesData => {
     const pageObj = new page();
-    return await pageObj.buildPage(pagesData, isFetch);
+    return await pageObj.buildPage(pagesData.template, pagesData, isFetch);
   }));
 
   return masterRes;

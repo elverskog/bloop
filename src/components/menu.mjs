@@ -1,5 +1,5 @@
 import fakeMenu from "../data/fake-menu.json" assert { type: "json" };
-import { validateArgs } from "../utils/validation-utils.mjs";
+
 
 export async function getMenuItems(fakeMenu) {
 

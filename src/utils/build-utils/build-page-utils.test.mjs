@@ -80,6 +80,8 @@ tap.test("build-page-utils should return a valid object under certain conditions
   // const resultAllGood = await pageObj.buildPage(data, true, { label: "test" });
   const resultAllGood = await pageObj.buildPage(data.template, data, false, { label: "test" });
 
+  console.log("RESULT ALL GOOD: ", resultAllGood);
+
   t.match(resultAllGood, {
     modulePath: String,
     name: String,
@@ -88,57 +90,57 @@ tap.test("build-page-utils should return a valid object under certain conditions
     js: Object
   }, "pageObj.buildPage result object should have css, markup, style");
 
-  // const dataNoTitle = { template: "src/utils/build-utils/mocks/mock-page.mjs" }
-  // const resultNoTitle = await pageObj.buildPage("src/utils/build-utils/mocks/mock-page-no-title.mjs", false, { label: "test" });
+  const dataNoTitle = { template: "src/utils/build-utils/mocks/mock-page.mjs" };
+  const resultNoTitle = await pageObj.buildPage("src/utils/build-utils/mocks/mock-page-no-title.mjs", dataNoTitle, false, { label: "test" });
 
-  // t.match(resultNoTitle, {
-  //   modulePath: String,
-  //   name: String,
-  //   css: Object,
-  //   markup: String,
-  //   js: Object
-  // }, "pageObj.buildPage result object should have css, markup, style");
+  t.match(resultNoTitle, {
+    modulePath: String,
+    name: String,
+    css: Object,
+    markup: String,
+    js: Object
+  }, "pageObj.buildPage result object should have css, markup, style");
 
   t.end();
 
 });
 
-// /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-// tap.test("build, when returned invalid result, should throw an error", async t => {
+tap.test("build, when returned invalid result, should throw an error", async t => {
 
-//   const pageObj = new page();
+  const pageObj = new page();
 
-//   t.rejects(() => pageObj.buildPage("src/utils/build-utils/mocks/mock-page-bad-function.mjs", false, true), Error, "build-utils should throw error if module does not return anything");
+  t.rejects(() => pageObj.buildPage("src/utils/build-utils/mocks/mock-page-bad-function.mjs", false, true), Error, "build-utils should throw error if module does not return anything");
 
-//   t.rejects(() => pageObj.buildPage("src/utils/build-utils/mocks/mock-page-no-name.mjs", false, true), Error, "build-utils should throw error if module does not return a name");
+  t.rejects(() => pageObj.buildPage("src/utils/build-utils/mocks/mock-page-no-name.mjs", false, true), Error, "build-utils should throw error if module does not return a name");
 
-//   t.rejects(() => pageObj.buildPage("src/utils/build-utils/mocks/mock-page-bad-title.mjs", false, true), Error, "build-utils should throw error if module does not return a title as a string");
+  t.rejects(() => pageObj.buildPage("src/utils/build-utils/mocks/mock-page-bad-title.mjs", false, true), Error, "build-utils should throw error if module does not return a title as a string");
 
-//   t.end();
+  t.end();
 
-// });
+});
 
-// /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-// tap.test("build, when passed an invalid options obj, should throw an error", async t => {
+tap.test("build, when passed an invalid options obj, should throw an error", async t => {
 
-//   const pageObj = new page();
-//   const path = "src/utils/build-utils/mocks/mock-page.mjs";
+  const pageObj = new page();
+  const path = "src/utils/build-utils/mocks/mock-page.mjs";
 
-//   t.rejects(() => pageObj.buildPage(), Error, "build-page-utils should throw error if passed no arg");
+  t.rejects(() => pageObj.buildPage(), Error, "build-page-utils should throw error if passed no arg");
 
-//   t.rejects(() => pageObj.buildPage({}), Error, "build-page-utils should throw error if passed empty object");
+  t.rejects(() => pageObj.buildPage({}), Error, "build-page-utils should throw error if passed empty object");
 
-//   t.rejects(() => pageObj.buildPage(path, false, "sdfs"), Error, "build-page-utils should throw error if isProd not a boolean");
+  t.rejects(() => pageObj.buildPage(path, false, "sdfs"), Error, "build-page-utils should throw error if isProd not a boolean");
 
-//   t.rejects(() => pageObj.buildPage(path, "", false), Error, "build-page-utils should throw error if isFetch not a boolean");
+  t.rejects(() => pageObj.buildPage(path, "", false), Error, "build-page-utils should throw error if isFetch not a boolean");
 
-//   t.rejects(() => pageObj.buildPage(null, false, false), Error, "build-page-utils should throw error if path not a boolean");
+  t.rejects(() => pageObj.buildPage(null, false, false), Error, "build-page-utils should throw error if path not a boolean");
 
-//   t.rejects(() => pageObj.buildPage("aaaa/xxxx", false, false), Error, "build-page-utils should return undefined...");
+  t.rejects(() => pageObj.buildPage("aaaa/xxxx", false, false), Error, "build-page-utils should return undefined...");
 
-//   t.end();
+  t.end();
 
-// });
+});
 

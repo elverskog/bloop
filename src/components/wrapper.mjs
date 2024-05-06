@@ -6,7 +6,7 @@ export default async function wrapper(data) {
 
 
   const bodyMarkup = this?.markup ? this.markup : "";
-  const title = typeof data.title === "string" ? data.title : "Bloop";
+  const title = typeof data?.title === "string" ? data.title : "Bloop";
 
   //keep track of what css tags have been added (e.g. link may appear many times on a page)
   const addedCssNames = [ "wrapper", "menu" ];
@@ -33,7 +33,6 @@ export default async function wrapper(data) {
       }
     });
   }
-
 
   //keep track of what scripts have been added (e.g. link may appear many times on a page)
   const addedJsNames = [ "wrapper" ];
