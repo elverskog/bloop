@@ -66,7 +66,7 @@ async function addModule(modulePath, data, args) {
   // console.log("MODULEPATH: ", modulePath);
   // console.log("PAGE/THIS CSS LENGTH: ", this.css.length);
   // console.log("ADDMODULE ARGUMENTS: ", arguments);
-  // console.log("ADDMODULE DATA.NAME: ", data?.name);
+  // console.log("ADDMODULE: ", modulePath, data, args);
 
   validateArgs(arguments, ["string", "~object", "~object"]);
 
@@ -93,15 +93,20 @@ async function addModule(modulePath, data, args) {
 
   //add a path for the page if it doesn't exist (e.g. use the first module in chains name)
   //we use this as the save location
-  if(!this,modulePath.length) {
-    console.log("THIS MOD PATH: ", this.modulePath, this.modulePath.length);
-    console.log("PASSED MOD PATH: ", modulePath);
-    this.modulePath = modulePath;    
+  if(data?.category && data?.name) {
+    // console.log("THIS MOD PATH: ", this.modulePath, this.modulePath.length);
+    // console.log("PASSED MOD PATH: ", modulePath);
+    this.modulePath = data.category.join("/") + "/" + data.name;    
   }
 
   //if data.name exists, assume this is a page level module and use it as the page name
   if(data?.name) {
     this.name = data.name; 
+  }
+
+  //if data.name exists, assume this is a page level module and use it as the page name
+  if(data?.category) {
+    this.category = data.category; 
   }
 
   //add a title for the page if it doesn't exist (e.g. use the first module in chains title)

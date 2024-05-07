@@ -5,7 +5,7 @@ export default async function pageDefault(pageData) {
 
   // console.log("PAGE DEFAULT: ", Object.values(pageData));
 
-  validateArgs(Object.values(pageData), [ "string", "string", "string", "string", "string" ]);
+  validateArgs(Object.values(pageData), [ "string", "array", "string", "string", "string" ]);
 
   const result = {
     name: pageData.name,

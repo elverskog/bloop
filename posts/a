@@ -1,0 +1,338 @@
+window.p_p.wrapper = 
+
+{ init: function() {
+        //for forward and back buttons
+        window.addEventListener("popstate", () => {
+          p_p.wrapper.getBody(window.location.pathname);
+        });
+        //for script based changes to change current page
+        window.addEventListener("pathnameChanged", eventObj => {
+          //pathnameChanged event needs to pass in a URL, we can at least make sure it's a string
+          if(typeof eventObj.detail === "string") {
+            p_p.wrapper.getBody(eventObj.detail);
+          }
+        });
+      },
+parseAndOutputStream: async function parseAndOutputStream(res) {
+
+  //this function is only for browser
+  // if(typeof window !== "object") return;
+
+  const result = "";
+  const decoder = new TextDecoder();
+  const reader = res.body.getReader();
+  const { done, value } = await reader.read();
+  
+  // done  - true if the stream has already given you all its data.
+  // value - some data. Always undefined when done is true.
+
+  async function processText({ done, value }) {
+
+    //exit if stream is fully parsed 
+    if (done) return;
+
+    const newContent = decoder.decode(value);
+    
+    if(typeof newContent === "string") {
+      return result + newContent;
+    }
+
+    // If not done, read some more, and call this function again
+    const newDoneAndVal = await reader.read();
+
+    processText(newDoneAndVal);
+
+  }
+
+  return await processText({ done, value });
+
+},
+insertStyleSheets: function insertStyleSheets(cssArray, fn, window) {
+
+  //create an array that just lists the key of each succesfully inserted 
+  //I use an object to just automatically avoid duplicates, that would come with an array
+  //TODO maybe this can just be a count or a boolean?
+  const completedList = {};
+
+
+  // if window.p_p doesn't exist create it
+  // and add wrapper.insertEachScript to it
+  // this is for testing
+  //for unit testing (test uses JSDOM to pass in a "fake" window)
+  
+  const thisDocument = typeof document !== "object" ? window.document : document;
+
+  if(typeof window.p_p !== "object") {
+    window.p_p = {};
+    window.p_p.wrapper = {};
+    window.p_p.wrapper.insertEachStyleSheet = insertEachStyleSheet;
+  }
+
+
+  //create a interval loop that checks if a stylesheet has been properly added for each module cssArray
+  const intervalAll = setInterval(() =>
+    {
+      try {
+        //I don't check one by one here as completedArray can't have dupes
+        if (Object.keys(completedList).length === Object.keys(cssArray).length) {
+          //based on if each element in cssArray has "loaded" set (as true)
+          clearInterval(intervalAll);
+          clearTimeout(timeoutAll);
+          fn.call(window, true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 10),                                                   
+    //set another slower timer for when to abandon effort
+    timeoutAll = setTimeout(() => {       
+      //our style sheets process has failed, so clear the the above interval, fire the callback with success as false
+      clearInterval(intervalAll);            
+      clearTimeout(timeoutAll);              
+      fn.call(window, "false");
+    //}, 15000);
+    }, 7000);
+
+   
+  //iterate through cssArray and call function to load, validate and insert each into DOM
+  for(const cssObj of cssArray) {
+    try {
+      window.p_p.wrapper.insertEachStyleSheet(cssObj, completedList, thisDocument);
+    } catch (error) {
+      throw new TypeError(error); 
+    }
+  }
+
+},
+insertEachStyleSheet: function insertEachStyleSheet(cssObj, completedList, document) {
+
+  if(typeof cssObj?.name !== "string" || typeof cssObj?.val !== "string") {
+    return "insertEach passed invalid args";
+  }
+
+  //if stylesheet for module is already in document 
+  //mark that module as done in "completed" and exit
+  //we check actual doc as oppose to some list, to be more assured
+  const existingMatch = document.getElementById(`${cssObj.name}Styles`);
+  if(existingMatch) {
+    completedList[cssObj.name] = true;
+    return;
+  }
+
+  //create blob for value (CSS string) and turn it into a DOM link element
+  const styleBlob = new Blob([ cssObj.val ], { type: "text/css" });
+  const objectURL = URL.createObjectURL(styleBlob);
+  const linkEl = document.createElement("link");
+  linkEl.setAttribute("type", "text/css");
+  linkEl.setAttribute("rel", "stylesheet");
+  linkEl.setAttribute("href", objectURL);
+  linkEl.setAttribute("id", `${cssObj.name}Styles`);
+  
+  // get the correct properties to check for depending on the browser
+  const sheet = ("sheet" in linkEl) ? "sheet" : "styleSheet";
+  const cssRules = ("sheet" in linkEl) ? "cssRules" : "rules";
+
+  //start loop to check if stylesheet was loaded (every 10 milliseconds)
+  const intervalEach = setInterval( () =>
+    {
+      try {
+        if (linkEl[sheet] && linkEl[sheet][cssRules].length) {
+          // our style sheet has loaded, clear the counters, mark that module as done in "completed" and exit
+          clearInterval(intervalEach);
+          clearTimeout(timeoutEach);
+          completedList[cssObj.name] = true;
+        }
+      } catch (err) { 
+        console.error(err);
+      }
+    }, 10),                                                   
+    //set another slower timer for when to abandon effort
+    timeoutEach = setTimeout(() => {
+      //our style sheet has failed, clear the counters, fire the callback with success as false
+      clearInterval(intervalEach);            
+      clearTimeout(timeoutEach);
+      //the style sheet didn't load, remove the link node from the DOM and return
+      //we just compare length so marking it as false in "completed" is not need (TODO maybe)
+      document.head.removeChild(linkEl);                
+      return;
+    }, 15000);
+
+  //insert the link tag into the DOM and start loading the style sheet
+  document.head.appendChild(linkEl);
+
+},
+insertEachScript: function insertEachScript(jsObj, completedList, document) {
+
+  if(typeof jsObj?.name !== "string" || typeof jsObj?.val !== "string") {
+    return "insertEach passed invalid args";
+  }
+
+  //if stylesheet for module is already in document 
+  //mark that module as done in "completed" and exit
+  //we check actual doc as oppose to some list, to be more assured
+  const existingMatch = document.getElementById(`${jsObj}Script`);
+  if(existingMatch) {
+    completedList[jsObj.name] = true;
+    return;
+  }
+  
+  //create blob for value (JS string) and turn it into a DOM link element
+  const jsValWithP_P = `window.p_p.${ jsObj.name } = ${ jsObj.val }`;
+  const scriptBlob = new Blob([jsValWithP_P], { type: "text/javascript" });
+  const objectUrl = URL.createObjectURL(scriptBlob);
+  const scriptEl = document.createElement("script");
+  scriptEl.setAttribute("type", "module");
+  scriptEl.setAttribute("src", objectUrl);
+  scriptEl.setAttribute("id", `${jsObj.name}Script`);
+
+  //start loop to check if script was loaded (every 10 milliseconds)
+  const intervalEach = setInterval( () =>  
+    {
+      try {
+        //TODO: I'm not sure if this is OK (or maybe better)
+        //here we just test if the script element was created but we don't know if the script got atached to window
+        //the problem is that for unit testing, it seems JSDOM doesn't actually run the script inserted???
+        //also not testing the script being attached to window is actually more agnostic because the script may conceivably not do that 
+        //if (typeof window.p_p[moduleName] === "object") {
+        if (typeof document.getElementById("#{moduleName}Script") === "object") {
+          // our style sheet has loaded, clear the counters, mark that module as done in "completed" and exit
+          clearInterval(intervalEach);
+          clearTimeout(timeoutEach);
+          completedList[jsObj.name] = true;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 10),                                                   
+    //set another slower timer for when to abandon effort
+    timeoutEach = setTimeout(() => {
+      //our script insert has failed, clear the counters and return
+      clearInterval(intervalEach);            
+      clearTimeout(timeoutEach);
+      return;
+    }, 7000);
+
+  //insert the script tag into the DOM
+  document.body.appendChild(scriptEl);
+
+},
+insertScripts: function insertScripts(js, fn, window) {
+
+  if (js === null || typeof js !== "object" && typeof js[Symbol.iterator] !== "function") {
+    throw new TypeError("insertScript passed invalid js array");
+  }
+  if (typeof fn !== "function") {
+    throw new TypeError("insertScript passed invalid callback function");
+  }
+  if (typeof window?.document !== "object") {
+    throw new TypeError("insertScript passed invalid window");
+  }
+
+  //create an array that just lists the key of each succesfully inserted script; to avoid dupes 
+  const completedList = {};
+
+
+  //run callback with false if window doesn't exist
+  if(typeof window !== "object") {
+    fn.call(window, false);
+  }
+
+  // if window.p_p doesn't exist create it
+  // and add wrapper.insertEachScript to it
+  // this is for testing
+  //for unit testing (test uses JSDOM to pass in a "fake" window)
+  
+  const thisDocument = typeof document !== "object" ? window.document : document;
+
+  if(typeof window.p_p !== "object") {
+    window.p_p = {};
+    window.p_p.wrapper = {};
+    window.p_p.wrapper.insertEachScript = insertEachScript;
+  }
+
+
+  //interval to check the completed object, to see if it matches the length of the passed in jsObj 
+  const intervalAll = setInterval(() =>
+    {
+      try {
+        //I don't check the value here, one by one here, as completedArray can't have dupes
+        if (Object.keys(completedList).length === Object.keys(js).length) {
+          //based on if each element in script has "loaded" set (as true)
+          clearInterval(intervalAll);
+          clearTimeout(timeoutAll);
+          fn.call(window, true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 10),                                                   
+    //set another slower timer for when to abandon effort
+    timeoutAll = setTimeout(() => {       
+      //script insertion process failed, so clear the the above interval, fire the callback with success as false
+      clearInterval(intervalAll);            
+      clearTimeout(timeoutAll);              
+      fn.call(window, false);
+    }, 7000);
+
+   
+  // console.log("JS ---- ", js);
+  // console.log("JS ITERATOR ---- ", js[Symbol.iterator]);
+
+  //iterate through jsObject and call function to load, validate and insert each into DOM
+  for(const jsObj of js) {
+    try {
+      window.p_p.wrapper.insertEachScript(jsObj, completedList, thisDocument);
+    } catch (error) {
+      throw new TypeError(error); 
+    }
+  }
+
+},
+getBody: async function(pathname) {
+        //exit if not in browser, as this can/should only be run in browser
+        if(typeof window !== "object") return;
+
+        // const parseAndOutputStream = (await import(`/src/utils/res-utils.mjs`)).parseAndOutputStream;
+        // const insertStyleSheets = (await import(`/src/utils/dom-utils.mjs`)).insertStyleSheets;
+        // const insertScripts = (await import(`/src/utils/dom-utils.mjs`)).insertScripts;
+
+        const headers = new Headers();
+        headers.append("is-fetch", true);
+        const options = { headers };  
+        const res = await fetch(pathname, options);
+        const parsedResStream = await p_p.wrapper.parseAndOutputStream(res);
+        const resParsed = JSON.parse(parsedResStream);
+
+        // return;
+
+        //add CSS to head
+        if(typeof resParsed.css === "object") {       
+          p_p.wrapper.insertStyleSheets(resParsed.css, success => {
+            if (success) {
+              console.log("insert styles succeeded");
+              //replace body HTML
+              const targetEl = document.getElementById("content");
+              targetEl.innerHTML = resParsed.markup;
+              //set page title
+              document.title = typeof resParsed.title === "string" ? resParsed.title : "Bloop";
+              //add scripts by footer
+
+              if (typeof resParsed.js[Symbol.iterator] === "function") {
+                p_p.wrapper.insertScripts(resParsed.js, success => {
+                  if(success) {
+                    console.log("insert scripts succeeded");
+                  } else {
+                    console.log("insert scripts failed");
+                  }
+                }, window);
+              }
+
+            } else {
+              console.log("insert styles failed");
+            }
+          }, window);
+        }
+
+      },
+ 
+}

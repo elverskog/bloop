@@ -170,7 +170,7 @@ export function writeMarkup(page, compress = false) {
 
   const savePath = page.modulePath.replace("src/", "dist/").replace("components/", "markup/").replace(".mjs", ".html");
 
-  console.log("SAVEPATH: ", savePath);
+  // console.log("SAVEPATH: ", savePath);
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
