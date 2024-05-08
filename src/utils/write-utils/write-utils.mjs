@@ -162,15 +162,16 @@ export function writeJs(page, compress = false) {
 //function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page, compress = false) {
 
-  // console.log("MODULEPATH: ", page.modulePath);
+  console.log("MODULEPATH: ", page.modulePath);
   // console.log("WRITE MARKUP: ", page.markup);
 
   validateArgs(arguments, ["object"]); 
   validateArgs([ page.modulePath, page.markup ], ["string", "string"]); 
 
-  const savePath = page.modulePath.replace("src/", "dist/").replace("components/", "markup/").replace(".mjs", ".html");
+  // const savePath = page.modulePath.replace("src/", "dist/").replace("components/", "markup/").replace(".mjs", ".html");
+  const savePath = `dist/markup/${ page.modulePath }.html`;
 
-  // console.log("SAVEPATH: ", savePath);
+  console.log("SAVEPATH: ", savePath);
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;

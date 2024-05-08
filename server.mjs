@@ -35,7 +35,7 @@ const PORT = 3000;
 const server = http.createServer(async (req, res) => {
 
   //need to account for the homepage or whatever the pathname "/" should load
-  const url = req.url === "/" ? "/a" : req.url;
+  const url = req.url === "/" ? "/posts/a" : req.url;
 
   const isFetch = req?.headers ? req?.headers["is-fetch"] : false;
 
