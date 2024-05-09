@@ -35,7 +35,7 @@ const PORT = 3000;
 const server = http.createServer(async (req, res) => {
 
   //need to account for the homepage or whatever the pathname "/" should load
-  const url = req.url === "/" ? "/posts/a" : req.url;
+  const url = req.url === "/" ? "/a" : req.url;
 
   const isFetch = req?.headers ? req?.headers["is-fetch"] : false;
 
@@ -97,7 +97,7 @@ const server = http.createServer(async (req, res) => {
 
     //path to rendered files changes based on if request is for a page or a module
     const path = isFetch ? `${baseDir}/dist/modules${url}.json` : `${baseDir}/dist/markup/${url}.html`;
-    const fallbackPath = isFetch ? `${baseDir}/dist/modules/fourOhFour.json` : `${baseDir}/dist/markup/fourOhFour.html`;
+    const fallbackPath = isFetch ? `${baseDir}/dist/modules/four-oh-four.json` : `${baseDir}/dist/markup/four-oh-four.html`;
 
     //if there is a file found for the pathname, return it
     //else compile the module(s) and write the related files
@@ -186,7 +186,7 @@ if(process.env.NODE_ENV === "production") {
     "dist/js",
     "dist/markup",
     "dist/modules"
-  ])
+  ]);
 
   //get an array of paths to all valid pages
   const pagesData = await getPagesData();
@@ -196,9 +196,9 @@ if(process.env.NODE_ENV === "production") {
   const buildObjectFullPages = await build(pagesData, false);
   const buildObjectModules = await build(pagesData, true);
 
+  // console.log("BUILDOBJECTFULLPAGES: ", buildObjectFullPages);
 
   buildObjectFullPages.forEach(page => {
-    console.log("PAGE MOD PATH: ", page.modulePath);
     writeMarkup(page);
     writeCss(page);
     writeJs(page);

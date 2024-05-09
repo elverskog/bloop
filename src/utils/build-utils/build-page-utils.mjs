@@ -63,7 +63,8 @@ async function addModule(modulePath, data, args) {
 
   //note: "this" here is the master object of all the modules for the page
 
-  // console.log("MODULEPATH: ", modulePath);
+  const modulePathClean = modulePath.replace("src/", "").replace("components/", "");
+  console.log("MODULEPATH: ", modulePathClean);
   // console.log("PAGE/THIS CSS LENGTH: ", this.css.length);
   // console.log("ADDMODULE ARGUMENTS: ", arguments);
   // console.log("ADDMODULE: ", modulePath, data, args);
@@ -118,7 +119,7 @@ async function addModule(modulePath, data, args) {
   if(typeof moduleRes.css === "string") {
     this.css.push({
       name: moduleRes.name,
-      modulePath: modulePath,
+      modulePath: modulePathClean,
       val: moduleRes.css    
     });
   }
@@ -136,7 +137,7 @@ async function addModule(modulePath, data, args) {
     // add JS
     this.js.push({
       name: moduleRes.name,
-      modulePath: this.modulePath,
+      modulePath: modulePathClean,
       val: convertJsToString(js)
     });
 
@@ -189,4 +190,5 @@ export function page() {
   };
 
 }
+
 

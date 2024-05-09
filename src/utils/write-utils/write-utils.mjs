@@ -35,6 +35,10 @@ export function write(val, savePath, compress) {
   //if the dirs in the path doesn't exist create them (cut the filename off the end)
   dirPath = savePath.split("/").slice(0, -1).join("/").toString();
 
+  // console.log("SAVEPATH: ", savePath);
+  // console.log("DIRPATH: ", dirPath);
+  // console.log("VAL: ", val.slice(0, 20));
+
   if(!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
@@ -70,11 +74,16 @@ function writeEachCss(cssObj, compress) {
   })(cssObj.val, cssObj.modulePath);
 
   const val = cssObj.val;
-  const savePath = cssObj.modulePath
-    .replace("src", "dist")
-    .replace("pages", "css")
-    .replace("components", "css")
-    .replace("mjs", "css");
+
+  const savePath = `dist/css/${ cssObj.modulePath }.css`;
+
+  // console.log("WRITEEACHCSS SAVEPATH: ", savePath);
+
+  // const savePath = cssObj.modulePath
+  //   .replace("src", "dist")
+  //   .replace("pages", "css")
+  //   .replace("components", "css")
+  //   .replace("mjs", "css");
 
   write(val, savePath, compress);
 
@@ -108,7 +117,11 @@ function writeEachJs(page, index, compress) {
   const jsObj = page.js[index];
   const name = jsObj.name;
   const jsVal = jsObj.val;
-  const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
+  // const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
+
+
+  const savePath = `dist/js/${ page.modulePath }.js`;
+
   //only add inits (to add listeners for example) if we are creating the main js file
   const inits = (index === 0 && page.inits) ? page.inits : "";
   let scriptWithWindow = "";
@@ -145,7 +158,10 @@ export function writeJs(page, compress = false) {
   (function () { 
     validateArgs(arguments, ["array"]); 
   })(page.js); 
-  
+
+
+  console.log("PAGE JS AT 0: ", page.js[0]);
+
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
   if (validateObj(page.js[0], "string")) {
@@ -162,7 +178,7 @@ export function writeJs(page, compress = false) {
 //function to compress and write markup files for a full page request /////////////////////////////////////////
 export function writeMarkup(page, compress = false) {
 
-  console.log("MODULEPATH: ", page.modulePath);
+  // console.log("MODULEPATH: ", page.modulePath);
   // console.log("WRITE MARKUP: ", page.markup);
 
   validateArgs(arguments, ["object"]); 
@@ -171,7 +187,7 @@ export function writeMarkup(page, compress = false) {
   // const savePath = page.modulePath.replace("src/", "dist/").replace("components/", "markup/").replace(".mjs", ".html");
   const savePath = `dist/markup/${ page.modulePath }.html`;
 
-  console.log("SAVEPATH: ", savePath);
+  // console.log("SAVEPATH: ", savePath);
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
@@ -209,7 +225,9 @@ export function writeModule(page, compress = false) {
     validateArgs(arguments, ["string", "string", "array", "string", "array"]);
   })(page.title, page.modulePath, page.css, page.markup, page.js);
 
-  const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "modules/").replace(".mjs", ".json");
+  // const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "modules/").replace(".mjs", ".json");
+
+  const savePath = `dist/modules/${ page.modulePath }.css`;
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;

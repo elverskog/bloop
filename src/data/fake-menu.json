@@ -1,26 +1,26 @@
 [
   {
     "label": "A",
-    "path": "/posts/a"
+    "path": "/a"
   },
   {
     "label": "B",
-    "path": "/posts/b"
+    "path": "/b"
   },
   {
     "label": "C",
-    "path": "/posts/c"
+    "path": "/c"
   },
   {
     "label": "Lev1",
-    "path": "/posts/level1/lev1"
+    "path": "/level-one/lev1"
   },
   {
     "label": "Lev2",
-    "path": "/posts/level1/level2/lev2"
+    "path": "/level-one/level-two/lev2"
   },
   {
     "label": "?",
-    "path": "/posts/adfdfdfdf"
+    "path": "/adfdfdfdf"
   }
 ]
