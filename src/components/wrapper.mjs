@@ -20,16 +20,12 @@ export default async function wrapper(data) {
   //get menu module
   const menuRes = await this.addModule("src/components/menu.mjs");
 
-  //create a css/link tag for each module used in the page, server-side
+  //create a CSS link tag for each module used in the page, server-side
   if(this.css.length) {
     this.css.forEach( obj => {
       if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedCssNames.includes(obj.name)) {
         addedCssNames.push(obj.name);
-        const cssPath = obj.modulePath.replace("src/", "/dist/")
-          .replace("components/", "css/")
-          .replace("pages/", "css/")
-          .replace(".mjs", ".css");
-        cssTags += `<link id="${obj.name}Styles" rel="stylesheet" type="text/css" href="${cssPath}" />\n`;
+        cssTags += `<link id="${obj.name}Styles" rel="stylesheet" type="text/css" href="/dist/css/${obj.modulePath.replace("mjs", "css")}" />\n`;
       }
     });
   }
@@ -49,11 +45,7 @@ export default async function wrapper(data) {
     jsRev.forEach( obj => {
       if(typeof obj.val === "string" && typeof obj.name === "string" && typeof obj.modulePath === "string" && !addedJsNames.includes(obj.name)) {
         addedJsNames.push(obj.name);
-        const path = obj.modulePath.replace("src/", "/dist/")
-          .replace("components/", "js/")
-          .replace("pages/", "js/")
-          .replace(".mjs", ".js");
-        jsTags += `<script id="${obj.name}Script" type="text/javascript" src="${path}"></script>\n`;
+        jsTags += `<script id="${obj.name}Script" type="text/javascript" src="/dist/js/${obj.modulePath.replace("mjs", "js")}"></script>\n`;
       }
     });
   }
@@ -133,9 +125,8 @@ export default async function wrapper(data) {
         const options = { headers };  
         const res = await fetch(pathname, options);
         const parsedResStream = await p_p.wrapper.parseAndOutputStream(res);
+        console.log("PARSEDRESSTREAM: ", parsedResStream);
         const resParsed = JSON.parse(parsedResStream);
-
-        // return;
 
         //add CSS to head
         if(typeof resParsed.css === "object") {       

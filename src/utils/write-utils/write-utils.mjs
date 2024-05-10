@@ -75,7 +75,7 @@ function writeEachCss(cssObj, compress) {
 
   const val = cssObj.val;
 
-  const savePath = `dist/css/${ cssObj.modulePath }.css`;
+  const savePath = `dist/css/${ cssObj.modulePath.replace("mjs", "css") }`;
 
   // console.log("WRITEEACHCSS SAVEPATH: ", savePath);
 
@@ -120,7 +120,7 @@ function writeEachJs(page, index, compress) {
   // const savePath = jsObj.modulePath.replace("src", "dist").replace("components", "js").replace("pages", "js").replace("mjs", "js");
 
 
-  const savePath = `dist/js/${ page.modulePath }.js`;
+  const savePath = `dist/js/${ jsObj.modulePath.replace("mjs", "js")}`;
 
   //only add inits (to add listeners for example) if we are creating the main js file
   const inits = (index === 0 && page.inits) ? page.inits : "";
@@ -137,6 +137,7 @@ function writeEachJs(page, index, compress) {
   scriptWithWindow += inits;
 
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
+    // console.log("PAGE JS SAVEPATH", savePath);
     write(scriptWithWindow, savePath, compress);
   } else {
     throw new Error("writeJs passed invalid page object");
@@ -154,13 +155,11 @@ function writeEachJs(page, index, compress) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page, compress = false) {
 
+
   validateArgs(arguments, ["object"]); 
   (function () { 
     validateArgs(arguments, ["array"]); 
   })(page.js); 
-
-
-  console.log("PAGE JS AT 0: ", page.js[0]);
 
   //if we have an "js object" at the current index, try and write it
   //else just exit (doing anything can cause errors in tests)
@@ -227,7 +226,7 @@ export function writeModule(page, compress = false) {
 
   // const savePath = page.modulePath.replace("src/", "dist/").replace("pages/", "modules/").replace(".mjs", ".json");
 
-  const savePath = `dist/modules/${ page.modulePath }.css`;
+  const savePath = `dist/modules/${ page.modulePath }.json`;
 
   //if in PROD, exit if the file exists (on dev always write the file)
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;

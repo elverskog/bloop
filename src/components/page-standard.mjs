@@ -37,11 +37,14 @@ export default async function pageDefault(pageData) {
       </div>    
     `,
     js: {
-      init: function() {
+      init: function(args) {
         if(typeof window === "object") {
-          console.log(`INIT ${ pageData.name }`);
+          console.log(`INIT ${ args.name }`);
         }
-      } 
+      },
+    },
+    initArgs: {
+      name: pageData.name 
     } 
   };
 

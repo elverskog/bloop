@@ -64,7 +64,6 @@ async function addModule(modulePath, data, args) {
   //note: "this" here is the master object of all the modules for the page
 
   const modulePathClean = modulePath.replace("src/", "").replace("components/", "");
-  console.log("MODULEPATH: ", modulePathClean);
   // console.log("PAGE/THIS CSS LENGTH: ", this.css.length);
   // console.log("ADDMODULE ARGUMENTS: ", arguments);
   // console.log("ADDMODULE: ", modulePath, data, args);
