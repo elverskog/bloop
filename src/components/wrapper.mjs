@@ -124,9 +124,7 @@ export default async function wrapper(data) {
         headers.append("is-fetch", true);
         const options = { headers };  
         const res = await fetch(pathname, options);
-        const parsedResStream = await p_p.wrapper.parseAndOutputStream(res);
-        console.log("PARSEDRESSTREAM: ", parsedResStream);
-        const resParsed = JSON.parse(parsedResStream);
+        const resParsed = await res.json();
 
         //add CSS to head
         if(typeof resParsed.css === "object") {       
