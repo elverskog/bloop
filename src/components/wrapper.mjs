@@ -1,4 +1,3 @@
-import { parseAndOutputStream } from "../utils/res-utils/res-utils.mjs";
 import { insertStyleSheets, insertEachStyleSheet, insertScripts, insertEachScript } from "../utils/dom-utils.mjs";
 
 
@@ -104,7 +103,6 @@ export default async function wrapper(data) {
           }
         });
       },
-      parseAndOutputStream,
       insertStyleSheets,
       insertEachStyleSheet,
       insertEachScript,
