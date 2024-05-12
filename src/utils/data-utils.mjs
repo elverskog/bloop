@@ -8,10 +8,10 @@ export async function getPages() {
 
   try {
 
-    fileNames = fs.readdirSync("./src/content/pages");
+    fileNames = fs.readdirSync("./content/pages");
 
     for (let index = 0; index < fileNames.length; index++) {
-      const { default: page } = await import(`../../src/content/pages/${fileNames[ index ]}`, { assert: { type: "json" } });
+      const { default: page } = await import(`../../content/pages/${fileNames[ index ]}`, { assert: { type: "json" } });
       res.push(page);
     }
 
