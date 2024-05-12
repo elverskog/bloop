@@ -1,0 +1,9 @@
+{
+  "name": "four-oh-four",
+  "category": [],
+  "title": "404",
+  "template": "src/components/four-oh-four.mjs",
+  "created": "",
+  "updated": "",
+  "order": 0
+}

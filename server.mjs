@@ -1,12 +1,11 @@
 import http from "http";
 import fs from "fs";
-import { getPagesData } from "./src/data/data-utils.mjs";
+import { getPages } from "./src/utils/data-utils.mjs";
 import { build } from "./src/utils/build-utils/build-utils.mjs";
 import { page } from "./src/utils/build-utils/build-page-utils.mjs";
 import { 
   clearFiles, 
-  utilBaseDir,
-  getAllFiles 
+  utilBaseDir
 } from "./src/utils/dir-utils/dir-utils.mjs";
 import { 
   writeCss, 
@@ -189,9 +188,9 @@ if(process.env.NODE_ENV === "production") {
   ]);
 
   //get an array of paths to all valid pages
-  const pagesData = await getPagesData();
+  const pagesData = await getPages();
 
-  // console.log("PAGEsDATA: ", pagesData);
+  console.log("PAGEsDATA: ", pagesData);
 
   const buildObjectFullPages = await build(pagesData, false);
   const buildObjectModules = await build(pagesData, true);

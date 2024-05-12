@@ -66,7 +66,7 @@ async function addModule(modulePath, data, args) {
   const modulePathClean = modulePath.replace("src/", "").replace("components/", "");
   // console.log("PAGE/THIS CSS LENGTH: ", this.css.length);
   // console.log("ADDMODULE ARGUMENTS: ", arguments);
-  // console.log("ADDMODULE: ", modulePath, data, args);
+  console.log("ADDMODULE: ", modulePath, data, args);
 
   validateArgs(arguments, ["string", "~object", "~object"]);
 
@@ -154,7 +154,8 @@ async function addModule(modulePath, data, args) {
 
 export async function buildPage(template, pageData, isFetch, args) {
 
-  // console.log("BUILDPAGE: ", pageData);
+  // console.log("BUILDPAGE ARGS: ", arguments);
+  // console.log("BUILDPAGE TEMPLATE: ", template);
 
   validateArgs(arguments, ["string", "object", "boolean", "~object"]);
 

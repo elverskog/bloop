@@ -1,4 +1,4 @@
-import fakeMenu from "../data/fake-menu.json" assert { type: "json" };
+import fakeMenu from "../content/menus/fake-menu.json" assert { type: "json" };
 
 
 export async function getMenuItems(fakeMenu) {
