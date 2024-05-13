@@ -66,7 +66,7 @@ async function addModule(modulePath, data, args) {
   const modulePathClean = modulePath.replace("src/", "").replace("components/", "");
   // console.log("PAGE/THIS CSS LENGTH: ", this.css.length);
   // console.log("ADDMODULE ARGUMENTS: ", arguments);
-  console.log("ADDMODULE: ", modulePath, data, args);
+  // console.log("ADDMODULE: ", modulePath, data, args);
 
   validateArgs(arguments, ["string", "~object", "~object"]);
 

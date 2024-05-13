@@ -110,31 +110,30 @@ const server = http.createServer(async (req, res) => {
     if(process.env.NODE_ENV === "development" || typeof output !== "object") {
       try {
 
-        const modulePath = `src/pages${ url }.mjs`;
-        // console.log("MODULEPATH: ", modulePath);
-
-        // I AM HERE
-        // DO I NEED TO HAVE IS ISPROD OR ISDEV AS BOTH MODES WANT ISPROD
-        // EG - BOTH MODES RITE THE FILE AND READ IT, PATHS ARE THE SAME ETC
+        const jsonFileName = `${ url.substring(1).replace("/", "~") }.json`;
+        const { default: pageData } = await import(`./content/pages/${jsonFileName}`, { assert: { type: "json" } });
         const pageObj = new page();
-        const pageAsModule = await pageObj.buildPage(modulePath, true);
-        const pageFull = await pageObj.buildPage(modulePath, false);
 
-        // console.log("PAGE: ", page);
+        const pageAsModule = await pageObj.buildPage(pageData.template, pageData, true);
+        const pageFull = await pageObj.buildPage(pageData.template, pageData, false);
+
+        // console.log("PAGEASMODULE: ", pageAsModule);
+        console.log("PAGEFULL: ", pageFull);
 
         if (isFetch) {
           writeModule(pageAsModule);
+          output = fs.readFileSync(`./content/pages/${url}.mjs`, {});
         } else {
           writeMarkup(pageFull);
           writeCss(pageFull);
           writeJs(pageFull);
+          output = fs.readFileSync(`./dist/markup/${url}.html`, {});
         }
-
-        output = fs.readFileSync(path, {});
 
       } catch (error) {
         console.log("server.js module compile error", error); 
       }
+
     }
 
     //if no file was found and we couldn't create it, try to return a 404 page or module from dist
