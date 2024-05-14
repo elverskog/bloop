@@ -114,16 +114,12 @@ const server = http.createServer(async (req, res) => {
         const { default: pageData } = await import(`./content/pages/${jsonFileName}`, { assert: { type: "json" } });
         const pageObj = new page();
 
-        const pageAsModule = await pageObj.buildPage(pageData.template, pageData, true);
-        const pageFull = await pageObj.buildPage(pageData.template, pageData, false);
-
-        // console.log("PAGEASMODULE: ", pageAsModule);
-        console.log("PAGEFULL: ", pageFull);
-
         if (isFetch) {
+          const pageAsModule = await pageObj.buildPage(pageData.template, pageData, true);
           writeModule(pageAsModule);
-          output = fs.readFileSync(`./content/pages/${url}.mjs`, {});
+          output = fs.readFileSync(`./dist/modules/${url}.json`, {});
         } else {
+          const pageFull = await pageObj.buildPage(pageData.template, pageData, false);
           writeMarkup(pageFull);
           writeCss(pageFull);
           writeJs(pageFull);
@@ -209,5 +205,5 @@ if(process.env.NODE_ENV === "production") {
 }
 
 server.listen(PORT, () => {
-  console.log(`PROD listening on port ${PORT}`);
+  console.log(`${ process.env.NODE_ENV } listening on port ${ PORT }`);
 });

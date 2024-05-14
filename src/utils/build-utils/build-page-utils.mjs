@@ -61,6 +61,9 @@ export function validateModuleRes(moduleRes) {
 
 async function addModule(modulePath, data, args) {
 
+  // console.log("ADDEDMODULES: ", this.addedModules);
+  // console.log("MODULE PATH: ", modulePath);
+
   //note: "this" here is the master object of all the modules for the page
 
   const modulePathClean = modulePath.replace("src/", "").replace("components/", "");
@@ -114,8 +117,8 @@ async function addModule(modulePath, data, args) {
     this.title = data.title;    
   }
 
-  // add CSS
-  if(typeof moduleRes.css === "string") {
+  // add CSS if not already added
+  if(typeof moduleRes.css === "string" && this.addedModules.indexOf(moduleRes.name) < 0) {
     this.css.push({
       name: moduleRes.name,
       modulePath: modulePathClean,
@@ -123,7 +126,8 @@ async function addModule(modulePath, data, args) {
     });
   }
 
-  // add inits if js has init function
+  // add JS
+  // add js and inits if not already added 
   if(typeof moduleRes.js === "object") {
 
     const js = moduleRes.js;
@@ -133,12 +137,15 @@ async function addModule(modulePath, data, args) {
       this.inits += `\n p_p.${moduleRes.name}.init(${initArgs});`; 
     }
 
-    // add JS
-    this.js.push({
-      name: moduleRes.name,
-      modulePath: modulePathClean,
-      val: convertJsToString(js)
-    });
+    if(this.addedModules.indexOf(moduleRes.name) < 0) {
+
+      this.js.push({
+        name: moduleRes.name,
+        modulePath: modulePathClean,
+        val: convertJsToString(js)
+      });
+
+    }
 
   }
 
@@ -146,6 +153,9 @@ async function addModule(modulePath, data, args) {
   if(typeof moduleRes.markup === "string") {
     this.markup = moduleRes.markup;
   }
+
+  //mark this module as added
+  this.addedModules.push(moduleRes.name);
 
   return this;
 
@@ -163,6 +173,7 @@ export async function buildPage(template, pageData, isFetch, args) {
 
   // get the wrapper for the page if a fullpage request
   if (!isFetch) {
+    console.log("GET WRAPPER=====================================");
     await this.addModule.call(this, "src/components/wrapper.mjs");
   }
 
@@ -180,6 +191,7 @@ export function page() {
   this.markup = "";
   this.js = [];
   this.inits = "";
+  this.addedModules = [];
 
   this.buildPage = async function(template, pageData, isFetch, args) {
     return await buildPage.call(this, template, pageData, isFetch, args);

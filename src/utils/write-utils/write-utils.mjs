@@ -122,8 +122,6 @@ function writeEachJs(page, index, compress) {
 
   const savePath = `dist/js/${ jsObj.modulePath.replace("mjs", "js")}`;
 
-  //only add inits (to add listeners for example) if we are creating the main js file
-  const inits = (index === 0 && page.inits) ? page.inits : "";
   let scriptWithWindow = "";
 
   if (typeof jsVal === "string" && typeof name === "string") {
@@ -134,10 +132,19 @@ function writeEachJs(page, index, compress) {
 
   //if we are the first element, as it is the main js for the page,
   //check for inits in page and add them to the end of said js file
+  //only add inits (to add listeners for example) if we are creating the main js file
+  const inits = (index === 0 && page.inits) ? page.inits : "";
   scriptWithWindow += inits;
 
+  // console.log("INDEX: ", index);
+  // console.log("INITS: ", inits);
+
   if (typeof scriptWithWindow === "string" && typeof savePath === "string") {
-    // console.log("PAGE JS SAVEPATH", savePath);
+    // if(index === 0 || index === 1) {
+    // // if(savePath === "dist/js/page-standard.js") {
+    //   console.log("PAGE JS SAVEPATH", savePath);
+    //   console.log("SCRIPT", scriptWithWindow);
+    // }
     write(scriptWithWindow, savePath, compress);
   } else {
     throw new Error("writeJs passed invalid page object");
@@ -145,6 +152,7 @@ function writeEachJs(page, index, compress) {
   
   index++;
 
+  //iterate on this function if there is a next js "object"
   if (validateObj(page.js[index], "string")) {
     writeEachJs(page, index, compress);
   }
@@ -155,6 +163,7 @@ function writeEachJs(page, index, compress) {
 //function to compress and write js files for a full page request///////////////////////////
 export function writeJs(page, compress = false) {
 
+  // console.log("WRITEJS: ", page.js);  
 
   validateArgs(arguments, ["object"]); 
   (function () { 
