@@ -68,7 +68,7 @@ tap.test("writeMarkup tests", t => {
   clearFiles(["dist/pages-test",]);
 
   const page = {
-    modulePath: "src/markup/test-markup.mjs",
+    modulePath: "test-markup",
     markup: `<!DOCTYPE html>
     <html>dsfasdf</html>`
   };
@@ -92,7 +92,7 @@ tap.test("writeMarkup tests", t => {
   //////////////////////////////////////////////
 
   const pageMissingMarkup = {
-    modulePath: "src/markup/test-markup.mjs",
+    modulePath: "test-markup",
   };
 
   t.throws(() => writeMarkup(pageMissingMarkup), Error("validateArgsArgs - [object Undefined] is not string"));
@@ -118,11 +118,11 @@ tap.test("writeMarkup tests", t => {
 
 tap.test("write CSS tests", t => {
  
-  clearFiles(["dist/css-test"]);
+  clearFiles(["dist/css"]);
 
   const page = {
     css: [{
-      modulePath: "src/components/test.mjs",
+      modulePath: "test-css.mjs",
       val: `
           .thing { 
             color: red; 
@@ -131,10 +131,10 @@ tap.test("write CSS tests", t => {
     }]
   };
 
-  t.match(writeCss(page), true, "writeCssOrJs returned true");
-  t.match(fs.existsSync("dist/css/test.css"), true, "writeCssOrJs wrote test.mjs");
+  t.match(writeCss(page), true, "writeCss returned true");
+  t.match(fs.existsSync("dist/css/test-css.css"), true, "writeCss wrote test-css");
 
-  clearFiles(["dist/css"]);
+  // clearFiles(["dist/css"]);
 
   //////////////////////////////////////////////
 
@@ -187,18 +187,18 @@ tap.test("write CSS tests", t => {
 
 tap.test("write JS tests", t => {
  
-  clearFiles(["dist/js-test"]);
+  clearFiles(["dist/js"]);
 
   const page = {
     js: [{
       name: "test",
-      modulePath: "src/components/test.mjs",
+      modulePath: "test-js.mjs",
       val: "{ init: testFunction }"
     }]
   };
 
   t.match(writeJs(page), true, "writeJs returned true");
-  t.match(fs.existsSync("dist/js/test.js"), true, "writeJs wrote test.js");
+  t.match(fs.existsSync("dist/js/test-js.js"), true, "writeJs wrote test.js");
 
   clearFiles(["dist/js"]);
 

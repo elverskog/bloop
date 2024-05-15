@@ -64,7 +64,6 @@ export function write(val, savePath, compress) {
 }
 
 
-
 function writeEachCss(cssObj, compress) {
 
   validateArgs(arguments, ["object", "boolean"]); 
@@ -201,8 +200,6 @@ export function writeMarkup(page, compress = false) {
   if(process.env.NODE_ENV === "production" && fs.existsSync(savePath)) return;
 
   return write(page.markup, savePath, compress);
-
-  // return true;
 
 }
 

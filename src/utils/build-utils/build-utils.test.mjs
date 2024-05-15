@@ -1,6 +1,6 @@
 import tap from "tap";
 import { build } from "./build-utils.mjs";
-
+import { getPages } from "../data-utils.mjs";
 
 tap.test("test build", async t => {
 
@@ -15,7 +15,10 @@ tap.test("test build", async t => {
   t.rejects(() => build(pagePathsArray, null), Error("[object Null] is not boolean"));
   t.rejects(() => build(null, false), Error("[object Null] is not array"));
 
-  const result = await build(pagePathsArray, false);
+
+  const pagesData = await getPages("./src/utils/build-utils/mocks/content");
+
+  const result = await build(pagesData, false);
   t.match(result, [{
     title: String,
     name: String,

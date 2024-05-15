@@ -111,7 +111,7 @@ const server = http.createServer(async (req, res) => {
       try {
 
         const jsonFileName = `${ url.substring(1).replace("/", "~") }.json`;
-        const { default: pageData } = await import(`./content/pages/${jsonFileName}`, { assert: { type: "json" } });
+        const { default: pageData } = await import(`./content/pages/${jsonFileName}`, { with: { type: "json" } });
         const pageObj = new page();
 
         if (isFetch) {
@@ -183,10 +183,7 @@ if(process.env.NODE_ENV === "production") {
   ]);
 
   //get an array of paths to all valid pages
-  const pagesData = await getPages();
-
-  console.log("PAGEsDATA: ", pagesData);
-
+  const pagesData = await getPages("./content/pages");
   const buildObjectFullPages = await build(pagesData, false);
   const buildObjectModules = await build(pagesData, true);
 

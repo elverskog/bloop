@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 
 
-export async function getPages() {
+export async function getPages(path) {
 
   let fileNames;
   let res = [];
@@ -11,7 +11,7 @@ export async function getPages() {
     fileNames = fs.readdirSync("./content/pages");
 
     for (let index = 0; index < fileNames.length; index++) {
-      const { default: page } = await import(`../../content/pages/${fileNames[ index ]}`, { assert: { type: "json" } });
+      const { default: page } = await import(`../../content/pages/${fileNames[ index ]}`, { with: { type: "json" } });
       res.push(page);
     }
 
