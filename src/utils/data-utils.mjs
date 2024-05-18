@@ -19,8 +19,6 @@ export async function getPages(path) {
     throw new Error(error.message);
   }
 
-  console.log("RES: ", res);
-
   return res;
 
 }

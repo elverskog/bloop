@@ -80,8 +80,6 @@ tap.test("build-page-utils should return a valid object under certain conditions
   // const resultAllGood = await pageObj.buildPage(data, true, { label: "test" });
   const resultAllGood = await pageObj.buildPage(data.template, data, false, { label: "test" });
 
-  console.log("RESULT ALL GOOD: ", resultAllGood);
-
   t.match(resultAllGood, {
     modulePath: String,
     name: String,
